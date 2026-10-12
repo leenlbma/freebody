@@ -100,10 +100,36 @@ for (const bad of [{ freebody: 'import', version: 1, entries: [] }, { freebody: 
   { freebody: 'import', version: 1, entries: [{ type: 'body', id: 'b', date: '2026-01-01' }] }, { freebody: 'import', version: 1, entries: [{ type: 'workout', id: 'w', date: '2026-01-01', exercise: 'x', sets: [{ reps: 1.5 }] }] }]) {
   const e = []; validate(schema, bad, '$', e); if (!e.length) throw new Error('schema 校验器未能拒绝反例: ' + JSON.stringify(bad));
 }
-// skill：通用 Agent Skill 格式（frontmatter 含 name / description）
-const sk = fs.readFileSync(path.join(root, 'skills', 'freebody-coach', 'SKILL.md'), 'utf8');
-const fm = /^---\n([\s\S]*?)\n---\n/.exec(sk);
-if (!fm || !/^name:\s*freebody-coach\s*$/m.test(fm[1]) || !/^description:\s*\S/m.test(fm[1])) throw new Error('skills/freebody-coach/SKILL.md 缺少 frontmatter name / description');
+// skill：通用 Agent Skill 格式（frontmatter 含 name / description；description 不超过 1024 字符、不含尖括号）
+for (const f of ['SKILL.md', 'SKILL.en.md']) {
+  const sk = fs.readFileSync(path.join(root, 'skills', 'freebody-coach', f), 'utf8');
+  const fm = /^---\n([\s\S]*?)\n---\n/.exec(sk);
+  const dm = fm && /^description:\s*(?:"([^"\n]+)"|([^\n]+))$/m.exec(fm[1]);
+  if (!fm || !/^name:\s*freebody-coach\s*$/m.test(fm[1]) || !dm) throw new Error('skills/freebody-coach/' + f + ' 缺少 frontmatter name / description');
+  const desc = dm[1] || dm[2];
+  if (desc.length > 1024 || /[<>]/.test(desc)) throw new Error('skills/freebody-coach/' + f + ' 的 description 超过 1024 字符或含尖括号');
+  if (!/#import=/.test(desc) || !/schema/.test(desc)) throw new Error('skills/freebody-coach/' + f + ' 的 description 须写明输出（导入包 / #import 链接）');
+}
+// 「复制给你的 AI」提示词：README 与 skills/freebody-coach/PROMPT.md 必须逐字一致
+const promptRe = (lang) => new RegExp('<!-- freebody-prompt:' + lang + ' -->\\n```text\\n([\\s\\S]*?)\\n```\\n<!-- /freebody-prompt -->', 'g');
+const getPrompts = (f, lang) => [...fs.readFileSync(path.join(root, f), 'utf8').matchAll(promptRe(lang))].map((m) => m[1]);
+const promptMd = 'skills/freebody-coach/PROMPT.md';
+for (const [readme, lang] of [['README.md', 'zh'], ['README.en.md', 'en']]) {
+  const a = getPrompts(readme, lang), b = getPrompts(promptMd, lang);
+  if (a.length !== 1 || b.length !== 1) throw new Error(`提示词（${lang}）应在 ${readme} 与 ${promptMd} 中各出现一次，实际 ${a.length} / ${b.length}`);
+  if (a[0] !== b[0]) {
+    const la = a[0].split('\n'), lb = b[0].split('\n'); let i = 0; while (i < la.length && la[i] === lb[i]) i++;
+    throw new Error(`${readme} 与 ${promptMd} 的提示词（${lang}）不一致，第 ${i + 1} 行：\n  ${la[i]}\n  ${lb[i]}`);
+  }
+  const t = a[0], n = t.split('\n').length;
+  if (n > 30) throw new Error(`提示词（${lang}）共 ${n} 行，应不超过 30 行`);
+  for (const must of ['https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL', 'https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json', 'https://leenlbma.github.io/freebody/#import=', '"estimated": true'])
+    if (!t.includes(must)) throw new Error(`提示词（${lang}）缺少 ${must}`);
+  const ex = /^\s*(\{"freebody":"import"[\s\S]*?^\s*\]\})\s*$/m.exec(t);
+  if (!ex) throw new Error(`提示词（${lang}）缺少导入包示例`);
+  checkPack(JSON.parse(ex[1]), `提示词（${lang}）中的示例`);
+}
 console.log(`[ok] 导入包 schema 校验通过（示例 ${nPack} 个、${nEnt} 条；文档示例 ${nDoc} 个；反例均被拒绝）`);
+console.log('[ok] skill frontmatter 合规；README 与 PROMPT.md 的提示词（中 / 英）一致');
 console.log(`[ok] 食物库 ${foods.length} 项，id / ref 校验通过`);
 console.log(`[ok] 语法检查通过（${scripts.length} 段脚本）`);

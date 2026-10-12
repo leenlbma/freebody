@@ -4,6 +4,16 @@
 
 ## [未发布]
 
+## [2.5.1] - 2026-10-13
+
+### 新增
+- **「复制给你的 AI」**：README 与 README.en.md 首屏新增一段可直接复制的提示词（中 / 英各一份，不超过 30 行），让任何 AI 扮演 FreeBody 教练。能联网的 AI 先读取 skill 和 schema；不能联网时按内联要点执行：导入包格式、`https://leenlbma.github.io/freebody/#import=` 链接格式、估算标注、不做医疗诊断。
+- `skills/freebody-coach/PROMPT.md`：同一段提示词（中英文）。
+
+### 变更
+- skill 的 `description` 补全为通用 Agent Skill 规范的写法：何时触发、能做什么、输出什么；正文开头新增「概览」。英文版同步。
+- `npm run check` 新增校验：README / README.en.md 中的提示词必须与 PROMPT.md 逐字一致，不超过 30 行，包含必需的地址与要点，内含示例符合 schema；skill 的 description 不超过 1024 字符。
+
 ## [2.5.0] - 2026-10-12
 
 定位调整为「AI 健身教练的仪表盘」：用户与自己的 AI 聊训练和饮食，AI 生成数据，FreeBody 负责本地存储与可视化。
