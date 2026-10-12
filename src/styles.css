@@ -328,6 +328,19 @@ input::-webkit-datetime-edit{padding:0;line-height:20px}
 input::-webkit-date-and-time-value{min-height:20px}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select){height:var(--bh)}
 .dnav input{height:var(--bhs)}.pe-row input,.pe-row select,.pe-row2 input,.pe-row2 select{height:36px}.ck-t input:not([type=range]){height:var(--bhs)}.mini-sel{height:auto}
+/* v2.3.3 iOS WebKit：日期 / 时间 / 下拉统一外观与高度；空日期显示占位文字 */
+input[type=date],input[type=time],input[type=datetime-local],input[type=month]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
+input::-webkit-date-and-time-value{text-align:left;margin:0}
+input::-webkit-calendar-picker-indicator{opacity:.6;margin:0 0 0 4px}
+.dtw{position:relative;display:block;min-width:0}
+.dtw.dt-empty>input{color:transparent}
+.dtw.dt-empty>input::-webkit-datetime-edit{color:transparent}
+.dtw.dt-empty::after{content:attr(data-ph);position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none;font-size:15px;line-height:20px;white-space:nowrap}
+.dtw.dt-empty>input:focus{color:var(--fg)}.dtw.dt-empty:has(>input:focus)::after{content:none}
+.dtw.dt-empty>input:focus::-webkit-datetime-edit{color:var(--fg)}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e96' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px 16px;padding-right:32px}
+.pe-row select,.pe-row2 select,.mini-sel{background-position:right 4px center;background-size:14px 14px;padding-right:20px}
+.grid2>div:has(>.dtw){display:flex;flex-direction:column;justify-content:flex-end}
 /* 快捷入口：等宽网格 */
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 @media(min-width:600px){.chips{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}

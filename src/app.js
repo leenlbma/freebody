@@ -147,7 +147,7 @@ function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(
  if(a){var tot=0,dn=0;a.items.forEach(function(x){tot+=x.sets.length;dn+=x.sets.filter(function(s){return s.done;}).length;});
   th='<div class="mut">训练进行中</div><h2 class="rec-t">'+esc(a.name)+'</h2><div class="mut">已完成 '+dn+' / '+tot+' 组</div><button class="btn-big" data-ss="rec">'+IC('play')+'继续训练</button>';}
  else if(ws.length){var n=ws.reduce(function(s,w){return s+(w.sets||1);},0);
-  th='<div class="mut">今日训练</div><h2 class="rec-t">已完成 '+n+' 组</h2><div class="mut">训练量 '+Math.round(dayVol(sel))+' kg</div><button class="ghost btn-big" data-sub="train">查看</button>';}
+  th='<div class="mut">今日训练</div><h2 class="rec-t">已完成 '+n+' 组</h2><div class="mut">'+(dayVol(sel)>0?'训练量 '+Math.round(dayVol(sel))+' kg':'自重训练')+'</div><button class="ghost btn-big" data-sub="train">查看</button>';}
  else th='<div class="mut">今日推荐</div><h2 class="rec-t">'+esc(rc.title)+'</h2><div class="mut">'+esc(rc.why)+'</div><button class="btn-big'+(rc.rest?' ghost':'')+'" data-ss="rec">'+IC('play')+(rc.rest?'仍要训练':'开始训练')+'</button>';
  $('#ovTrain').innerHTML=th;
  var left=Math.round(g.kcal-t.k),pl=Math.max(0,Math.round(g.p-t.p)),nm=dayMeals(sel).length;
@@ -458,8 +458,8 @@ function rTrain(){rSession();if(cur==='train'&&!(S.active||showSummary||editPlan
  $('#exList').innerHTML=Object.keys(names).map(function(n){return'<option value="'+esc(n)+'">';}).join('');
  $('#exTpl').innerHTML='<span class="mut">示例动作：</span>'+EX_PRESETS.slice(0,8).map(function(e){return'<button class="chip" data-ex="'+esc(e)+'">'+esc(e)+'</button>';}).join('');
  var ws=S.workouts.filter(function(w){return w.date===sel;});
- $('#wVolTxt').textContent=Math.round(dayVol(sel))+' kg';$('#wTodayCard').style.display=ws.length?'':'none';
- $('#wList').innerHTML=ws.length?'<ul class="list">'+ws.map(function(w){return'<li><div><b>'+esc(w.exercise)+'</b> '+w.sets+'×'+w.reps+' @ '+w.weight+'kg'+(w.rpe?' <span class="tag">RPE '+w.rpe+(rirOf(w)!=null?' · RIR '+rirOf(w):'')+'</span>':'')+(w.wrist?' <span class="tag" style="color:var(--bad)">'+IC('bandage')+esc(flagLabel())+'</span>':'')+'<div class="mut">训练量 '+Math.round(vol(w))+' kg'+(w.note?' · '+esc(w.note):'')+'</div></div><button class="del" data-delw="'+w.id+'">'+IC('x')+'</button></li>';}).join('')+'</ul>':'<div class="mut">暂无记录</div>';
+ $('#wVolTxt').textContent=dayVol(sel)>0?Math.round(dayVol(sel))+' kg':'';$('#wTodayCard').style.display=ws.length?'':'none';
+ $('#wList').innerHTML=ws.length?'<ul class="list">'+ws.map(function(w){return'<li><div><b>'+esc(w.exercise)+'</b> '+w.sets+'×'+w.reps+(w.weight>0?' @ '+w.weight+'kg':' · 自重')+(w.rpe?' <span class="tag">RPE '+w.rpe+(rirOf(w)!=null?' · RIR '+rirOf(w):'')+'</span>':'')+(w.wrist?' <span class="tag" style="color:var(--bad)">'+IC('bandage')+esc(flagLabel())+'</span>':'')+'<div class="mut">'+[vol(w)>0?'训练量 '+Math.round(vol(w))+' kg':'',w.note?esc(w.note):''].filter(Boolean).join(' · ')+'</div></div><button class="del" data-delw="'+w.id+'">'+IC('x')+'</button></li>';}).join('')+'</ul>':'<div class="mut">暂无记录</div>';
  var cs=S.cardio.filter(function(c){return c.date===sel;});
  $('#cList').innerHTML=cs.length?'<ul class="list">'+cs.map(function(c){return'<li><div>爬楼 '+c.min+' 分'+(c.floors?' · '+c.floors+' 层':'')+(c.hr?' · 心率 '+c.hr:'')+'</div><button class="del" data-delc="'+c.id+'">'+IC('x')+'</button></li>';}).join('')+'</ul>':'';
  if(cur==='tstats')chTrain();chPerf();rPerfTests();
@@ -849,7 +849,10 @@ function sessAction(act,t){var a=S.active,it=a&&a.items[a.cur],j=a?curSet(a):nul
  if(!a)return;
  if(act==='w'||act==='r'){if(j==null)return;var s=it.sets[j],stp=act==='w'?(defInc(it.ex,s.w)>=2.5?2.5:1):1;s[act]=Math.max(0,r1(s[act]+(+v)*stp));save();rSession();return;}
  if(act==='rir'){if(j==null)return;it.sets[j].rir=+v;save();rSession();return;}
- if(act==='done'){if(j==null)return;var st=it.sets[j];var e={id:uid(),date:a.date,exercise:it.ex,sets:1,reps:st.r,weight:st.w,rir:st.rir,rpe:10-st.rir,target:{reps:st.tr,weight:st.tw},session:a.id,note:'',wrist:!!it.wrist};
+ if(act==='done'){if(j==null)return;var st=it.sets[j];
+  if(!(st.r>0)){toast('次数为 0，不计入本组；请先点「调整」填写次数');adjOpen=true;render();return;}
+  if(!(st.w>0)&&!it.zeroOk){if(!confirm('当前重量为 0 kg。\n自重动作可直接记录；负重动作请先点「调整」填写重量。\n\n确定按 0 kg（自重）记录？')){adjOpen=true;render();return;}it.zeroOk=true;}
+  var e={id:uid(),date:a.date,exercise:it.ex,sets:1,reps:st.r,weight:st.w,rir:st.rir,rpe:10-st.rir,target:{reps:st.tr,weight:st.tw},session:a.id,note:'',wrist:!!it.wrist};
   S.workouts.push(e);st.done=true;st.eid=e.id;st.miss=st.r<st.tr;
   it.sets.forEach(function(s2,i2){if(i2>j&&!s2.done&&s2.w===s2.tw)s2.w=st.w;});
   if(curSet(a)==null){var nx=a.items.findIndex(function(x){return x.sets.some(function(s2){return!s2.done;});});if(nx>=0)a.cur=nx;}
@@ -866,12 +869,15 @@ function sessAction(act,t){var a=S.active,it=a&&a.items[a.cur],j=a?curSet(a):nul
   if(doneSets<a.items.reduce(function(n,x){return n+x.sets.length;},0)&&!confirm('还有未完成的组，确定结束？'))return;finishSession();return;}
  if(act==='discard'){if(!confirm('放弃本次训练并删除已记录的组？'))return;var ids=[];a.items.forEach(function(x){x.sets.forEach(function(s){if(s.eid)ids.push(s.eid);});});S.workouts=S.workouts.filter(function(x){return ids.indexOf(x.id)<0;});S.active=null;save();render();return;}}
 function readPlanForm(){if(!editPlan)return;editPlan.name=($('#peName2')||{}).value||editPlan.name;editPlan.items.forEach(function(x,i){var g=function(f){var el=document.getElementById('pe-'+f+'-'+i);return el?el.value:null;};x.ex=(g('ex')||'').trim();x.sets=num(g('sets'))||3;x.lo=num(g('lo'))||8;x.hi=num(g('hi'));x.rule=g('rule')||'linear';});}
+/** 会话小结的组记录（存储格式「次×kg」保持不变，仅显示时转换）：5×60 → 5 次 × 60 kg；5×0 → 5 次 · 自重 */
+function fmtSessSets(t){var parts=String(t||'').split(' / '),out=[],i=0;while(i<parts.length){var m=/^(\d+(?:\.\d+)?)×(\d+(?:\.\d+)?)$/.exec(parts[i]),k=1;while(i+k<parts.length&&parts[i+k]===parts[i])k++;
+  var s=m?(+m[2]>0?m[1]+' 次 × '+m[2]+' kg':m[1]+' 次 · 自重'):parts[i];out.push(k>1?k+' 组 '+s:s);i+=k;}return out.join(' / ');}
 function finishSession(){var a=S.active,end=Date.now(),res=[],tot=0,vol0=0,prs=[];
- a.items.forEach(function(it){var ds=it.sets.filter(function(s){return s.done;});if(!ds.length)return;tot+=ds.length;var v=ds.reduce(function(n,s){return n+s.w*s.r;},0);vol0+=v;
+ a.items.forEach(function(it){var ds=it.sets.filter(function(s){return s.done&&s.r>0;});if(!ds.length)return;tot+=ds.length;var v=ds.reduce(function(n,s){return n+s.w*s.r;},0);vol0+=v;
   var best=Math.max.apply(null,ds.map(function(s){return epley({weight:s.w,reps:s.r})||0;})),prev=S.workouts.filter(function(w){return w.exercise===it.ex&&w.date<a.date;}).reduce(function(m,w){return Math.max(m,epley(w)||0);},0);
   if(best>0&&prev>0&&best>prev+0.05)prs.push(it.ex+' 估算1RM '+r1(best)+'kg（+'+r1(best-prev)+'）');
   res.push({ex:it.ex,sets:ds.map(function(s){return s.r+'×'+s.w;}).join(' / '),miss:ds.some(function(s){return s.miss;})});});
- var saved=sel;sel=addDays(a.date,1);res.forEach(function(r){var nt=nextTarget(r.ex);r.next=nt?nt.w+'kg × '+nt.reps:'';r.why=nt?nt.why:'';});sel=saved;
+ var saved=sel;sel=addDays(a.date,1);res.forEach(function(r){var nt=nextTarget(r.ex);r.next=nt?(nt.w>0?nt.w+' kg × '+nt.reps+' 次':nt.reps+' 次（自重）'):'';r.why=nt?nt.why:'';});sel=saved;
  var sm={id:a.id,date:a.date,name:a.name,start:a.start,end:end,sets:tot,volume:Math.round(vol0),prs:prs,items:res};S.sessions.push(sm);S.active=null;showSummary=sm.id;save();toast('训练完成');render();window.scrollTo(0,0);}
 function tickRest(){if(restTimer)return;restTimer=setInterval(function(){var a=S.active;if(!a){clearInterval(restTimer);restTimer=null;return;}
  var el=document.getElementById('ssElapsed');if(el)el.textContent=fmtDur(Date.now()-a.start);
@@ -888,9 +894,9 @@ function recPlan(){var rc=recommend(),p=rc.keys&&rc.keys.length?bestPlanFor(rc.k
  return{id:null,name:tp[0],items:tp[1].map(function(x){return{ex:x[0],sets:x[1],lo:x[2],hi:x[3],rule:x[4]};})};}
 function rSession(){var box=$('#sessBox');if(!box)return;var a=S.active,pb0=$('#plansBox'),mw=$('#musWrap');if(pb0)pb0.innerHTML='';if(mw)mw.style.display=(a||showSummary||editPlan)?'none':'';
  if(showSummary){var sm=S.sessions.find(function(x){return x.id===showSummary;});if(sm){box.innerHTML='<div class="card"><div class="sess-h"><div><div class="mut">训练完成</div><h2 class="rec-t">'+esc(sm.name)+'</h2></div>'+IC('trophy')+'</div>'+
-  '<div class="kpis"><div><b>'+fmtDur(sm.end-sm.start)+'</b><span>时长</span></div><div><b>'+sm.sets+'</b><span>组</span></div><div><b>'+(sm.volume>=1000?r1(sm.volume/1000)+'k':sm.volume)+'</b><span>kg</span></div><div><b>'+sm.prs.length+'</b><span>纪录</span></div></div>'+
+  '<div class="kpis"><div><b>'+fmtDur(sm.end-sm.start)+'</b><span>时长</span></div><div><b>'+sm.sets+'</b><span>组</span></div><div><b>'+(!sm.volume?'—':sm.volume>=1000?r1(sm.volume/1000)+'k':sm.volume)+'</b><span>训练量 kg</span></div><div><b>'+sm.prs.length+'</b><span>纪录</span></div></div>'+
   (sm.prs.length?'<div class="why">'+IC('medal')+'<span>'+sm.prs.map(esc).join('<br>')+'</span></div>':'')+
-  '<ul class="list">'+sm.items.map(function(r){return'<li><div><b>'+esc(r.ex)+'</b> <span class="st">'+esc(r.sets)+'</span>'+(r.next?'<div class="mut">下次 '+esc(r.next)+' · '+esc(r.why)+'</div>':'')+'</div></li>';}).join('')+'</ul>'+
+  '<ul class="list">'+sm.items.map(function(r){return'<li><div><b>'+esc(r.ex)+'</b> <span class="st">'+esc(fmtSessSets(r.sets))+'</span>'+(r.next?'<div class="mut">下次 '+esc(r.next)+' · '+esc(r.why)+'</div>':'')+'</div></li>';}).join('')+'</ul>'+
   '<button class="btn-big" data-ss="summary-close">完成</button></div>';return;}}
  if(a){tickRest();var total=0,dn=0;a.items.forEach(function(x){total+=x.sets.length;dn+=x.sets.filter(function(s){return s.done;}).length;});var it=a.items[a.cur],j=curSet(a),s=it&&j!=null?it.sets[j]:null;
   var h='<div class="card"><div class="sess-h"><div><div class="mut">'+esc(a.name)+' · '+dn+'/'+total+' 组</div><span class="big" id="ssElapsed">'+fmtDur(Date.now()-a.start)+'</span></div><button class="'+(dn===total?'':'ghost ')+'sm" data-ss="finish">'+IC('flag')+'结束</button></div><div class="pbar"><i style="width:'+(total?dn/total*100:0)+'%"></i></div></div>';
@@ -1104,7 +1110,13 @@ function layFill(){var hd=document.querySelector('header');if(hd)document.docume
  var row=[],used=0,flush=function(){if(row.length&&used<cols){var w=Math.floor(cols/row.length);if(w*row.length===cols)row.forEach(function(x){x.el.style.gridColumn='span '+w;});else row[row.length-1].el.style.gridColumn='span '+(row[row.length-1].s+cols-used);}row=[];used=0;};
  kids.forEach(function(el){if(getComputedStyle(el).display==='none')return;var m=/span (\d+)/.exec(getComputedStyle(el).gridColumnStart),s=m?+m[1]:cols;
   if(s>=cols){flush();return;}if(used+s>cols)flush();row.push({el:el,s:s});used+=s;if(used===cols){row=[];used=0;}});flush();}
-(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();layFill();};})();a11y();layFill();window.addEventListener('resize',layFill);
+/* 日期 / 时间输入：iOS Safari 空值时不显示任何提示，包一层显示占位文字（顶部日期栏始终有值，不处理） */
+var DT_PH={date:'选择日期',time:'选择时间','datetime-local':'选择日期时间',month:'选择月份'};
+function dtWrap(){document.querySelectorAll('input[type=date],input[type=time],input[type=datetime-local],input[type=month]').forEach(function(el){if(el.id==='dSel')return;var w=el.parentNode;
+  if(!w.classList||!w.classList.contains('dtw')){w=document.createElement('span');w.className='dtw';el.parentNode.insertBefore(w,el);w.appendChild(el);}
+  w.setAttribute('data-ph',el.getAttribute('placeholder')||DT_PH[el.type]||'选择');w.classList.toggle('dt-empty',!el.value);});}
+['input','change','blur'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('dtw'))t.parentNode.classList.toggle('dt-empty',!t.value);},true);});
+(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();dtWrap();layFill();};})();a11y();dtWrap();layFill();window.addEventListener('resize',layFill);
 function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
 /** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */
 document.addEventListener('keydown',function(e){var t=e.target;
