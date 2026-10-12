@@ -2,7 +2,7 @@
 // 数据：演示模式不碰本机存储；链接导入；损坏数据不被覆盖
 const fs = require('fs');
 const path = require('path');
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 const { openSection, watchErrors } = require('./helpers');
 
 test('演示模式：有数据可看，但不读取也不写入 localStorage', async ({ page }) => {

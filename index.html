@@ -2393,7 +2393,7 @@ window.FIT_DATA = {"foods":{"version":4,"per":"100g","note":"常见食物每100g
  */
 (function(){
 'use strict';
-var FB_VERSION = "2.10.0";
+var FB_VERSION = "2.11.0";
 /* 00-core.js — 常量、导航配置、预设 */
 /** localStorage 键名；LEGACY_KEYS 用于从旧版本自动迁移 */
 var KEY = 'freeBody_v1',
@@ -4674,8 +4674,9 @@ function bkDecrypt(d, pw) {
       }
     );
 }
+/* 09-init.js — 初始化：读取本机数据或生成演示数据 */
 /* ---------- 初始化状态 ----------
- * 00–05 只定义常量与函数，这里才真正读取本机数据（演示模式则生成虚构数据）。
+ * 00–06 只定义常量与函数，这里才真正读取本机数据（演示模式则生成虚构数据）。
  * 放在纯逻辑模块之后、界面模块之前，界面代码可以直接使用 S。 */
 S = DEMO ? demoData(today()) : load();
 (S.customFoods || []).forEach(function (f) {

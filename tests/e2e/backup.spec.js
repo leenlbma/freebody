@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // 加密备份往返；API Key 可以只在本次使用。只用测试内临时写入的虚构记录
 const fs = require('fs');
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 const { openSection, watchErrors } = require('./helpers');
 
 const FAKE = {

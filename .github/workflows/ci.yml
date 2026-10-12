@@ -39,9 +39,13 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test:e2e
+      - name: 端到端测试（Chromium 收集覆盖率）
+        run: npm run test:e2e
         env:
           CI: '1'
+          FB_COVERAGE: '1'
+      - name: 端到端覆盖率（src/app 合计 ≥ 60%）
+        run: node scripts/e2e-coverage.js --min 60
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

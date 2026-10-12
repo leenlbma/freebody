@@ -11,6 +11,7 @@
 | Unit tests | `npm test` | The logic modules 00–09: totals, readiness, progression, 1RM, BMR, fatigue, quick entry, CSV, import merge and undo, link decoding, storage warnings, corrupt-data protection, demo data | Local / CI |
 | Coverage | `npm run test:coverage` | As above, with per-file coverage; CI requires at least 85% line coverage of the logic modules | Local / CI |
 | End to end | `npm run test:e2e` | Chromium and WebKit at iPhone 13 size: every page without script errors, navigation, quick entry, axe 0 violations (light / dark), reduced motion, chart text alternatives, demo mode never writes storage, link import, corrupt data | Local / CI |
+| End-to-end coverage | `npm run test:e2e:coverage` | Collects V8 coverage of the app script in Chromium and reports, per module, the share of non-whitespace characters executed; CI requires at least 60% for src/app overall | Local / CI |
 | Real devices | [device-test.en.md](device-test.en.md) | Home-screen mode, safe areas, screen readers, real storage and the service worker | **Only someone with the device can do this** |
 
 ## End-to-end tests
@@ -43,4 +44,4 @@ Arrays from the sandbox belong to another realm, so spread them (`[...arr]`) bef
 
 - **WebKit is not iOS Safari:** emulated WebKit differs from iOS Safari, so home-screen mode and safe areas can only be confirmed on a real device.
 - **Automated a11y checks are partial:** axe and similar tools catch only some accessibility problems. The screen-reader experience still needs VoiceOver / TalkBack testing.
-- **UI modules lack unit coverage:** the UI modules (10–90) have no unit coverage figure and are covered only by the end-to-end tests.
+- **UI modules lack unit tests:** the UI modules (10–90) are covered only by the end-to-end tests: about 66% overall as of v2.11.0, measured by characters, which is not comparable with the unit tests' line coverage. The training, quick-entry and import modules are still below 50%.
