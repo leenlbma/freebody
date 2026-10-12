@@ -333,15 +333,9 @@ input::-webkit-date-and-time-value{min-height:20px}
 input[type=date],input[type=time],input[type=datetime-local],input[type=month]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
 input::-webkit-date-and-time-value{text-align:left;margin:0}
 input::-webkit-calendar-picker-indicator{opacity:.6;margin:0 0 0 4px}
-.dtw{position:relative;display:block;min-width:0}
-.dtw.dt-empty>input{color:transparent}
-.dtw.dt-empty>input::-webkit-datetime-edit{color:transparent}
-.dtw.dt-empty::after{content:attr(data-ph);position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none;font-size:15px;line-height:20px;white-space:nowrap}
-.dtw.dt-empty>input:focus{color:var(--fg)}.dtw.dt-empty:has(>input:focus)::after{content:none}
-.dtw.dt-empty>input:focus::-webkit-datetime-edit{color:var(--fg)}
 select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e96' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px 16px;padding-right:32px}
 .pe-row select,.pe-row2 select,.mini-sel{background-position:right 4px center;background-size:14px 14px;padding-right:20px}
-.grid2>div:has(>.dtw){display:flex;flex-direction:column;justify-content:flex-end}
+.grid2>div:has(>.dtf){display:flex;flex-direction:column;justify-content:flex-end}
 /* 快捷入口：等宽网格 */
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 @media(min-width:600px){.chips{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
@@ -514,8 +508,6 @@ main{padding:12px 12px 24px}
 @media(min-width:600px){#dietAI.on{display:block;max-width:720px;margin:0 auto}.ai-slot img{height:280px}.ai-slots.n2 .ai-slot img{height:220px}.ai-slot{min-height:220px}}
 /* ---------- v2.4 首页 / 侧栏 / 页头 ---------- */
 .nav-brand{display:none}
-#dSel::-webkit-calendar-picker-indicator{display:none}
-#dSel{cursor:pointer;text-align:center}
 .hello-bar{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut);padding:0 0 0 14px;border:1px solid var(--bd);border-radius:12px;min-height:44px;margin-bottom:12px}
 .hello-bar>span{flex:1;min-width:0}.hello-bar>.ic{flex:none;width:16px;height:16px}
 .hello-x{width:44px;min-height:44px!important;padding:0!important;background:transparent!important;color:var(--mut)!important;flex:none;border-radius:12px!important}
@@ -587,3 +579,23 @@ input[list]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 input[list]::-webkit-calendar-picker-indicator{opacity:0}
 input[list]{padding-right:34px;text-overflow:ellipsis}
 @media(max-width:599px){#aiCard .grid2{grid-template-columns:1fr}}
+
+/* ===== v2.4.1 日期 / 时间字段：可见普通元素 + 透明原生 input（WebKit 下不再偏移） ===== */
+.dtf{position:relative;display:flex;align-items:center;gap:8px;box-sizing:border-box;width:100%;min-width:0;height:var(--bh);padding:0 12px;background:var(--in);border:1px solid transparent;border-radius:12px;color:var(--fg);font-size:15px;line-height:20px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dtf-v{flex:1;min-width:0;display:block;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.dtf.dt-empty .dtf-v{color:var(--mut)}
+.dtf-i{flex:none;display:inline-flex;align-items:center;color:var(--mut)}.dtf-i svg{width:18px;height:18px}
+.dtf>input,header .dtf>#dSel{position:absolute!important;inset:-1px;z-index:1;display:block;box-sizing:border-box;width:calc(100% + 2px)!important;max-width:none!important;height:calc(100% + 2px)!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:inherit;background:transparent!important;box-shadow:none!important;opacity:0;-webkit-appearance:none;appearance:none;color:transparent;font-size:16px;cursor:pointer}
+.dtf>input::-webkit-calendar-picker-indicator{display:none}
+.dtf:has(>input:focus){border-color:var(--acc)}
+.dtf:has(>input:focus-visible),.dtf:has(>input:focus){box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 70%,transparent)}
+/* 顶部日期栏：一个 44px 高的步进条「‹ 日期 ›」，左缘与 logo、内容对齐；「今天」在右侧，已是今天时保留占位 */
+header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
+.dnav{display:inline-flex!important;align-items:center;gap:0!important;flex:none;height:var(--bh);padding:0;background:var(--in);border-radius:12px}
+.dnav>button{flex:none;width:var(--bh)!important;height:var(--bh)!important;min-height:var(--bh)!important;padding:0!important;margin:0;border-radius:12px;background:transparent!important;color:var(--fg)}
+.dnav>button svg{width:20px;height:20px}
+@media(hover:hover){.dnav>button:hover{background:color-mix(in srgb,var(--fg) 7%,transparent)!important}}
+.dnav>.dtf-bar{flex:none;width:auto;min-width:136px;padding:0 6px;background:transparent;border-color:transparent;border-radius:10px;justify-content:center;font-weight:600}
+.dtf-bar .dtf-v{flex:none;text-align:center}
+#dToday{flex:none;height:var(--bh)!important;min-height:var(--bh)!important;padding:0 14px}
+@media(max-width:599px){header{padding-left:16px;padding-right:16px}main{padding-left:16px;padding-right:16px}}

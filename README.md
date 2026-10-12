@@ -3,7 +3,7 @@
 <p align="center">离线、单文件的个人训练与饮食记录。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.4.0-2148b8" alt="version 2.4.0">
+<img src="https://img.shields.io/badge/version-2.4.1-2148b8" alt="version 2.4.1">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>

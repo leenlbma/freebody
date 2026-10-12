@@ -76,7 +76,6 @@ var grp=!direct&&GROUPS.find(function(g){return g[0]===id;});if(grp)id=HUB[grp[0
 
 /* ---------- 日期 ---------- */
 $('#dSel').value=sel;
-$('#dSel').addEventListener('click',function(){try{if(this.showPicker)this.showPicker();}catch(e){}});
 $('#dSel').onchange=function(){if(this.value){sel=this.value;render();}};
 $('#dPrev').onclick=function(){sel=addDays(sel,-1);$('#dSel').value=sel;render();};
 $('#dNext').onclick=function(){sel=addDays(sel,1);$('#dSel').value=sel;render();};
@@ -1305,12 +1304,36 @@ function layFill(){var hd=document.querySelector('header');if(hd)document.docume
  var row=[],used=0,flush=function(){if(row.length&&used<cols){var w=Math.floor(cols/row.length);if(w*row.length===cols)row.forEach(function(x){x.el.style.gridColumn='span '+w;});else row[row.length-1].el.style.gridColumn='span '+(row[row.length-1].s+cols-used);}row=[];used=0;};
  kids.forEach(function(el){if(getComputedStyle(el).display==='none')return;var m=/span (\d+)/.exec(getComputedStyle(el).gridColumnStart),s=m?+m[1]:cols;
   if(s>=cols){flush();return;}if(used+s>cols)flush();row.push({el:el,s:s});used+=s;if(used===cols){row=[];used=0;}});flush();}
-/* 日期 / 时间输入：iOS Safari 空值时不显示任何提示，包一层显示占位文字（顶部日期栏始终有值，不处理） */
+/* 日期 / 时间输入（v2.4.1）：WebKit 去掉原生外观后，内部 ::-webkit-date-and-time-value 仍带 margin 与行高，文字会贴顶、框高不一。
+   改为「可见的普通元素显示格式化值 + 透明的原生 input 覆盖其上唤起选择器」。原生 input 仍是真实的表单控件（可聚焦、可读屏、值不变）。 */
 var DT_PH={date:'选择日期',time:'选择时间','datetime-local':'选择日期时间',month:'选择月份'};
-function dtWrap(){document.querySelectorAll('input[type=date],input[type=time],input[type=datetime-local],input[type=month]').forEach(function(el){if(el.id==='dSel')return;var w=el.parentNode;
-  if(!w.classList||!w.classList.contains('dtw')){w=document.createElement('span');w.className='dtw';el.parentNode.insertBefore(w,el);w.appendChild(el);}
-  w.setAttribute('data-ph',el.getAttribute('placeholder')||DT_PH[el.type]||'选择');w.classList.toggle('dt-empty',!el.value);});}
-['input','change','blur'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('dtw'))t.parentNode.classList.toggle('dt-empty',!t.value);},true);});
+var DT_WD=['周日','周一','周二','周三','周四','周五','周六'];
+function dtFmt(el){var v=el.value;if(!v)return'';var m;
+ if(el.type==='date'&&(m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v))){var y=+m[1],mo=+m[2],d=+m[3];
+  if(el.id==='dSel'){var wd=DT_WD[new Date(y,mo-1,d).getDay()];return(y===new Date().getFullYear()?'':y+'年')+mo+'月'+d+'日 '+wd;}
+  return y+'年'+mo+'月'+d+'日';}
+ if(el.type==='time')return v.slice(0,5);
+ if(el.type==='month'&&(m=/^(\d{4})-(\d{2})$/.exec(v)))return m[1]+'年'+(+m[2])+'月';
+ if(el.type==='datetime-local')return v.replace('T',' ').slice(0,16);
+ return v;}
+function dtSync(el){var w=el.parentNode;if(!w||!w.classList||!w.classList.contains('dtf'))return;var t=dtFmt(el),v=w.querySelector('.dtf-v');
+ if(v)v.textContent=t||el.getAttribute('placeholder')||DT_PH[el.type]||'选择';w.classList.toggle('dt-empty',!t);}
+var DT_DESC=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
+function dtWrap(){document.querySelectorAll('input[type=date],input[type=time],input[type=datetime-local],input[type=month]').forEach(function(el){
+  var w=el.parentNode;
+  if(!w.classList||!w.classList.contains('dtf')){w=document.createElement('span');w.className='dtf'+(el.id==='dSel'?' dtf-bar':'');el.parentNode.insertBefore(w,el);
+   var v=document.createElement('span');v.className='dtf-v';v.setAttribute('aria-hidden','true');w.appendChild(v);
+   if(el.id!=='dSel'){var ic=document.createElement('span');ic.className='dtf-i';ic.setAttribute('aria-hidden','true');ic.innerHTML=IC(el.type==='time'?'clock':'calendar');w.appendChild(ic);}
+   w.appendChild(el);
+   if(DT_DESC&&DT_DESC.set)try{Object.defineProperty(el,'value',{configurable:true,get:function(){return DT_DESC.get.call(this);},set:function(x){DT_DESC.set.call(this,x);dtSync(this);}});}catch(e){}
+   if(!el.getAttribute('aria-label')){var lb=w.parentNode&&w.parentNode.querySelector('label');if(lb)el.setAttribute('aria-label',lb.textContent.trim());}
+  }
+  dtSync(el);});}
+function dtPick(el){if(window.matchMedia&&matchMedia('(pointer:coarse)').matches)return false;try{if(el.showPicker){el.showPicker();return true;}}catch(e){}return false;}
+['input','change','blur'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.tagName==='INPUT')dtSync(t);},true);});
+document.addEventListener('click',function(e){var t=e.target;if(t&&t.tagName==='INPUT'&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('dtf'))dtPick(t);},true);
+document.addEventListener('keydown',function(e){var t=e.target;if(!(t&&t.tagName==='INPUT'&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('dtf')))return;
+ if(e.key==='Enter'||e.key===' '){if(dtPick(t))e.preventDefault();}},true);
 (function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();dtWrap();todayBtn();layFill();};})();a11y();dtWrap();todayBtn();layFill();window.addEventListener('resize',layFill);
 function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
 /** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */

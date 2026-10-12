@@ -16,6 +16,8 @@
     theme: '<circle cx="12" cy="12" r="8"/><path d="M12 4v16a8 8 0 0 0 0-16z"/>',
     left: '<path d="M14.5 6 8.5 12l6 6"/>',
     right: '<path d="M9.5 6l6 6-6 6"/>',
+    calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+    clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>',
     x: '<path d="M7 7l10 10M17 7 7 17"/>',
     check: '<path d="M5 12.5 10 17l9-10"/>',
     repeat: '<path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L19.5 9M19.5 4.5V9H15M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4.5 15M4.5 19.5V15H9"/>',
