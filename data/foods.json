@@ -20,9 +20,9 @@
       ],
       "servings": [
         {
-          "unit": "碗",
           "g": 200,
-          "label": "1碗米饭≈200g"
+          "label": "1碗米饭≈200g",
+          "unit": "碗"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -42,9 +42,9 @@
       ],
       "servings": [
         {
-          "unit": "碗",
           "g": 250,
-          "label": "1碗面条≈250g"
+          "label": "1碗面条≈250g",
+          "unit": "碗"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -64,9 +64,9 @@
       ],
       "servings": [
         {
-          "unit": "勺",
           "g": 10,
-          "label": "1勺燕麦片≈10g"
+          "label": "1勺燕麦片≈10g",
+          "unit": "勺"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -87,9 +87,9 @@
       ],
       "servings": [
         {
-          "unit": "片",
           "g": 35,
-          "label": "1片全麦面包≈35g"
+          "label": "1片全麦面包≈35g",
+          "unit": "片"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -110,9 +110,9 @@
       ],
       "servings": [
         {
-          "unit": "个",
           "g": 200,
-          "label": "1个红薯≈200g"
+          "label": "1个红薯≈200g",
+          "unit": "个"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -132,9 +132,9 @@
       ],
       "servings": [
         {
-          "unit": "个",
           "g": 150,
-          "label": "1个土豆≈150g"
+          "label": "1个土豆≈150g",
+          "unit": "个"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -155,9 +155,9 @@
       ],
       "servings": [
         {
-          "unit": "块",
           "g": 120,
-          "label": "1块鸡胸肉≈120g"
+          "label": "1块鸡胸肉≈120g",
+          "unit": "块"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -178,9 +178,9 @@
       ],
       "servings": [
         {
-          "unit": "个",
           "g": 50,
-          "label": "1个鸡蛋≈50g"
+          "label": "1个鸡蛋≈50g",
+          "unit": "个"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -248,9 +248,9 @@
       ],
       "servings": [
         {
-          "unit": "块",
           "g": 150,
-          "label": "1块豆腐≈150g"
+          "label": "1块豆腐≈150g",
+          "unit": "块"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -270,9 +270,9 @@
       ],
       "servings": [
         {
-          "unit": "勺",
           "g": 30,
-          "label": "1勺乳清蛋白粉≈30g"
+          "label": "1勺乳清蛋白粉≈30g",
+          "unit": "勺"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -292,14 +292,14 @@
       ],
       "servings": [
         {
-          "unit": "杯",
           "g": 250,
-          "label": "1杯牛奶≈250g"
+          "label": "1杯牛奶≈250g",
+          "unit": "杯"
         },
         {
-          "unit": "盒",
           "g": 250,
-          "label": "1盒牛奶≈250g"
+          "label": "1盒牛奶≈250g",
+          "unit": "盒"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -320,14 +320,14 @@
       ],
       "servings": [
         {
-          "unit": "杯",
           "g": 150,
-          "label": "1杯希腊酸奶≈150g"
+          "label": "1杯希腊酸奶≈150g",
+          "unit": "杯"
         },
         {
-          "unit": "盒",
           "g": 150,
-          "label": "1盒希腊酸奶≈150g"
+          "label": "1盒希腊酸奶≈150g",
+          "unit": "盒"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -364,9 +364,9 @@
       ],
       "servings": [
         {
-          "unit": "个",
           "g": 200,
-          "label": "1个苹果≈200g"
+          "label": "1个苹果≈200g",
+          "unit": "个"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -386,9 +386,9 @@
       ],
       "servings": [
         {
-          "unit": "根",
           "g": 120,
-          "label": "1根香蕉≈120g"
+          "label": "1根香蕉≈120g",
+          "unit": "根"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -408,9 +408,9 @@
       ],
       "servings": [
         {
-          "unit": "把",
           "g": 15,
-          "label": "1把杏仁≈15g"
+          "label": "1把杏仁≈15g",
+          "unit": "把"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
@@ -430,9 +430,1323 @@
       ],
       "servings": [
         {
-          "unit": "勺",
           "g": 10,
-          "label": "1勺橄榄油≈10g"
+          "label": "1勺橄榄油≈10g",
+          "unit": "勺"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "mantou",
+      "name": "馒头",
+      "category": "主食",
+      "kcal": 223,
+      "p": 7.0,
+      "c": 44.3,
+      "f": 1.1,
+      "fib": 1.3,
+      "aliases": [
+        "馒头"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 100,
+          "label": "1个馒头≈100g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "hua-juan",
+      "name": "花卷",
+      "category": "主食",
+      "kcal": 217,
+      "p": 6.8,
+      "c": 43.0,
+      "f": 1.6,
+      "fib": 1.2,
+      "aliases": [
+        "花卷"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 80,
+          "label": "1个花卷≈80g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "dumpling-pork-cabbage",
+      "name": "水饺（猪肉白菜，熟）",
+      "category": "主食",
+      "kcal": 198,
+      "p": 7.5,
+      "c": 22.0,
+      "f": 9.0,
+      "aliases": [
+        "水饺",
+        "饺子"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 20,
+          "label": "1个水饺≈20g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "baozi-pork",
+      "name": "肉包",
+      "category": "主食",
+      "kcal": 227,
+      "p": 8.3,
+      "c": 33.0,
+      "f": 7.0,
+      "fib": 1.0,
+      "aliases": [
+        "包子",
+        "肉包"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 100,
+          "label": "1个肉包≈100g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "wonton-pork",
+      "name": "猪肉馄饨（熟）",
+      "category": "主食",
+      "kcal": 170,
+      "p": 7.0,
+      "c": 21.0,
+      "f": 6.5,
+      "aliases": [
+        "馄饨"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 25,
+          "label": "1个馄饨≈25g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "fried-rice",
+      "name": "蛋炒饭",
+      "category": "主食",
+      "kcal": 188,
+      "p": 4.5,
+      "c": 32.0,
+      "f": 5.0,
+      "aliases": [
+        "炒饭"
+      ],
+      "servings": [
+        {
+          "unit": "碗",
+          "g": 250,
+          "label": "1碗炒饭≈250g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "fried-noodles",
+      "name": "炒面",
+      "category": "主食",
+      "kcal": 180,
+      "p": 5.0,
+      "c": 30.0,
+      "f": 5.0,
+      "aliases": [
+        "炒面"
+      ],
+      "servings": [
+        {
+          "unit": "份",
+          "g": 300,
+          "label": "1份炒面≈300g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "congee",
+      "name": "白粥",
+      "category": "主食",
+      "kcal": 46,
+      "p": 1.0,
+      "c": 10.0,
+      "f": 0.2,
+      "aliases": [
+        "粥",
+        "白粥"
+      ],
+      "servings": [
+        {
+          "unit": "碗",
+          "g": 250,
+          "label": "1碗白粥≈250g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "corn-cooked",
+      "name": "玉米（熟）",
+      "category": "主食",
+      "kcal": 112,
+      "p": 4.0,
+      "c": 22.0,
+      "f": 1.3,
+      "fib": 2.9,
+      "aliases": [
+        "玉米"
+      ],
+      "servings": [
+        {
+          "unit": "根",
+          "g": 200,
+          "label": "1根玉米≈200g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "purple-sweet-potato",
+      "name": "紫薯（熟）",
+      "category": "主食",
+      "kcal": 106,
+      "p": 1.8,
+      "c": 24.5,
+      "f": 0.3,
+      "fib": 3.0,
+      "aliases": [
+        "紫薯"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 150,
+          "label": "1个紫薯≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "yam-cooked",
+      "name": "山药（熟）",
+      "category": "主食",
+      "kcal": 56,
+      "p": 1.9,
+      "c": 12.4,
+      "f": 0.2,
+      "fib": 0.8,
+      "aliases": [
+        "山药"
+      ],
+      "servings": [
+        {
+          "unit": "段",
+          "g": 150,
+          "label": "1段山药≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "quinoa-cooked",
+      "name": "藜麦（熟）",
+      "category": "主食",
+      "kcal": 120,
+      "p": 4.4,
+      "c": 21.3,
+      "f": 1.9,
+      "fib": 2.8,
+      "aliases": [
+        "藜麦"
+      ],
+      "servings": [
+        {
+          "unit": "碗",
+          "g": 180,
+          "label": "1碗藜麦≈180g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "brown-rice-cooked",
+      "name": "糙米（熟）",
+      "category": "主食",
+      "kcal": 112,
+      "p": 2.7,
+      "c": 23.5,
+      "f": 1.0,
+      "fib": 1.8,
+      "aliases": [
+        "糙米"
+      ],
+      "servings": [
+        {
+          "unit": "碗",
+          "g": 200,
+          "label": "1碗糙米≈200g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "youtiao",
+      "name": "油条",
+      "category": "主食",
+      "kcal": 386,
+      "p": 6.9,
+      "c": 51.0,
+      "f": 17.6,
+      "aliases": [
+        "油条"
+      ],
+      "servings": [
+        {
+          "unit": "根",
+          "g": 60,
+          "label": "1根油条≈60g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "pork-tenderloin-raw",
+      "name": "猪里脊（生）",
+      "category": "蛋白质",
+      "kcal": 155,
+      "p": 20.2,
+      "c": 0,
+      "f": 7.9,
+      "aliases": [
+        "猪里脊",
+        "里脊"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "lamb-lean-raw",
+      "name": "羊肉（瘦，生）",
+      "category": "蛋白质",
+      "kcal": 118,
+      "p": 20.5,
+      "c": 0.2,
+      "f": 3.9,
+      "aliases": [
+        "羊肉"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "duck-raw",
+      "name": "鸭肉（带皮，生）",
+      "category": "蛋白质",
+      "kcal": 240,
+      "p": 15.0,
+      "c": 0.2,
+      "f": 19.7,
+      "aliases": [
+        "鸭肉",
+        "鸭"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "chicken-thigh-cooked",
+      "name": "鸡腿（熟，去皮）",
+      "category": "蛋白质",
+      "kcal": 209,
+      "p": 26.0,
+      "c": 0,
+      "f": 11.0,
+      "aliases": [
+        "鸡腿"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 100,
+          "label": "1个鸡腿≈100g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "chicken-wing-cooked",
+      "name": "鸡翅（熟）",
+      "category": "蛋白质",
+      "kcal": 200,
+      "p": 18.0,
+      "c": 0,
+      "f": 14.0,
+      "aliases": [
+        "鸡翅"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 60,
+          "label": "1个鸡翅≈60g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "shrimp",
+      "name": "虾仁",
+      "category": "蛋白质",
+      "kcal": 93,
+      "p": 18.6,
+      "c": 1.3,
+      "f": 0.8,
+      "na": 160,
+      "aliases": [
+        "虾",
+        "虾仁"
+      ],
+      "servings": [
+        {
+          "unit": "只",
+          "g": 15,
+          "label": "1只虾仁≈15g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "hairtail",
+      "name": "带鱼",
+      "category": "蛋白质",
+      "kcal": 127,
+      "p": 17.7,
+      "c": 2.4,
+      "f": 4.9,
+      "aliases": [
+        "带鱼"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "sea-bass",
+      "name": "鲈鱼",
+      "category": "蛋白质",
+      "kcal": 105,
+      "p": 18.6,
+      "c": 0,
+      "f": 3.4,
+      "aliases": [
+        "鲈鱼"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "grass-carp",
+      "name": "草鱼",
+      "category": "蛋白质",
+      "kcal": 113,
+      "p": 16.6,
+      "c": 2.8,
+      "f": 4.2,
+      "aliases": [
+        "草鱼"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "tuna-canned",
+      "name": "金枪鱼罐头（水浸）",
+      "category": "蛋白质",
+      "kcal": 108,
+      "p": 23.0,
+      "c": 0,
+      "f": 1.0,
+      "na": 300,
+      "aliases": [
+        "金枪鱼"
+      ],
+      "servings": [
+        {
+          "unit": "罐",
+          "g": 100,
+          "label": "1罐金枪鱼罐头≈100g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "squid",
+      "name": "鱿鱼",
+      "category": "蛋白质",
+      "kcal": 92,
+      "p": 15.0,
+      "c": 3.0,
+      "f": 1.4,
+      "aliases": [
+        "鱿鱼",
+        "墨鱼"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "scallop",
+      "name": "扇贝",
+      "category": "蛋白质",
+      "kcal": 88,
+      "p": 16.4,
+      "c": 2.4,
+      "f": 0.8,
+      "aliases": [
+        "扇贝"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "quail-egg",
+      "name": "鹌鹑蛋",
+      "category": "蛋白质",
+      "kcal": 160,
+      "p": 12.8,
+      "c": 1.0,
+      "f": 11.1,
+      "aliases": [
+        "鹌鹑蛋"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 10,
+          "label": "1个鹌鹑蛋≈10g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "preserved-egg",
+      "name": "皮蛋",
+      "category": "蛋白质",
+      "kcal": 171,
+      "p": 14.4,
+      "c": 4.4,
+      "f": 10.7,
+      "aliases": [
+        "皮蛋",
+        "松花蛋"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 60,
+          "label": "1个皮蛋≈60g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "soy-milk-unsweetened",
+      "name": "豆浆（无糖）",
+      "category": "蛋白质",
+      "kcal": 32,
+      "p": 3.0,
+      "c": 1.5,
+      "f": 1.8,
+      "aliases": [
+        "豆浆"
+      ],
+      "servings": [
+        {
+          "unit": "杯",
+          "g": 250,
+          "label": "1杯豆浆≈250g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "dried-tofu",
+      "name": "香干",
+      "category": "蛋白质",
+      "kcal": 140,
+      "p": 16.0,
+      "c": 3.5,
+      "f": 6.5,
+      "aliases": [
+        "香干",
+        "豆腐干"
+      ],
+      "servings": [
+        {
+          "unit": "块",
+          "g": 40,
+          "label": "1块香干≈40g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "edamame",
+      "name": "毛豆（熟）",
+      "category": "蛋白质",
+      "kcal": 123,
+      "p": 11.5,
+      "c": 9.0,
+      "f": 5.2,
+      "fib": 4.0,
+      "aliases": [
+        "毛豆"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "chickpea-cooked",
+      "name": "鹰嘴豆（熟）",
+      "category": "蛋白质",
+      "kcal": 164,
+      "p": 9.0,
+      "c": 27.4,
+      "f": 2.6,
+      "fib": 7.6,
+      "aliases": [
+        "鹰嘴豆"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "cheddar",
+      "name": "奶酪（切达）",
+      "category": "乳制品",
+      "kcal": 402,
+      "p": 25.0,
+      "c": 1.3,
+      "f": 33.0,
+      "na": 620,
+      "aliases": [
+        "奶酪",
+        "芝士"
+      ],
+      "servings": [
+        {
+          "unit": "片",
+          "g": 20,
+          "label": "1片奶酪≈20g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "napa-cabbage",
+      "name": "大白菜",
+      "category": "蔬果",
+      "kcal": 17,
+      "p": 1.5,
+      "c": 3.2,
+      "f": 0.1,
+      "fib": 0.8,
+      "aliases": [
+        "白菜",
+        "大白菜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "spinach",
+      "name": "菠菜",
+      "category": "蔬果",
+      "kcal": 28,
+      "p": 2.6,
+      "c": 4.5,
+      "f": 0.4,
+      "fib": 1.7,
+      "aliases": [
+        "菠菜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "lettuce",
+      "name": "生菜",
+      "category": "蔬果",
+      "kcal": 16,
+      "p": 1.4,
+      "c": 3.0,
+      "f": 0.2,
+      "aliases": [
+        "生菜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "cucumber",
+      "name": "黄瓜",
+      "category": "蔬果",
+      "kcal": 16,
+      "p": 0.8,
+      "c": 2.9,
+      "f": 0.2,
+      "aliases": [
+        "黄瓜"
+      ],
+      "servings": [
+        {
+          "unit": "根",
+          "g": 150,
+          "label": "1根黄瓜≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "tomato",
+      "name": "番茄",
+      "category": "蔬果",
+      "kcal": 20,
+      "p": 0.9,
+      "c": 4.0,
+      "f": 0.2,
+      "aliases": [
+        "番茄",
+        "西红柿"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 150,
+          "label": "1个番茄≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "carrot",
+      "name": "胡萝卜",
+      "category": "蔬果",
+      "kcal": 37,
+      "p": 1.0,
+      "c": 8.8,
+      "f": 0.2,
+      "fib": 1.1,
+      "aliases": [
+        "胡萝卜"
+      ],
+      "servings": [
+        {
+          "unit": "根",
+          "g": 150,
+          "label": "1根胡萝卜≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "eggplant",
+      "name": "茄子",
+      "category": "蔬果",
+      "kcal": 23,
+      "p": 1.0,
+      "c": 5.3,
+      "f": 0.2,
+      "aliases": [
+        "茄子"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "green-pepper",
+      "name": "青椒",
+      "category": "蔬果",
+      "kcal": 22,
+      "p": 1.0,
+      "c": 5.0,
+      "f": 0.2,
+      "aliases": [
+        "青椒"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "celery",
+      "name": "芹菜",
+      "category": "蔬果",
+      "kcal": 16,
+      "p": 0.8,
+      "c": 3.0,
+      "f": 0.2,
+      "aliases": [
+        "芹菜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "bean-sprouts",
+      "name": "绿豆芽",
+      "category": "蔬果",
+      "kcal": 18,
+      "p": 2.0,
+      "c": 2.9,
+      "f": 0.1,
+      "aliases": [
+        "豆芽",
+        "绿豆芽"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "enoki",
+      "name": "金针菇",
+      "category": "蔬果",
+      "kcal": 32,
+      "p": 2.7,
+      "c": 5.0,
+      "f": 0.4,
+      "fib": 2.7,
+      "aliases": [
+        "金针菇"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "shiitake-fresh",
+      "name": "香菇（鲜）",
+      "category": "蔬果",
+      "kcal": 26,
+      "p": 2.2,
+      "c": 5.2,
+      "f": 0.3,
+      "aliases": [
+        "香菇"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "kelp-fresh",
+      "name": "海带（鲜）",
+      "category": "蔬果",
+      "kcal": 13,
+      "p": 1.2,
+      "c": 2.1,
+      "f": 0.1,
+      "aliases": [
+        "海带"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "pumpkin",
+      "name": "南瓜",
+      "category": "蔬果",
+      "kcal": 23,
+      "p": 0.8,
+      "c": 5.3,
+      "f": 0.1,
+      "aliases": [
+        "南瓜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "winter-melon",
+      "name": "冬瓜",
+      "category": "蔬果",
+      "kcal": 12,
+      "p": 0.4,
+      "c": 2.6,
+      "f": 0.1,
+      "aliases": [
+        "冬瓜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "onion",
+      "name": "洋葱",
+      "category": "蔬果",
+      "kcal": 40,
+      "p": 1.1,
+      "c": 9.3,
+      "f": 0.1,
+      "aliases": [
+        "洋葱"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "orange",
+      "name": "橙子",
+      "category": "蔬果",
+      "kcal": 47,
+      "p": 0.8,
+      "c": 11.0,
+      "f": 0.2,
+      "fib": 1.4,
+      "aliases": [
+        "橙子"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 200,
+          "label": "1个橙子≈200g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "pear",
+      "name": "梨",
+      "category": "蔬果",
+      "kcal": 51,
+      "p": 0.4,
+      "c": 13.3,
+      "f": 0.2,
+      "aliases": [
+        "梨"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 250,
+          "label": "1个梨≈250g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "grape",
+      "name": "葡萄",
+      "category": "蔬果",
+      "kcal": 44,
+      "p": 0.5,
+      "c": 10.3,
+      "f": 0.2,
+      "aliases": [
+        "葡萄"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "watermelon",
+      "name": "西瓜",
+      "category": "蔬果",
+      "kcal": 31,
+      "p": 0.6,
+      "c": 7.5,
+      "f": 0.1,
+      "aliases": [
+        "西瓜"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "strawberry",
+      "name": "草莓",
+      "category": "蔬果",
+      "kcal": 32,
+      "p": 0.7,
+      "c": 7.7,
+      "f": 0.3,
+      "fib": 1.1,
+      "aliases": [
+        "草莓"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "blueberry",
+      "name": "蓝莓",
+      "category": "蔬果",
+      "kcal": 57,
+      "p": 0.7,
+      "c": 14.5,
+      "f": 0.3,
+      "fib": 2.4,
+      "aliases": [
+        "蓝莓"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "kiwi",
+      "name": "猕猴桃",
+      "category": "蔬果",
+      "kcal": 61,
+      "p": 0.8,
+      "c": 14.5,
+      "f": 0.6,
+      "fib": 2.6,
+      "aliases": [
+        "猕猴桃",
+        "奇异果"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 100,
+          "label": "1个猕猴桃≈100g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "mango",
+      "name": "芒果",
+      "category": "蔬果",
+      "kcal": 60,
+      "p": 0.8,
+      "c": 15.0,
+      "f": 0.4,
+      "aliases": [
+        "芒果"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 300,
+          "label": "1个芒果≈300g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "dragon-fruit",
+      "name": "火龙果",
+      "category": "蔬果",
+      "kcal": 55,
+      "p": 1.2,
+      "c": 13.0,
+      "f": 0.2,
+      "aliases": [
+        "火龙果"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 350,
+          "label": "1个火龙果≈350g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "avocado",
+      "name": "牛油果",
+      "category": "蔬果",
+      "kcal": 160,
+      "p": 2.0,
+      "c": 8.5,
+      "f": 14.7,
+      "fib": 6.7,
+      "aliases": [
+        "牛油果"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 150,
+          "label": "1个牛油果≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "cherry",
+      "name": "樱桃",
+      "category": "蔬果",
+      "kcal": 46,
+      "p": 1.1,
+      "c": 10.2,
+      "f": 0.5,
+      "aliases": [
+        "樱桃",
+        "车厘子"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "peanut",
+      "name": "花生",
+      "category": "油脂坚果",
+      "kcal": 567,
+      "p": 24.8,
+      "c": 16.1,
+      "f": 44.3,
+      "aliases": [
+        "花生"
+      ],
+      "servings": [
+        {
+          "unit": "把",
+          "g": 20,
+          "label": "1把花生≈20g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "walnut",
+      "name": "核桃",
+      "category": "油脂坚果",
+      "kcal": 654,
+      "p": 15.4,
+      "c": 13.7,
+      "f": 58.3,
+      "aliases": [
+        "核桃"
+      ],
+      "servings": [
+        {
+          "unit": "把",
+          "g": 20,
+          "label": "1把核桃仁≈20g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "cashew",
+      "name": "腰果",
+      "category": "油脂坚果",
+      "kcal": 553,
+      "p": 18.2,
+      "c": 30.5,
+      "f": 43.9,
+      "aliases": [
+        "腰果"
+      ],
+      "servings": [
+        {
+          "unit": "把",
+          "g": 20,
+          "label": "1把腰果≈20g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "pistachio",
+      "name": "开心果",
+      "category": "油脂坚果",
+      "kcal": 557,
+      "p": 20.6,
+      "c": 28.0,
+      "f": 44.4,
+      "aliases": [
+        "开心果"
+      ],
+      "servings": [
+        {
+          "unit": "把",
+          "g": 20,
+          "label": "1把开心果≈20g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "dark-chocolate-85",
+      "name": "黑巧克力（85%）",
+      "category": "零食饮料",
+      "kcal": 598,
+      "p": 7.8,
+      "c": 24.0,
+      "f": 42.6,
+      "aliases": [
+        "黑巧克力",
+        "巧克力"
+      ],
+      "servings": [
+        {
+          "unit": "块",
+          "g": 10,
+          "label": "1块黑巧克力≈10g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "soda-cracker",
+      "name": "苏打饼干",
+      "category": "零食饮料",
+      "kcal": 433,
+      "p": 9.0,
+      "c": 72.0,
+      "f": 13.0,
+      "na": 600,
+      "aliases": [
+        "苏打饼干",
+        "饼干"
+      ],
+      "servings": [
+        {
+          "unit": "片",
+          "g": 10,
+          "label": "1片苏打饼干≈10g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "potato-chips",
+      "name": "薯片",
+      "category": "零食饮料",
+      "kcal": 536,
+      "p": 5.6,
+      "c": 52.8,
+      "f": 34.6,
+      "na": 550,
+      "aliases": [
+        "薯片"
+      ],
+      "servings": [
+        {
+          "unit": "小包",
+          "g": 40,
+          "label": "1小包薯片≈40g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "cola",
+      "name": "可乐",
+      "category": "零食饮料",
+      "kcal": 43,
+      "p": 0,
+      "c": 10.6,
+      "f": 0,
+      "aliases": [
+        "可乐"
+      ],
+      "servings": [
+        {
+          "unit": "罐",
+          "g": 330,
+          "label": "1罐可乐≈330g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "milk-tea",
+      "name": "奶茶（半糖）",
+      "category": "零食饮料",
+      "kcal": 65,
+      "p": 1.0,
+      "c": 13.0,
+      "f": 1.5,
+      "aliases": [
+        "奶茶"
+      ],
+      "servings": [
+        {
+          "unit": "杯",
+          "g": 500,
+          "label": "1杯奶茶≈500g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "black-coffee",
+      "name": "美式咖啡",
+      "category": "零食饮料",
+      "kcal": 2,
+      "p": 0.3,
+      "c": 0,
+      "f": 0,
+      "aliases": [
+        "美式",
+        "咖啡"
+      ],
+      "servings": [
+        {
+          "unit": "杯",
+          "g": 300,
+          "label": "1杯美式咖啡≈300g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "latte",
+      "name": "拿铁",
+      "category": "零食饮料",
+      "kcal": 46,
+      "p": 3.0,
+      "c": 4.5,
+      "f": 1.8,
+      "aliases": [
+        "拿铁"
+      ],
+      "servings": [
+        {
+          "unit": "杯",
+          "g": 300,
+          "label": "1杯拿铁≈300g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "beer",
+      "name": "啤酒",
+      "category": "零食饮料",
+      "kcal": 43,
+      "p": 0.5,
+      "c": 3.6,
+      "f": 0,
+      "aliases": [
+        "啤酒"
+      ],
+      "servings": [
+        {
+          "unit": "罐",
+          "g": 330,
+          "label": "1罐啤酒≈330g"
         }
       ],
       "source": "自整理（参考 USDA FoodData Central，CC0）"
