@@ -22,6 +22,7 @@ AI 或其他工具向 FreeBody 写入数据请使用增量导入包，见 [data-
 {
   "v": 1,
   "theme": "auto",                       // auto | light | dark
+  "motion": "auto",                      // auto（跟随系统「减弱动态效果」）| reduce（v2.7 起）
   "profile": {
     "name": "", "height": null,          // 身高 cm，用于 BMI
     "injuryFlagLabel": "伤处不适",        // 训练记录中的伤处标记名称

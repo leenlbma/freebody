@@ -15,7 +15,8 @@ Thanks for helping out. FreeBody sticks to three principles: **no dependencies, 
    npm test
    ```
 4. Open `index.html` at phone width (390 px, for example) and check it in both the light and dark themes.
-5. Open a pull request with a short entry under "未发布" (Unreleased) in `CHANGELOG.md`. Include both the source changes and the rebuilt `index.html`.
+5. If you have a real device, run the relevant parts of [docs/device-test.en.md](docs/device-test.en.md) and note the device and results in the pull request.
+6. Open a pull request with a short entry under "未发布" (Unreleased) in `CHANGELOG.md`. Include both the source changes and the rebuilt `index.html`.
 
 ## Code conventions
 
@@ -35,6 +36,15 @@ Thanks for helping out. FreeBody sticks to three principles: **no dependencies, 
   - copy should fit in one sentence where possible.
 - **New data fields:** give each a default in `defaults()`, so older data is filled in on load, and update `docs/data-model.md`.
 - **Escaping:** pass user input through `esc()` before rendering it as HTML.
+- **Accessibility:**
+  - icon-only buttons need an `aria-label`;
+  - tie each `<label>` to its input with `for` (`a11y()` in `90-boot.js` fills this in for an adjacent control, but write it in the source where you can);
+  - clickable cards use `data-go` / `data-sub` and get focus and button semantics automatically;
+  - `charts.js` generates a text summary and a data table for every chart, so put an `<h3>` above each chart as its name;
+  - animation must stop under reduced motion (the global styles already cover CSS animations and transitions).
+
+  Check with a tool such as axe before submitting; the target is zero violations.
+- **Demo data** lives in `05-demo.js` and must stay fictional. When you add a data type, add a few demo records for it.
 - **No emoji in the interface.** Add icons to `src/icons.js` in the house style: 24×24, 1.5 px stroke, no fill, round caps, `currentColor`. Use `<i data-ic="name"></i>` in HTML and `IC('name')` in JavaScript.
 - **Charts:** use `src/charts.js` (`FitCharts.line / bars / stack / donut / hbars / heat`). Use CSS variables for colours only, and always provide empty-state copy.
 - **Muscle mapping:** exercise-to-muscle keywords live in `EX_MUS`, with the most specific keywords first. Muscles and their recovery half-lives live in `MUS`. If you change either, update `docs/data-model.md`.

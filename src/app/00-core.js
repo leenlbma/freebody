@@ -6,9 +6,9 @@ var FOOD_DB=(window.FIT_DATA&&window.FIT_DATA.foods)||{foods:[]};
 var EXAMPLE_PROFILES=(window.FIT_DATA&&window.FIT_DATA.examples)||[];
 /** 底部导航 4 个分组；HUB 分组的首页不显示子标签，详情页显示返回按钮 */
 var ICONS={today:'home',train:'train',data:'chart',me:'user'};
-var GROUPS=[['today','今天',['overview','diet','dietAdd','dietAI','dietFood']],['train','训练',['train','cardio','perf']],['data','数据',['data','body','nutri','tstats','sleep','hormone','injury','supp','notes']],['me','我的',['settings','impPack']]];
+var GROUPS=[['today','今天',['overview','diet','dietAdd','dietAI','dietFood']],['train','训练',['train','cardio','perf']],['data','数据',['data','body','nutri','tstats','sleep','hormone','injury','supp','notes']],['me','我的',['settings','impPack','selftest']]];
 var HUB={today:'overview',data:'data',me:'settings'};
-var SEC_LABEL={overview:'今天',diet:'饮食',dietAdd:'添加食物',dietFood:'食物',dietAI:'拍照识别',train:'力量',cardio:'有氧',perf:'表现',data:'数据',body:'身体',nutri:'营养',tstats:'训练统计',muscle:'肌群恢复',sleep:'睡眠',supp:'补剂',hormone:'恢复/化验',injury:'伤病',settings:'我的',impPack:'粘贴导入',notes:'心得'};
+var SEC_LABEL={overview:'今天',diet:'饮食',dietAdd:'添加食物',dietFood:'食物',dietAI:'拍照识别',train:'力量',cardio:'有氧',perf:'表现',data:'数据',body:'身体',nutri:'营养',tstats:'训练统计',muscle:'肌群恢复',sleep:'睡眠',supp:'补剂',hormone:'恢复/化验',injury:'伤病',settings:'我的',impPack:'粘贴导入',selftest:'设备自检',notes:'心得'};
 var lastSub={};
 /** 内联 SVG 图标（见 src/icons.js） */
 function IC(n){return window.FitIcons?FitIcons.svg(n):'';}

@@ -29,7 +29,7 @@ function rDiet(){var g=S.goals,t=dayTot(sel),mi=dayMicro(sel);
  var ms=dayMeals(sel);
  $('#mealCards').innerHTML=MEALS.map(function(meal){var arr=ms.filter(function(m){return mealGroup(m.meal)===meal;}),mt=mealTot(arr),tg=mealTarget(meal);
   return'<div class="card meal"><div class="meal-h"><div><b>'+meal+'</b><div class="mut">'+Math.round(mt.k)+' / '+tg+' kcal'+(arr.length?' · 蛋白 '+r1(mt.p)+' · 碳水 '+r1(mt.c)+' · 脂肪 '+r1(mt.f):'')+'</div></div><button class="plus" data-addmeal="'+meal+'" aria-label="添加到'+meal+'">'+IC('plus')+'</button></div>'+
-   (arr.length?'<ul class="list entries">'+arr.map(function(m){return'<li data-entry="'+m.id+'"><div>'+mealTags(m)+esc(mealLabel(m))+'</div><span class="ek">'+Math.round(m.kcal||0)+' kcal</span></li>';}).join('')+'</ul>':'')+'</div>';}).join('');
+   (arr.length?'<ul class="list entries">'+arr.map(function(m){return'<li><div class="ent" data-entry="'+m.id+'"><div>'+mealTags(m)+esc(mealLabel(m))+'</div><span class="ek">'+Math.round(m.kcal||0)+' kcal</span></div></li>';}).join('')+'</ul>':'')+'</div>';}).join('');
  var sp=mealSplit();$('#gK').value=g.kcal;$('#gP').value=g.p;$('#gC').value=g.c;$('#gF').value=g.f;MEALS.forEach(function(m,i){$('#gS'+i).value=sp[m];});gHint();
  rCal();rTarget();
 }
@@ -111,7 +111,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
  if((a=b.getAttribute('data-addmeal'))){openAdd(a,'recent');return;}
  if((a=b.getAttribute('data-entry'))){openEntry(a);return;}
  if((a=b.getAttribute('data-fatab'))){faTab=a;rDietAdd();if(a==='search')$('#faSearch').focus();return;}
- if(b.hasAttribute('data-go-cal')){$('#calCard').open=true;$('#calCard').scrollIntoView({block:'start',behavior:'smooth'});return;}
+ if(b.hasAttribute('data-go-cal')){$('#calCard').open=true;$('#calCard').scrollIntoView({block:'start',behavior:reduceMotion()?'auto':'smooth'});return;}
  if((a=b.getAttribute('data-fplus'))){e.stopPropagation();var d=keyModel(a);if(!d)return;d.meal=dMeal();DF=d;var m=dfRecord();S.meals.push(m);save();DF=null;toast('已加入'+m.meal+'：'+mealLabel(m));render();return;}
  if((a=b.getAttribute('data-fopen'))){var d2=keyModel(a);if(d2)openFood(d2,'dietAdd');return;}
  if((a=b.getAttribute('data-dfpre'))){DF.qty=+a;$('#dfQty').value=DF.qty;dfPresets();dfLive();return;}
@@ -171,12 +171,12 @@ function rCal(){var st=streakDays();$('#calSum').textContent=st?'连续记录 '+
 
 function rTarget(){var c=tgtCfg(),r=calcTarget(c),opt=function(v,l,s){return'<option value="'+v+'"'+(String(v)===String(s)?' selected':'')+'>'+l+'</option>';},hasBf=latestBody('bf')!=null&&latestBody('weight')!=null;
  var h='<div class="grid2" style="margin-top:8px">'+
-  '<div><label>性别</label><select id="tcSex">'+opt('','请选择',c.sex)+opt('m','男',c.sex)+opt('f','女',c.sex)+'</select></div>'+
-  '<div><label>年龄</label><input id="tcAge" type="number" value="'+(c.age!=null?c.age:'')+'"></div>'+
-  '<div><label>日常活动</label><select id="tcPal">'+PAL.map(function(p){return opt(p[0],p[1],c.pal);}).join('')+'</select></div>'+
-  '<div><label>目标</label><select id="tcMode">'+Object.keys(GMODE).map(function(k){var g=GMODE[k];return opt(k,g[0]+(g[1]?'（'+(g[1]>0?'+':'')+Math.round(g[1]*100)+'%）':''),c.mode);}).join('')+'</select></div>'+
-  '<div><label>手动偏移 kcal</label><input id="tcAdj" type="number" step="50" value="'+c.adj+'"></div>'+
-  '<div><label>蛋白 g/kg 体重</label><input id="tcPkg" type="number" step="0.1" value="'+c.pkg+'"></div>'+
+  '<div><label for="tcSex">性别</label><select id="tcSex">'+opt('','请选择',c.sex)+opt('m','男',c.sex)+opt('f','女',c.sex)+'</select></div>'+
+  '<div><label for="tcAge">年龄</label><input id="tcAge" type="number" value="'+(c.age!=null?c.age:'')+'"></div>'+
+  '<div><label for="tcPal">日常活动</label><select id="tcPal">'+PAL.map(function(p){return opt(p[0],p[1],c.pal);}).join('')+'</select></div>'+
+  '<div><label for="tcMode">目标</label><select id="tcMode">'+Object.keys(GMODE).map(function(k){var g=GMODE[k];return opt(k,g[0]+(g[1]?'（'+(g[1]>0?'+':'')+Math.round(g[1]*100)+'%）':''),c.mode);}).join('')+'</select></div>'+
+  '<div><label for="tcAdj">手动偏移 kcal</label><input id="tcAdj" type="number" step="50" value="'+c.adj+'"></div>'+
+  '<div><label for="tcPkg">蛋白 g/kg 体重</label><input id="tcPkg" type="number" step="0.1" value="'+c.pkg+'"></div>'+
   '</div>'+(hasBf?'<label class="ck-l" style="margin-top:6px"><input type="checkbox" id="tcKm"'+(c.km?' checked':'')+'> 有体脂数据：用 Katch-McArdle（按瘦体重）</label>':'');
  if(r.miss)h+='<div class="alert info" style="margin-top:8px">还缺：'+esc(r.miss.join('、'))+'。补齐后显示推导过程（不会自动填写）。</div>';
  else h+='<ol class="steps">'+
@@ -202,7 +202,7 @@ $('#tgtBox').addEventListener('click',function(e){if(e.target.id!=='tcApply')ret
 var cfMode='food';
 function rCustom(){var cs=(S.customFoods||[]).filter(function(f){return f.custom;});$('#cfCnt').textContent=cs.length?cs.length+' 项':'';
  $('#cfmFood').classList.toggle('on',cfMode==='food');$('#cfmCombo').classList.toggle('on',cfMode==='combo');$('#cfFood').hidden=cfMode!=='food';$('#cfCombo').hidden=cfMode!=='combo';
- $('#cuList').innerHTML=cs.map(function(f){var u=unitsOf(f),g=u['份']||100,r=g/100;return'<li><div><b>'+esc(f.name)+'</b> '+(f.combo?'<span class="tag">组合</span>':'')+'<div class="mut">每份 '+Math.round(f.kcal*r)+' kcal · P'+r1(f.p*r)+' C'+r1(f.c*r)+' F'+r1(f.f*r)+(f.combo?' · '+esc(f.combo):' · '+g+' g')+'</div></div><button class="del" data-delcu="'+esc(f.id)+'" aria-label="删除">'+IC('x')+'</button></li>';}).join('');}
+ $('#cuList').innerHTML=cs.map(function(f){var u=unitsOf(f),g=u['份']||100,r=g/100;return'<li><div><b>'+esc(f.name)+'</b> '+(f.combo?'<span class="tag">组合</span>':'')+'<div class="mut">每份 '+Math.round(f.kcal*r)+' kcal · P'+r1(f.p*r)+' C'+r1(f.c*r)+' F'+r1(f.f*r)+(f.combo?' · '+esc(f.combo):' · '+g+' g')+'</div></div><button class="del" aria-label="删除" data-delcu="'+esc(f.id)+'" aria-label="删除">'+IC('x')+'</button></li>';}).join('');}
 function coPreview(){var r=parseQuick($('#coText').value,true),k=0;r.items.forEach(function(i){k+=i.kcal;});$('#coPrev').innerHTML=$('#coText').value.trim()?'合计 '+Math.round(k)+' kcal'+(r.miss.length?' <span style="color:var(--warn)">未识别：'+esc(r.miss.join('、'))+'</span>':''):'';}
 $('#coText').addEventListener('input',coPreview);
 function saveCustom(f){S.customFoods=(S.customFoods||[]).filter(function(y){return normName(y.name)!==normName(f.name);});S.customFoods.push(f);save();}

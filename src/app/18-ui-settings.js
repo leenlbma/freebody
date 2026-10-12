@@ -5,7 +5,7 @@ $('#csvBtn').onclick=function(){$('#csvFile').click();};
 $('#csvFile').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var m=importCSV(rd.result);if(m){toast(m);render();}}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
 
 /* ---------- 设置：个人配置 / 示例配置 / 自定义食物库 ---------- */
-function rSettings(){rStore();var pf=S.profile;$('#pfName').value=pf.name||'';$('#pfH').value=pf.height||'';$('#pfFlag').value=pf.injuryFlagLabel||'';
+function rSettings(){rStore();rPrefs();var pf=S.profile;$('#pfName').value=pf.name||'';$('#pfH').value=pf.height||'';$('#pfFlag').value=pf.injuryFlagLabel||'';
  $('#exList2').innerHTML=EXAMPLE_PROFILES.length?EXAMPLE_PROFILES.map(function(e,i){return'<li><div><b>'+esc(e.title)+'</b><div class="mut">'+esc(e._comment||'')+'</div></div><button class="ghost sm" data-applyex="'+i+'">加载</button></li>';}).join(''):'<li class="mut">无内置示例</li>';
  $('#cfInfo').textContent='内置 '+(FOOD_DB.foods||[]).length+' 项 · 自定义 '+(S.customFoods||[]).length+' 项';
  var g=S.goals;$('#gSl').value=g.sleepH;$('#gTd').value=g.trainDays;$('#gSt').value=g.stairMin;$('#gWt').value=g.weight!=null?g.weight:'';}
@@ -29,7 +29,7 @@ $('#exFile').onchange=function(){var f=this.files[0],inp=this;if(!f)return;var r
 $('#exFileBtn').onclick=function(){$('#exFile').click();};
 $('#imp').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d||typeof d!=='object'||!Array.isArray(d.meals)||!d.goals)throw new Error('格式不符');
  if(!confirm('导入将覆盖当前全部数据，确定？'))return;if(d.aiConfig){aiImport(d.aiConfig);}delete d.aiConfig;localStorage.setItem(KEY,JSON.stringify(d));S=load();applyTheme();applyTitle();toast('导入成功');render();}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
-$('#wipe').onclick=function(){if(confirm('确定清空全部数据（含本机保存的 API Key）？建议先导出备份。')&&confirm('再次确认：不可恢复')){localStorage.removeItem(KEY);localStorage.removeItem(AIKEY);localStorage.removeItem(METAKEY);META={};STORE.used=0;STORE.banner=null;rStoreBanner();AIC=aiLoad();S=load();save();toast('已清空');render();}};
+$('#wipe').onclick=function(){if(DEMO){exitDemo();return;}if(confirm('确定清空全部数据（含本机保存的 API Key）？建议先导出备份。')&&confirm('再次确认：不可恢复')){localStorage.removeItem(KEY);localStorage.removeItem(AIKEY);localStorage.removeItem(METAKEY);META={};STORE.used=0;STORE.banner=null;rStoreBanner();AIC=aiLoad();S=load();save();toast('已清空');render();}};
 
 /* ---------- 存储安全（v2.6）：提示条、导出、持久存储、状态 ---------- */
 /** 导出完整备份（JSON）；记录 lastBackup，关闭备份提醒 */
@@ -37,16 +37,16 @@ function doExport(){var out={};for(var k in S)out[k]=S[k];out.aiConfig=aiExport(
  META.lastBackup=today();delete META.snooze;metaSave();if(STORE.banner==='backup')STORE.banner=null;rStoreBanner();rStore();
  toast(AIC.incKey&&AIC.key?'已导出（含 API Key，请妥善保管）':'已导出');}
 $('#exp').onclick=doExport;
-var ST_MSG={quota:['bad','存储空间已满，最近的修改没有保存','请立即导出备份。数据仍在当前页面中，导出后再清理旧记录或换用其他浏览器。'],
+var ST_MSG={demo:['info','演示模式：数据不会保存','这些是虚构的示例记录，只在当前页面中，不会写入本机存储。退出后回到你自己的数据。'],quota:['bad','存储空间已满，最近的修改没有保存','请立即导出备份。数据仍在当前页面中，导出后再清理旧记录或换用其他浏览器。'],
  90:['bad','本机存储已用约 90%','空间快满了，写满后新的记录将无法保存。请先导出备份。'],
  70:['warn','本机存储已用约 70%','建议导出一次备份，并留意存储用量。'],
  backup:['warn','超过 30 天没有备份','数据只存在本机，清除浏览器数据或换设备时会丢失。建议现在导出一份备份。']};
 function storeAlert(kind){if(STORE.banner==='quota'&&kind!=='quota')return;STORE.banner=String(kind);rStoreBanner();if(kind==='quota'||kind===90)toast(ST_MSG[kind][1]);}
 function backupTitle(){var ref=META.lastBackup||META.firstUse,n=ref?diffDays(ref,today()):BACKUP_DAYS;return META.lastBackup?'已经 '+n+' 天没有备份':'已记录 '+n+' 天，还没有备份过';}
 function rStoreBanner(){var b=$('#stBanner');if(!b)return;var k=STORE.banner,m=k&&ST_MSG[k];if(!m){b.innerHTML='';return;}if(k==='backup')m=[m[0],backupTitle(),m[2]];
- b.innerHTML='<div class="alert '+m[0]+' st-banner" role="'+(m[0]==='bad'?'alert':'status')+'">'+IC(m[0]==='bad'?'alert':'info')+'<div class="st-b-tx"><b>'+m[1]+'</b><span>'+m[2]+'</span></div><div class="st-b-act"><button class="sm" data-st="export">'+IC('download')+'立即导出</button>'+(k==='quota'?'':'<button class="ghost sm" data-st="later">'+(k==='backup'?'7 天后提醒':'知道了')+'</button>')+'</div></div>';
+ b.innerHTML='<div class="alert '+m[0]+' st-banner" role="'+(m[0]==='bad'?'alert':'status')+'">'+IC(m[0]==='bad'?'alert':'info')+'<div class="st-b-tx"><b>'+m[1]+'</b><span>'+m[2]+'</span></div><div class="st-b-act">'+(k==='demo'?'<button class="sm" data-st="exitdemo">退出演示</button>':'<button class="sm" data-st="export">'+IC('download')+'立即导出</button>')+(k==='quota'||k==='demo'?'':'<button class="ghost sm" data-st="later">'+(k==='backup'?'7 天后提醒':'知道了')+'</button>')+'</div></div>';
  if(window.FitIcons)FitIcons.hydrate();}
-document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-st]');if(!b)return;var a=b.getAttribute('data-st');
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-st]');if(!b)return;var a=b.getAttribute('data-st');if(a==='exitdemo'){exitDemo();return;}
  if(a==='export')doExport();else if(a==='later'){if(STORE.banner==='backup'){META.snooze=addDays(today(),7);metaSave();}STORE.banner=null;rStoreBanner();}
  else if(a==='persist')storePersist(true);});
 /** 申请持久存储：ask=false 为启动时自动申请（Firefox 会弹权限框，改为手动）；结果显示在数据备份卡片 */

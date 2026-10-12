@@ -1,0 +1,50 @@
+name: 真机测试报告 / Device test report
+description: 在真实手机或电脑上跑完测试清单后提交（通过也欢迎提交）
+labels: ["device-test"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        清单见 [docs/device-test.md](https://github.com/leenlbma/freebody/blob/main/docs/device-test.md)。全部通过也请提交一份，这是项目目前最缺的验证。**不要附带真实记录或导出文件。**
+        Checklist: [docs/device-test.md](https://github.com/leenlbma/freebody/blob/main/docs/device-test.md). Reports where everything passes are just as useful. **Do not attach real records or backups.**
+  - type: input
+    id: device
+    attributes:
+      label: 设备与系统 / Device and OS
+      placeholder: iPhone 15 · iOS 26.0
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 打开方式 / How it was opened
+      options:
+        - Safari / Chrome 标签页（browser tab）
+        - 添加到主屏幕（home-screen app）
+        - 桌面安装（desktop install）
+    validations:
+      required: true
+  - type: textarea
+    id: selftest
+    attributes:
+      label: 设备自检报告 / Self-check report
+      description: 「我的 › 帮助与自检 › 设备自检 › 复制报告」
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 清单结果 / Checklist
+      description: 勾选通过的项目，未通过的在下方说明 / Tick what passed and describe failures below
+      options:
+        - label: 布局：底部导航贴底、页头不被遮挡、日期栏与卡片对齐 / Layout
+        - label: 记录：补剂打卡、饮食、训练、睡眠保存后刷新仍在 / Records persist after reload
+        - label: 导入：#import= 链接预览、确认、撤销 / Link import, confirm, undo
+        - label: 离线：飞行模式下可以打开并记录 / Works offline
+        - label: 备份：导出 JSON 能找到文件，并能再导入 / Export and re-import
+        - label: 读屏：VoiceOver / TalkBack 能读出导航、按钮和图表摘要 / Screen reader
+  - type: textarea
+    id: notes
+    attributes:
+      label: 未通过的项目与说明 / Failures and notes

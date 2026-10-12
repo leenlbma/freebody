@@ -34,12 +34,13 @@ function memStorage(init, quota) {
 const EXPORTS = ['S', 'sel', 'META', 'STORE', 'LS_QUOTA', 'KEY', 'METAKEY', 'MUS', 'IMP', 'defaults', 'load', 'save', 'uid',
   'dayTot', 'dayMeals', 'otSignals', 'readiness', 'recWeek', 'nextTarget', 'exHistory', 'defInc', 'epley', 'calcTarget', 'tgtCfg',
   'muscleState', 'musclesOf', 'sleepDur', 'mealOfHour', 'impPlan', 'impRow', 'impApply', 'impCount', 'impStrip', 'impB64', 'impDecode',
-  'quotaLevel', 'quotaPct', 'lsUsage', 'isQuotaErr', 'backupDue', 'hasUserData', 'firstDataDate', 'addDays', 'diffDays', 'today'];
+  'quotaLevel', 'quotaPct', 'lsUsage', 'isQuotaErr', 'backupDue', 'hasUserData', 'firstDataDate', 'addDays', 'diffDays', 'today', 'demoData', 'DEMO', 'META'];
 
 /**
  * @param {object} [opt]
  * @param {object} [opt.storage] 初始 localStorage 内容
  * @param {number} [opt.quota]   模拟的 localStorage 上限（字符数）
+ * @param {string} [opt.hash]    模拟 location.hash（如 '#demo'）
  * @param {string} [opt.now]     固定「今天」，YYYY-MM-DD（默认 2026-10-12），时间为当天 12:00
  */
 function load(opt) {
@@ -55,7 +56,7 @@ function load(opt) {
   }
   const el = () => ({ textContent: '', innerHTML: '', value: '', classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, style: {}, setAttribute() {}, addEventListener() {} });
   const sandbox = {
-    window: {}, localStorage: ls, navigator: { userAgent: 'node' }, location: { hash: '', pathname: '/', search: '' },
+    window: {}, localStorage: ls, navigator: { userAgent: 'node' }, location: { hash: opt.hash || '', pathname: '/', search: '' },
     history: { replaceState() {} }, document: { querySelector: el, querySelectorAll: () => [], documentElement: el(), addEventListener() {} },
     console, Date: FDate, Math, JSON, TextDecoder, Uint8Array, Response, Blob, atob, DecompressionStream: global.DecompressionStream, Promise,
     setTimeout, clearTimeout, getComputedStyle: () => ({ getPropertyValue: () => '' }),

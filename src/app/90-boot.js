@@ -43,9 +43,9 @@ var rz;window.addEventListener('resize',function(){clearTimeout(rz);rz=setTimeou
 if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener&&matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
 if(window.FitIcons)FitIcons.hydrate();
 if(S.active)setTimeout(tickRest,0);
-applyTheme();applyTitle();show('overview');
+applyTheme();applyMotion();applyTitle();show('overview');
 /* 存储安全（v2.6）：启动时申请持久存储、检查备份提醒与用量 */
-(function(){STORE.used=lsUsage(JSON.stringify(S));STORE.pct=quotaPct(STORE.used);if(!META.firstUse&&hasUserData(S)){META.firstUse=firstDataDate(S)||today();metaSave();}
+if(DEMO)storeAlert('demo');else(function(){STORE.used=lsUsage(JSON.stringify(S));STORE.pct=quotaPct(STORE.used);if(!META.firstUse&&hasUserData(S)){META.firstUse=firstDataDate(S)||today();metaSave();}
  var w=META.warned||(META.warned={}),lv=quotaLevel(STORE.pct,w);if(lv){metaSave();storeAlert(lv);}else if(backupDue(META,today(),hasUserData(S)))storeAlert('backup');
  storePersist(false);})();
 /* ---------- 多端：主题色 / 键盘 / 可访问性 / 尺寸变化 / PWA ---------- */
@@ -54,7 +54,23 @@ function syncThemeColor(){var ms=document.querySelectorAll('meta[name=theme-colo
 syncThemeColor();(function(){var _a=applyTheme;applyTheme=function(){_a();syncThemeColor();};})();
 /** 非按钮的可点元素可用键盘聚焦，Enter / 空格触发 */
 var TAP_SEL='[data-go]:not(button),[data-sub]:not(button),[data-entry],[data-fopen],[data-calday]:not(button)';
-function a11y(){Array.prototype.forEach.call(document.querySelectorAll(TAP_SEL),function(el){if(!el.hasAttribute('tabindex')){el.setAttribute('tabindex','0');el.setAttribute('role','button');}});}
+var A11Y_ID=0,CTRL='input,select,textarea';
+/** 可访问性补全：可点元素可聚焦；标签关联控件；成组按钮加 group；嵌套可点区域只让标题行获得焦点 */
+function a11y(root){root=root&&root.querySelectorAll?root:document;
+ Array.prototype.forEach.call(root.querySelectorAll(TAP_SEL),function(el){if(el.hasAttribute('tabindex')||el.hasAttribute('data-a11y'))return;
+  if(el.querySelector(TAP_SEL+',button,a[href],'+CTRL)){el.setAttribute('data-a11y','1');var h=el.querySelector('.hrow')||el.querySelector('h2,h3');if(h&&!h.hasAttribute('tabindex')){h.setAttribute('tabindex','0');h.setAttribute('role','button');h.setAttribute('data-proxy','1');}return;}
+  el.setAttribute('tabindex','0');el.setAttribute('role','button');});
+ Array.prototype.forEach.call(root.querySelectorAll('label:not([for]):not([data-a11y])'),function(lb){lb.setAttribute('data-a11y','1');if(lb.querySelector(CTRL))return;
+  var nx=lb.nextElementSibling;if(!nx)return;var c=nx.matches(CTRL)?nx:nx.querySelectorAll(CTRL).length===1?nx.querySelector(CTRL):null;
+  if(c){if(!c.id)c.id='fb-c'+(++A11Y_ID);lb.setAttribute('for',c.id);return;}
+  if(!lb.id)lb.id='fb-l'+(++A11Y_ID);if(!nx.hasAttribute('role'))nx.setAttribute('role','group');nx.setAttribute('aria-labelledby',lb.id);});
+ Array.prototype.forEach.call(root.querySelectorAll('button:not([aria-label])'),function(b){if(b.textContent.trim())return;var t=b.getAttribute('title');if(t)b.setAttribute('aria-label',t);});
+ Array.prototype.forEach.call(document.querySelectorAll('#nav button'),function(b){if(b.classList.contains('on'))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});}
+/* 渲染之外动态插入的内容（弹层、导入预览、拍照识别等）也补全 */
+(function(){if(!window.MutationObserver)return;var q=false;new MutationObserver(function(){if(q)return;q=true;setTimeout(function(){q=false;a11y();},0);}).observe(document.body,{childList:true,subtree:true});})();
+/** 切换页面时告知屏幕阅读器 */
+function srSay(t){var l=$('#srLive');if(!l)return;l.textContent='';setTimeout(function(){l.textContent=t;},40);}
+(function(){var _s=show;show=function(id){_s.apply(this,arguments);if(SEC_LABEL[cur])srSay('已打开 '+SEC_LABEL[cur]);};})();
 /* 网格补位：平板 / 桌面下，一行未排满的卡片均分剩余列，避免零散留白；页头高度供侧边导航顶部对齐 */
 function layFill(){var hd=document.querySelector('header');if(hd)document.documentElement.style.setProperty('--hh',hd.offsetHeight+'px');
  var sec=document.querySelector('section.on');if(!sec)return;var kids=[].slice.call(sec.children);kids.forEach(function(el){el.style.gridColumn='';});
@@ -97,7 +113,7 @@ impFromHash();
 function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
 /** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */
 document.addEventListener('keydown',function(e){var t=e.target;
- if((e.key==='Enter'||e.key===' ')&&t&&t.matches&&t.matches(TAP_SEL)){e.preventDefault();t.click();return;}
+ if((e.key==='Enter'||e.key===' ')&&t&&t.matches&&t.matches(TAP_SEL+',[data-proxy]')){e.preventDefault();t.click();return;}
  if(e.key==='Escape'){if(typing(t))t.blur();var bk0=document.querySelector('#subnav .back');if(bk0)bk0.click();return;}
  if(e.ctrlKey||e.metaKey||e.altKey||typing(t))return;
  var k=e.key;

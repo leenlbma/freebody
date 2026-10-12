@@ -1,7 +1,7 @@
 /* 10-ui-shell.js — 界面外壳：主题、导航、日期栏、渲染调度 */
 /* ---------- 主题 ---------- */
 function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme||'auto');}
-$('#themeBtn').onclick=function(){var o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast('主题：'+{auto:'跟随系统',light:'浅色',dark:'深色'}[S.theme]);drawCharts();};
+$('#themeBtn').onclick=function(){var o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast('主题：'+{auto:'跟随系统',light:'浅色',dark:'深色'}[S.theme]);drawCharts();rPrefs();};
 
 /* ---------- 导航 ---------- */
 $('#nav').innerHTML='<div class="nav-brand" aria-hidden="true">'+$('#appTitle').innerHTML.replace(/id="whd"/,'id="whd2"').replace(/url\(#whd\)/,'url(#whd2)')+'</div>'+GROUPS.map(function(g){return'<button data-go="'+g[0]+'">'+IC(ICONS[g[0]])+g[1]+'</button>';}).join('');
@@ -33,7 +33,7 @@ function otHtml(d){var s=otSignals(d);if(!s.length)return'';var lvl=s.length>=3?
 /* ---------- 渲染 ---------- */
 function render(){
  document.querySelectorAll('[data-rng]').forEach(function(el){var k=el.getAttribute('data-rng'),v=rng(k);el.innerHTML=[[7,'7天'],[30,'30天'],[90,'90天'],[0,'全部']].map(function(o){return'<button data-rngk="'+k+'" data-rngv="'+o[0]+'" class="'+(o[0]===v?'on':'')+'">'+o[1]+'</button>';}).join('');});
- if(cur==='overview')rOverview();else if(cur==='diet')rDiet();else if(cur==='dietAdd')rDietAdd();else if(cur==='dietFood')rDietFood();else if(cur==='dietAI')rDietAI();else if(cur==='nutri')chNutrition();else if(cur==='data')rData();else if(cur==='train'||cur==='cardio'||cur==='perf'||cur==='tstats')rTrain();else if(cur==='muscle')rMuscle();else if(cur==='supp')rSupp();else if(cur==='sleep')rSleep();else if(cur==='body')rBody();else if(cur==='hormone')rHormone();else if(cur==='settings'){rSettings();rAiCard();}else if(cur==='injury')rInjury();else if(cur==='impPack')rImp();else if(cur==='notes')rNotes();
+ if(cur==='overview')rOverview();else if(cur==='diet')rDiet();else if(cur==='dietAdd')rDietAdd();else if(cur==='dietFood')rDietFood();else if(cur==='dietAI')rDietAI();else if(cur==='nutri')chNutrition();else if(cur==='data')rData();else if(cur==='train'||cur==='cardio'||cur==='perf'||cur==='tstats')rTrain();else if(cur==='muscle')rMuscle();else if(cur==='supp')rSupp();else if(cur==='sleep')rSleep();else if(cur==='selftest')rSelftest();else if(cur==='body')rBody();else if(cur==='hormone')rHormone();else if(cur==='settings'){rSettings();rAiCard();}else if(cur==='injury')rInjury();else if(cur==='impPack')rImp();else if(cur==='notes')rNotes();
 }
 function drawCharts(){render();}
 

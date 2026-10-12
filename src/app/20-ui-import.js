@@ -13,8 +13,8 @@ function rImp(){var h='',b=$('#impBox');if(!b)return;SEC_LABEL.impPack=IMP.phase
    '<div class="imp-stats">'+[['new','新增',c['new']],['update','合并',c.update+c.merge],['same','已存在',c.same],['bad','无效',c.bad]].map(function(x){return'<div class="imp-st st-'+x[0]+(x[2]?'':' zero')+'"><b>'+x[2]+'</b><span>'+x[1]+'</span></div>';}).join('')+'</div>'+
    (c.same?'<p class="mut imp-note">已存在且内容相同的条目会跳过。</p>':'')+(c.bad?'<p class="imp-note bad-t">无效条目不会写入，原因见下方。</p>':'')+'</div>';
   Object.keys(byD).sort().reverse().forEach(function(d){h+='<div class="card imp-day"><h3>'+(d==='?'?'日期无效':impWd(d))+'</h3><ul class="imp-list">'+byD[d].map(function(r){var ty=IMP_TYPES[r.type],st=IMP_ST[r.status];
-   return'<li class="imp-it is-'+r.status+'"><span class="imp-ic" aria-hidden="true">'+IC(ty?ty[1]:'alert')+'</span><div class="imp-tx"><b>'+esc(r.title)+'</b>'+(r.detail?'<div class="mut">'+esc(r.detail)+'</div>':'')+(r.reason?'<div class="bad-t">'+esc(r.reason)+'</div>':'')+'</div>'+
-    '<div class="imp-tg">'+r.tags.map(function(t){return'<span class="tag est">'+esc(t)+'</span>';}).join('')+'<span class="tag st-'+r.status+'">'+st[0]+'</span></div></li>';}).join('')+'</ul></div>';});
+   return'<li class="imp-it is-'+r.status+'"><span class="imp-ic" aria-hidden="true">'+IC(ty?ty[1]:'alert')+'</span><div class="imp-tx"><b>'+esc(r.title)+'</b>'+(r.detail||r.tags.length?'<div class="mut">'+r.tags.map(function(t){return'<span class="tag est">'+esc(t)+'</span>';}).join('')+esc(r.detail||'')+'</div>':'')+(r.reason?'<div class="bad-t">'+esc(r.reason)+'</div>':'')+'</div>'+
+    '<div class="imp-tg"><span class="tag st-'+r.status+'">'+st[0]+'</span></div></li>';}).join('')+'</ul></div>';});
   h+='<div class="imp-bar"><button id="ipOk"'+(n?'':' disabled')+'>'+IC('check')+(n?'确认导入 '+n+' 条':'没有可导入的条目')+'</button><button class="ghost" id="ipNo">取消</button></div>';
  }else{var r=IMP.res||{n:0,dates:[]},last=r.dates[r.dates.length-1];
   h+='<div class="card imp-done"><div class="imp-ok">'+IC('check')+'</div><h2>已导入 '+r.n+' 条</h2><p class="mut">可以在对应页面查看、修改或删除。'+(r.dates.length?'日期 '+md(r.dates[0])+(r.dates[0]!==last?'–'+md(last):'')+'。':'')+'</p>'+

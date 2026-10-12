@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.6.0-2148b8" alt="version 2.6.0">
+<img src="https://img.shields.io/badge/version-2.7.0-2148b8" alt="version 2.7.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -95,6 +95,8 @@ Four cards (body, nutrition, training, recovery) open into detailed views:
 
 Every chart is dependency-free inline SVG. Tap any point to read its value, and switch between 7 days, 30 days, 90 days and all time.
 
+**Accessibility.** Every chart has a text summary (latest value and change over the range) and an expandable data table that screen readers can read row by row. Icon buttons have names, form labels are tied to their inputs, there is a skip link, and page changes are announced. Motion follows the system Reduce Motion setting and can also be turned off under 我的 › 显示与辅助 (Me › Display).
+
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-data-dark.png"><img src="docs/screenshots/f-data-light.png" alt="Data overview and body trends" width="620"></picture></p>
 
 <br>
@@ -102,6 +104,10 @@ Every chart is dependency-free inline SVG. Tap any point to read its value, and 
 ## Quick start
 
 **Open it online.** Visit <https://leenlbma.github.io/freebody/>. After the first visit it works offline.
+
+**Try the demo.** Open <https://leenlbma.github.io/freebody/#demo>, or use 我的 › 帮助与自检 › 试用演示数据 (Me › Help › Try demo data), to load four weeks of fictional records. Demo data lives only in the current page and never writes over your own; tap 退出演示 (Exit demo) to go back.
+
+**Device self-check.** 我的 › 帮助与自检 › 设备自检 (Me › Help › Device self-check) tests offline support, storage, link import, safe areas and more in this browser. The report contains no records and can be pasted into an issue. For manual device testing, see [docs/device-test.en.md](docs/device-test.en.md).
 
 **Add it to your home screen.** FreeBody is a progressive web app (PWA). Open it once over https, from the link above or your own server, and you can install it like a native app and use it offline. Your data stays in the browser's localStorage either way.
 
@@ -230,7 +236,7 @@ FreeBody has no built-in chat. Keep using the AI you like; FreeBody's job is to 
 
 ## Contributing
 
-Issues and pull requests are welcome, especially food library entries. Food data must include `source` and `ref` and use only redistributable values (self-compiled or CC0). Never submit real personal data. If you change the import format or the skill, update the schema, the samples and both language versions of the docs together; `npm run check` verifies that they agree. See [CONTRIBUTING.en.md](CONTRIBUTING.en.md) and [docs/food-database.en.md](docs/food-database.en.md).
+Issues and pull requests are welcome, especially food library entries and [device test reports](https://github.com/leenlbma/freebody/issues/new?template=device_report.yml). Newcomers can start with a [good first issue](https://github.com/leenlbma/freebody/labels/good%20first%20issue); questions go to [Discussions](https://github.com/leenlbma/freebody/discussions). Taking part means agreeing to the [code of conduct](CODE_OF_CONDUCT.md); report security problems privately as described in [SECURITY.md](SECURITY.md). Food data must include `source` and `ref` and use only redistributable values (self-compiled or CC0). Never submit real personal data. If you change the import format or the skill, update the schema, the samples and both language versions of the docs together; `npm run check` verifies that they agree. See [CONTRIBUTING.en.md](CONTRIBUTING.en.md) and [docs/food-database.en.md](docs/food-database.en.md).
 
 <details>
 <summary>Project layout</summary>
@@ -248,7 +254,7 @@ freebody/
 │   ├── icons.js               # inline SVG line icons
 │   ├── charts.js              # dependency-free SVG charts
 │   ├── app/                   # application modules, concatenated in file-name order into one IIFE at build time
-│   │   ├── 00-core.js … 04-import.js   # state, storage, utilities, core calculations, import merge (no DOM; unit-tested)
+│   │   ├── 00-core.js … 05-demo.js     # state, storage, utilities, core calculations, import merge, demo data (no DOM; unit-tested)
 │   │   └── 10-ui-*.js … 90-boot.js     # page UI and startup
 │   └── sw.template.js         # service worker template
 ├── data/foods.json            # food library (322 entries, each with a ref)
@@ -259,7 +265,9 @@ freebody/
 ├── scripts/check.js           # syntax, emoji, food library and import-pack schema checks
 ├── tests/                     # node:test unit tests (calculations, progression, import merge, storage warnings)
 ├── scripts/gen-foods.js       # food library generator (ingredient values + recipes → foods.json)
-├── docs/                      # data format, data model, food library, CSV import, screenshots
+├── docs/                      # data format, data model, food library, CSV import, device test checklist, screenshots
+├── .github/                   # CI, Pages deployment, issue / PR templates (including device test reports)
+├── CODE_OF_CONDUCT.md · SECURITY.md
 ├── LICENSE                    # MIT
 └── NOTICE                     # third-party notices
 ```

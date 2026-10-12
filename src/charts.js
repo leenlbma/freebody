@@ -4,6 +4,7 @@
  * - 带 data-tip 的元素可点按/悬停显示数值 tooltip
  * - 入场动效：折线描绘、柱体生长、面积淡入（尊重 prefers-reduced-motion）
  * - 同一容器数据未变化时不重绘（避免动效反复播放）
+ * - 无障碍：SVG 带 role="img" 与文字摘要（标题 + 最新值 / 区间），下方可展开数据表
  */
 (function () {
   'use strict';
@@ -36,6 +37,54 @@
     if (el.__sig === sig) return;
     el.__sig = sig;
     el.innerHTML = fn(w);
+    describe(el, data);
+  }
+
+  /* ---------- 无障碍：文字摘要 + 可展开的数据表 ---------- */
+  function txt(h) { return h.textContent.replace(/\s+/g, ' ').trim(); }
+  /** 图表标题：向前找最近的 h2 / h3（同一卡片内多张图各用自己的小标题），找不到用卡片标题 */
+  function cardTitle(el) {
+    for (var n = el; n && n.nodeType === 1; n = n.parentNode) {
+      for (var p = n.previousElementSibling; p; p = p.previousElementSibling) {
+        var h = p.matches('h2, h3') ? p : p.querySelector('h2, h3');
+        if (h) return txt(h);
+      }
+      if (n.classList.contains('card')) break;
+    }
+    var c = el.closest && el.closest('.card'), hh = c && c.querySelector('h2, h3, summary b');
+    return hh ? txt(hh) : '';
+  }
+  /** 每个 data-tip 是一行：第一行为日期或类别，其余为数值 */
+  function tipRows(el) {
+    return Array.prototype.map.call(el.querySelectorAll('[data-tip]'), function (t) {
+      var l = t.getAttribute('data-tip').split('\n');
+      return { h: l[0], v: l.slice(1).join('；') };
+    }).filter(function (r) { return r.v && r.v !== '无训练'; });
+  }
+  /** 折线：各系列的最新值与区间变化 */
+  function seriesSummary(opt) {
+    return (opt.series || []).map(function (s) {
+      var p = (s.pts || []).filter(function (q) { return q.y != null && !isNaN(q.y) && (!opt.from || q.d >= opt.from) && (!opt.to || q.d <= opt.to); });
+      if (!p.length) return '';
+      p = p.slice().sort(function (a, b) { return a.d < b.d ? -1 : 1; });
+      var f = s.fmt || fmt, last = p[p.length - 1], first = p[0];
+      var t = s.name + '最新 ' + f(last.y) + (s.unit || '') + '（' + md(last.d) + '）';
+      if (p.length > 1) { var dv = last.y - first.y; t += '，较 ' + md(first.d) + (dv === 0 ? '持平' : (dv > 0 ? '上升 ' : '下降 ') + fmt(Math.abs(dv)) + (s.unit || '')); }
+      return t;
+    }).filter(Boolean).join('；');
+  }
+  function describe(el, opt) {
+    var svg = el.querySelector('svg.cv');
+    if (!svg) return;
+    var rows = tipRows(el), title = opt.title || el.getAttribute('data-title') || cardTitle(el) || '图表';
+    var sum = opt.series ? seriesSummary(opt) : '';
+    if (!sum && rows.length) sum = '共 ' + rows.length + ' 项' + (rows.length > 1 ? '，' + rows[0].h + ' 至 ' + rows[rows.length - 1].h : '：' + rows[0].h + ' ' + rows[0].v);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', title + '。' + (sum || '暂无数值') + (rows.length ? '。具体数值见下方数据表。' : ''));
+    if (!rows.length || (el.closest && el.closest('[data-go], [data-sub]'))) return; // 可点卡片内的迷你图只给摘要，数据表在详情页
+    el.insertAdjacentHTML('beforeend', '<details class="cv-tb"><summary>数据表</summary><div class="cv-tw" tabindex="0" role="region" aria-label="' + esc(title) + ' 数据表"><table><caption class="sr">' + esc(title) + '</caption>' +
+      '<thead><tr><th scope="col">日期 / 类别</th><th scope="col">数值</th></tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr><th scope="row">' + esc(r.h) + '</th><td>' + esc(r.v) + '</td></tr>'; }).join('') + '</tbody></table></div></details>');
   }
 
   /**

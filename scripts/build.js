@@ -58,6 +58,7 @@ const app = [
   ' */',
   '(function(){',
   "'use strict';",
+  'var FB_VERSION = ' + JSON.stringify(require(path.join(root, 'package.json')).version) + ';',
 ].join('\n') + '\n' + appFiles.map((n) => fs.readFileSync(path.join(appDir, n), 'utf8')).join('') + '})();\n';
 
 // 4) 内联：样式、数据、图标、图表库、应用脚本依次注入模板（JSON 中的 "</" 转义，避免提前闭合 <script>）

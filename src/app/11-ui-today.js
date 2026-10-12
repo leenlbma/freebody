@@ -2,7 +2,7 @@
 /* ---------- 今天（一屏：准备度 / 推荐训练 / 营养剩余 / 打卡） ---------- */
 function activeInjury(){return S.injuries.some(function(x){return x.status!=='已恢复';});}
 function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(sel),wk=recWeek(sel);
- $('#ovAlerts').innerHTML=(!S.hideHello&&!S.meals.length&&!S.workouts.length&&!S.body.length&&!S.sleep.length)?'<div class="hello-bar">'+IC('hello')+'<span>欢迎使用 FreeBody。数据只存在本机，可在「我的」中导出备份。</span><button class="ghost hello-x" id="helloX" aria-label="关闭欢迎提示">'+IC('x')+'</button></div>':'';
+ $('#ovAlerts').innerHTML=(!S.hideHello&&!S.meals.length&&!S.workouts.length&&!S.body.length&&!S.sleep.length)?'<div class="hello-bar">'+IC('hello')+'<span>欢迎使用 FreeBody。数据只存在本机，可在「我的」中导出备份。<button class="linkb" id="helloDemo">先看看演示数据</button></span><button class="ghost hello-x" id="helloX" aria-label="关闭欢迎提示">'+IC('x')+'</button></div>':'';
  var lv=rd?(rd.score>=70?'ok':rd.score>=50?'warn':'bad'):'',
   sent=rd?(rd.score>=70?'状态不错，按计划练':rd.score>=50?'状态一般，控制强度':'恢复偏弱，以休息为主'):'记录睡眠后显示准备度';
  if(ot.length>=2){lv='bad';sent='恢复不足信号 '+ot.length+' 项，建议减量';}
@@ -15,7 +15,7 @@ function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(
   th='<div class="mut">今日训练</div><h2 class="rec-t">已完成 '+n+' 组</h2><div class="mut">'+(dayVol(sel)>0?'训练量 '+Math.round(dayVol(sel))+' kg':'自重训练')+'</div><button class="ghost btn-big" data-sub="train">查看</button>';}
  else th='<div class="mut">今日推荐</div><h2 class="rec-t">'+esc(rc.title)+'</h2><div class="mut">'+esc(rc.why)+'</div><button class="btn-big'+(rc.rest?' ghost':'')+'" data-ss="rec">'+IC('play')+(rc.rest?'仍要训练':'开始训练')+'</button>';
  var wi0=weekInfo(sel),td=Math.max(1,S.goals.trainDays||4),dots='';for(var di=0;di<Math.min(td,7);di++)dots+='<i class="'+(di<wi0.days?'on':'')+'"></i>';
- th+='<div class="wk-prog" data-sub="tstats" role="button" tabindex="0" aria-label="本周训练 '+wi0.days+' / '+td+' 天"><span class="mut">本周</span><span class="wk-dots" aria-hidden="true">'+dots+'</span><span class="mut">'+wi0.days+' / '+td+' 天</span></div>';
+ th+='<div class="wk-prog" data-sub="tstats" role="button" tabindex="0" aria-label="本周 '+wi0.days+' / '+td+' 天，查看训练统计"><span class="mut">本周</span><span class="wk-dots" aria-hidden="true">'+dots+'</span><span class="mut">'+wi0.days+' / '+td+' 天</span></div>';
  $('#ovTrain').innerHTML=th;
  var left=Math.round(g.kcal-t.k),pl=Math.max(0,Math.round(g.p-t.p)),nm=dayMeals(sel).length;
  $('#ovNut').innerHTML='<div class="hrow"><span class="mut">营养剩余</span><span class="mut">'+(nm?nm+' 条记录':'未记录')+IC('right')+'</span></div><div class="nut1"><div><b class="xl">'+left+'</b> <span class="mut">kcal</span></div><div><b class="xl">'+pl+'</b> <span class="mut">g 蛋白</span></div></div><div class="bar"><i style="width:'+Math.min(100,g.kcal?t.k/g.kcal*100:0)+'%;background:'+(left<0?'var(--bad)':'var(--k)')+'"></i></div>'+

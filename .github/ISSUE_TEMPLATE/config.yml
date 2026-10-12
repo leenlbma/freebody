@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用问题与讨论 / Questions and discussion
+    url: https://github.com/leenlbma/freebody/discussions
+    about: 怎么用、和 AI 配合的经验、想法交流 / How-to questions, AI workflows and ideas
+  - name: 安全问题 / Security
+    url: https://github.com/leenlbma/freebody/security/advisories/new
+    about: 请私下报告，不要公开提交 issue / Report privately, not as a public issue

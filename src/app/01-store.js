@@ -7,9 +7,11 @@ function defaults(){return{v:1,
  perfEvents:[{id:'vj',name:'纵跳',unit:'cm',better:'higher',hist:null}],perfLog:[],
  // 伤病：默认空，可在设置中加载示例配置
  plans:[],sessions:[],active:null,exRules:{},
- injuries:[],wristLog:[],rehabLog:{},rehab:[],restricted:[],customFoods:[],suppLog:{},sleep:[],body:[],recov:[],labs:[],notes:[],theme:'auto'};}
+ injuries:[],wristLog:[],rehabLog:{},rehab:[],restricted:[],customFoods:[],suppLog:{},sleep:[],body:[],recov:[],labs:[],notes:[],theme:'auto',motion:'auto'};}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 var S;
+/** 地址带 #demo 时进入演示模式（见 05-demo.js）：数据只在内存中，不读写本机存储，退出或关闭页面后消失 */
+var DEMO=/^#demo(&|$)/.test(location.hash||'');
 function load(){var d=defaults();try{var raw=localStorage.getItem(KEY);if(raw==null){for(var li=0;li<LEGACY_KEYS.length;li++){raw=localStorage.getItem(LEGACY_KEYS[li]);if(raw!=null){localStorage.setItem(KEY,raw);break;}}}var r=JSON.parse(raw||'null');if(r&&typeof r==='object'){for(var k in d){if(r[k]===undefined)r[k]=d[k];}for(var g in d.goals){if(r.goals[g]===undefined)r.goals[g]=d.goals[g];}for(var pk in d.profile){if(r.profile[pk]===undefined)r.profile[pk]=d.profile[pk];}return r;}}catch(e){}return d;}
 /* ---------- 存储安全（v2.6）：用量预警 / 写满兜底 / 备份提醒 / 持久存储 ---------- */
 /** 辅助状态单独存放（不进入备份）：firstUse、lastBackup、已提示的用量阈值、备份提醒的推迟日期 */
@@ -18,8 +20,8 @@ var METAKEY='freeBody_meta_v1';
 var LS_QUOTA=2621440,QUOTA_STEPS=[70,90],BACKUP_DAYS=30;
 var STORE={err:null,used:0,pct:0,persist:null,banner:null};
 function metaLoad(){var m=null;try{m=JSON.parse(localStorage.getItem(METAKEY)||'null');}catch(e){}return m&&typeof m==='object'&&!Array.isArray(m)?m:{};}
-var META=metaLoad();
-function metaSave(){try{localStorage.setItem(METAKEY,JSON.stringify(META));}catch(e){}}
+var META=DEMO?{}:metaLoad();
+function metaSave(){if(DEMO)return;try{localStorage.setItem(METAKEY,JSON.stringify(META));}catch(e){}}
 /** 写满判断：各浏览器的名称 / 错误码不同 */
 function isQuotaErr(e){return!!e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'||e.code===22||e.code===1014);}
 /** 估算本应用在 localStorage 中占用的字符数（键 + 值）；json 为即将写入的主数据 */
@@ -34,12 +36,12 @@ function backupDue(meta,day,hasData){if(!hasData)return false;var ref=meta.lastB
 function firstDataDate(s){var m=null;['meals','workouts','cardio','sleep','body','recov','labs','notes','wristLog'].forEach(function(k){(s[k]||[]).forEach(function(x){if(x&&typeof x.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&(!m||x.date<m))m=x.date;});});return m;}
 function hasUserData(s){return['meals','workouts','cardio','sleep','body','recov','labs','notes','sessions','wristLog'].some(function(k){return s[k]&&s[k].length;})||Object.keys(s.suppLog||{}).length>0;}
 /** 保存：写满时保留内存中的数据并给出导出出口；成功后更新用量并按阈值预警 */
-function save(){var json=JSON.stringify(S);
+function save(){if(DEMO)return true;var json=JSON.stringify(S);
  try{localStorage.setItem(KEY,json);}catch(e){if(isQuotaErr(e)){STORE.err='quota';storeAlert('quota');}else toast('保存失败：'+e.message);return false;}
  if(STORE.err){STORE.err=null;if(STORE.banner==='quota'){STORE.banner=null;if(typeof rStoreBanner==='function')rStoreBanner();}}
  STORE.used=lsUsage(json);STORE.pct=quotaPct(STORE.used);
  var w=META.warned||(META.warned={}),before=JSON.stringify(w),lv=quotaLevel(STORE.pct,w),dirty=JSON.stringify(w)!==before;
  if(!META.firstUse){META.firstUse=firstDataDate(S)||today();dirty=true;}
  if(dirty)metaSave();if(lv)storeAlert(lv);return true;}
-S=load();
+S=DEMO?demoData(today()):load();
 (S.customFoods||[]).forEach(function(f){f.custom=true;}); // 自定义食物均优先匹配

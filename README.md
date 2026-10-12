@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.6.0-2148b8" alt="version 2.6.0">
+<img src="https://img.shields.io/badge/version-2.7.0-2148b8" alt="version 2.7.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -75,6 +75,8 @@ v2.4 起可选拍照识别：拍一张，或吃前、吃后各拍一张，模型
 
 身体、营养、训练、恢复四张卡片，点开看细分：体重与体脂双轴、7 日均线、热量与目标、蛋白达标率、准备度曲线、化验趋势。所有图表为零依赖内联 SVG，可点按查看数值，支持 7 天 / 30 天 / 90 天 / 全部。
 
+**无障碍**：每张图表都带文字摘要（最新值与区间变化），下方可展开「数据表」，读屏软件可以逐行读出；图标按钮都有名称，表单标签与输入框关联；有「跳到主要内容」链接，切换页面会播报；动效跟随系统「减弱动态效果」，也可以在「我的 › 显示与辅助」单独关闭。
+
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-data-dark.png"><img src="docs/screenshots/f-data-light.png" alt="数据概览与身体趋势" width="620"></picture></p>
 
 <br>
@@ -82,6 +84,10 @@ v2.4 起可选拍照识别：拍一张，或吃前、吃后各拍一张，模型
 ## 快速开始
 
 **在线打开**　访问 <https://leenlbma.github.io/freebody/>。首次打开后即可离线使用。
+
+**先看演示**　打开 <https://leenlbma.github.io/freebody/#demo>（或「我的 › 帮助与自检 › 试用演示数据」），载入 4 周虚构记录。演示数据只在当前页面中，不会写入或覆盖你的数据，点「退出演示」即回到自己的数据。
+
+**设备自检**　「我的 › 帮助与自检 › 设备自检」检查本机浏览器的离线、存储、链接导入、安全区等能力，报告不含记录内容，可以复制贴到 issue。真机测试步骤见 [docs/device-test.md](docs/device-test.md)。
 
 **添加到主屏幕**
 
@@ -201,7 +207,7 @@ FreeBody 不内置聊天。你继续用自己习惯的 AI，FreeBody 只负责�
 
 ## 贡献
 
-欢迎提交 Issue 与 PR，尤其是食物库条目。食物数据请填写 `source` 与 `ref`，只使用自整理或 CC0 等可再分发的数值，不要提交任何真实个人数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/food-database.md](docs/food-database.md)。导入格式或 skill 有改动时，请同步更新 schema、示例和中英文文档，`npm run check` 会校验它们是否一致。
+欢迎提交 Issue 与 PR，尤其是食物库条目和[真机测试报告](https://github.com/leenlbma/freebody/issues/new?template=device_report.yml)。新手可以从 [good first issue](https://github.com/leenlbma/freebody/labels/good%20first%20issue) 开始，使用问题请到 [Discussions](https://github.com/leenlbma/freebody/discussions)。参与即表示同意[行为准则](CODE_OF_CONDUCT.md)，安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。食物数据请填写 `source` 与 `ref`，只使用自整理或 CC0 等可再分发的数值，不要提交任何真实个人数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/food-database.md](docs/food-database.md)。导入格式或 skill 有改动时，请同步更新 schema、示例和中英文文档，`npm run check` 会校验它们是否一致。
 
 <details>
 <summary>项目结构</summary>
@@ -223,7 +229,7 @@ freebody/
 │   ├── icons.js               # 内联 SVG 线条图标
 │   ├── charts.js              # 零依赖 SVG 图表库
 │   ├── app/                   # 应用逻辑模块，构建时按文件名顺序合并进一个 IIFE
-│   │   ├── 00-core.js … 04-import.js   # 状态、存储、工具函数、核心计算、导入合并（不依赖 DOM，可单测）
+│   │   ├── 00-core.js … 05-demo.js     # 状态、存储、工具函数、核心计算、导入合并、演示数据（不依赖 DOM，可单测）
 │   │   └── 10-ui-*.js … 90-boot.js     # 各页面界面与启动
 │   └── sw.template.js         # Service Worker 模板
 ├── data/foods.json            # 食物营养库（322 项，每条带 ref 来源）
@@ -234,7 +240,9 @@ freebody/
 ├── scripts/check.js           # 语法 / emoji / 食物库 / 导入包 schema 校验
 ├── tests/                     # node:test 单元测试（核心计算、进阶规则、导入合并、存储预警）
 ├── scripts/gen-foods.js       # 食物库生成（原料值 + 自拟配方 → foods.json）
-├── docs/                      # 数据格式、数据结构、食物库扩展、CSV 导入、截图
+├── docs/                      # 数据格式、数据结构、食物库扩展、CSV 导入、真机测试清单、截图
+├── .github/                   # CI、Pages 部署、issue / PR 模板（含真机测试报告）
+├── CODE_OF_CONDUCT.md · SECURITY.md
 ├── LICENSE                    # MIT
 └── NOTICE                     # 第三方声明
 ```

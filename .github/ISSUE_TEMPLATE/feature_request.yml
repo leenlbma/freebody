@@ -1,0 +1,24 @@
+name: 功能建议 / Feature request
+description: 新功能或改进建议
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 想解决什么问题 / Problem
+      description: 你在什么场景下遇到了不便 / When does this get in your way
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 建议的做法 / Proposal
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: 项目原则 / Project principles
+      options:
+        - label: 我理解 FreeBody 坚持数据只存本机、不引入账号与服务器 / Data stays on the device; no accounts or servers
+          required: true
+        - label: 我理解 FreeBody 只做记录与参考，不提供医疗诊断 / Records and reference only, no medical diagnosis
+          required: true

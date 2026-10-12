@@ -1,0 +1,41 @@
+name: 问题反馈 / Bug report
+description: 功能不正常、显示错乱、数据异常
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。**请不要粘贴真实的健康记录、导出文件或 API Key。** 需要示例数据时，可以用「我的 › 帮助与自检 › 试用演示数据」复现。
+        Thanks for reporting. **Please do not paste real health records, backup files or API keys.** You can reproduce with the built-in demo data (Me › Help › Try demo data).
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么 / What happened
+      description: 期望看到什么，实际看到什么 / What you expected and what you saw
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      placeholder: |
+        1. 打开 …
+        2. 点击 …
+    validations:
+      required: true
+  - type: textarea
+    id: selftest
+    attributes:
+      label: 设备自检报告 / Self-check report
+      description: 「我的 › 帮助与自检 › 设备自检 › 复制报告」，不含记录内容 / Copy from Me › Help › Device self-check; it contains no records
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / Version
+      description: 「我的」页面底部可以看到，如 v2.7.0 / Shown at the bottom of the Me page
+  - type: textarea
+    id: shots
+    attributes:
+      label: 截图 / Screenshots
+      description: 可选。请先遮挡个人信息 / Optional. Hide personal information first

@@ -15,7 +15,8 @@
    npm test
    ```
 4. 用手机尺寸（如 390px 宽）在浏览器中打开 `index.html`，浅色与深色主题下各检查一遍。
-5. 提交 PR，并在 `CHANGELOG.md` 的「未发布」下简述改动。PR 中需同时包含源码与重新构建后的 `index.html`。
+5. 有真机的话，按 [docs/device-test.md](docs/device-test.md) 跑一遍相关项目，并在 PR 中写明设备与结果。
+6. 提交 PR，并在 `CHANGELOG.md` 的「未发布」下简述改动。PR 中需同时包含源码与重新构建后的 `index.html`。
 
 ## 代码约定
 
@@ -25,6 +26,8 @@
 - 交互保持简洁：底部导航不超过 4 个；新功能优先放进已有卡片或"更多"折叠区；表单只默认显示必填字段，其余放进 `<details class="more">`；文案尽量一句话。
 - 新增数据字段必须在 `defaults()` 中给出默认值（旧数据加载时自动补齐），并更新 `docs/data-model.md`。
 - 用户输入渲染到 HTML 前一律经过 `esc()`。
+- 无障碍：只有图标的按钮必须写 `aria-label`；`<label>` 用 `for` 关联输入框（`90-boot.js` 中的 `a11y()` 会给紧邻的控件自动补上，但请优先写在源码里）；可点的卡片用 `data-go` / `data-sub`，会自动获得焦点与按钮语义；图表由 `charts.js` 自动生成文字摘要与数据表，请给图表上方写 `<h3>` 小标题作为图表名称；动画需在「减少动效」下关闭（全局样式已覆盖 CSS 动画与过渡）。提交前可以用 axe 等工具检查，目标是 0 项违规。
+- 演示数据在 `05-demo.js`，只用虚构内容；新增数据类型时请同步补一些演示记录。
 - 界面不使用 emoji。图标在 `src/icons.js` 中新增，保持 24×24、1.5px 描边、无填充、圆角端点、`currentColor`；HTML 中写 `<i data-ic="名称"></i>`，JS 中用 `IC('名称')`。
 - 图表统一用 `src/charts.js`（`FitCharts.line / bars / stack / donut / hbars / heat`），颜色只用 CSS 变量，并提供空状态文案。
 - 动作 → 肌群的关键词映射在 `EX_MUS`（越具体的关键词越靠前），肌群与恢复半衰期在 `MUS`；调整参数请同步 `docs/data-model.md`。
