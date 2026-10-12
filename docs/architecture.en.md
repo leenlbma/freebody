@@ -27,6 +27,7 @@ The files in `src/app/` are concatenated in file-name order into one function sc
 | | `03-calc` | Totals, readiness, overtraining signals, progression, 1RM, BMR, muscle fatigue, quick-entry parsing | No |
 | | `04-import` | Import-pack validation and merge, undo, link decoding, CSV | No |
 | | `05-demo` | Deterministic fictional demo data | No |
+| | `06-crypto` | Encrypted backups: PBKDF2 key derivation + AES-GCM (Web Crypto) | No |
 | Initialisation | `09-init` | Reads stored data (or builds demo data in demo mode) into the global state `S` | No |
 | UI | `10-ui-shell` | Navigation `show()`, page render dispatch `render()`, theme | Yes |
 | | `11`–`21` | Pages: today, diet, training, records, charts, guided session, quick entry, settings, photo recognition, import preview, help and self-check | Yes |

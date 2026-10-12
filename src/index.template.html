@@ -469,6 +469,7 @@
    <div style="grid-column:1/-1"><label>API Key</label><div class="qrow ai-keyrow"><input id="aiKey" type="password" autocomplete="off" spellcheck="false" placeholder="仅保存在本机"><button class="ghost" id="aiEye" type="button">显示</button></div></div>
   </div>
   <p class="mut ai-help" id="aiHelp"></p>
+  <label class="chk ai-inc"><input type="checkbox" id="aiRemember">在本机记住 API Key（取消后只在当前页面使用，关闭或刷新即需重新填写）</label>
   <label class="chk ai-inc"><input type="checkbox" id="aiIncKey">导出备份时包含 API Key（不推荐）</label>
   <div class="actions"><button id="aiSave">保存</button><button class="ghost" id="aiTest">测试连接</button></div>
   <div id="aiTestOut"></div>
@@ -494,9 +495,13 @@
   <div class="row" style="margin-top:8px" id="csvTpl"></div>
  </details>
  <div class="card"><h2>数据备份</h2>
-  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
+  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选），可加密。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
   <div class="st-status" id="stStatus"></div>
   <div class="actions bk-act"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
+  <details class="more bk-enc"><summary>加密备份（可选）</summary>
+   <div class="fg2"><div style="grid-column:1/-1"><label for="bkPw">备份密码</label><input id="bkPw" type="password" autocomplete="new-password" spellcheck="false" placeholder="留空则导出普通 JSON"></div></div>
+   <p class="mut">填写后，「导出 JSON」会用这个密码加密（AES-GCM，在本机完成）；导入加密备份时也在这里填写同一密码。密码不会保存，忘记后无法恢复。</p>
+  </details>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card" id="prefCard"><h2>显示与辅助</h2>

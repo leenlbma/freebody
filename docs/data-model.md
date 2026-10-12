@@ -5,7 +5,7 @@ AI 或其他工具向 FreeBody 写入数据请使用增量导入包，见 [data-
 全部数据以一个 JSON 对象保存在 `localStorage['freeBody_v1']`（v2.0 起；首次启动时若存在旧键 `fitTracker_v1` 会自动复制过来，旧键保留，结构不变），导出文件即该对象原样。日期统一为本地日期字符串 `YYYY-MM-DD`；`id` 为随机短字符串。加载时会用 `defaults()` 为缺失字段补默认值，因此新增字段向后兼容。
 
 
-另有两个独立的键，不在导出备份中（除非在「拍照识别」中勾选包含 Key）：`freeBody_ai_v1` 保存拍照识别的服务商与 Key；`freeBody_meta_v1`（v2.6 起）保存存储安全相关的状态，不含任何记录内容：
+另有两个独立的键，不在导出备份中（除非在「拍照识别」中勾选包含 Key）：`freeBody_ai_v1` 保存拍照识别的服务商与 Key（v2.10 起 `remember: false` 时不保存 Key）；`freeBody_meta_v1`（v2.6 起）保存存储安全相关的状态，不含任何记录内容：
 
 ```jsonc
 {

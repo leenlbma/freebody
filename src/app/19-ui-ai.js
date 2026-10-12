@@ -59,13 +59,17 @@ function aiLoad() {
     base: typeof c.base === 'string' ? c.base : p[2],
     model: typeof c.model === 'string' ? c.model : p[3],
     key: typeof c.key === 'string' ? c.key : '',
-    incKey: !!c.incKey
+    incKey: !!c.incKey,
+    remember: c.remember !== false // 旧配置默认记住
   };
 }
 var AIC = aiLoad();
+/** 不记住 key 时只把服务商与模型写入本机，key 只留在内存中 */
 function aiSave() {
+  var o = { prov: AIC.prov, base: AIC.base, model: AIC.model, incKey: AIC.incKey, remember: AIC.remember };
+  if (AIC.remember) o.key = AIC.key;
   try {
-    localStorage.setItem(AIKEY, JSON.stringify(AIC));
+    localStorage.setItem(AIKEY, JSON.stringify(o));
   } catch (e) {
     toast('保存失败：' + e.message);
   }
@@ -121,7 +125,10 @@ function rAiCard() {
   $('#aiModel').value = AIC.model;
   $('#aiKey').value = AIC.key;
   $('#aiIncKey').checked = AIC.incKey;
-  $('#aiSum').textContent = aiReady() ? aiProvName() + ' · ' + AIC.model : '未配置';
+  $('#aiRemember').checked = AIC.remember;
+  $('#aiSum').textContent = aiReady()
+    ? aiProvName() + ' · ' + AIC.model + (AIC.remember ? '' : ' · Key 仅本次')
+    : '未配置';
   $('#aiClear').disabled = !AIC.key;
 }
 $('#aiProv').addEventListener('change', function () {
@@ -151,13 +158,20 @@ function aiFromForm() {
   AIC.model = $('#aiModel').value.trim();
   AIC.key = $('#aiKey').value.trim();
   AIC.incKey = $('#aiIncKey').checked;
+  AIC.remember = $('#aiRemember').checked;
   return true;
 }
 $('#aiSave').onclick = function () {
   if (!aiFromForm()) return;
   aiSave();
   rAiCard();
-  toast(aiReady() ? '已保存（仅本机）' : '已保存，尚缺 ' + (!AIC.key ? 'API Key' : !AIC.base ? '接口地址' : '模型'));
+  toast(
+    aiReady()
+      ? AIC.remember
+        ? '已保存（仅本机）'
+        : '已保存，Key 只在本次使用'
+      : '已保存，尚缺 ' + (!AIC.key ? 'API Key' : !AIC.base ? '接口地址' : '模型')
+  );
 };
 $('#aiClear').onclick = function () {
   if (!confirm('清除本机保存的 API Key？')) return;

@@ -1180,6 +1180,7 @@ a.chip{display:inline-flex;align-items:center;justify-content:center;gap:4px;tex
    <div style="grid-column:1/-1"><label>API Key</label><div class="qrow ai-keyrow"><input id="aiKey" type="password" autocomplete="off" spellcheck="false" placeholder="仅保存在本机"><button class="ghost" id="aiEye" type="button">显示</button></div></div>
   </div>
   <p class="mut ai-help" id="aiHelp"></p>
+  <label class="chk ai-inc"><input type="checkbox" id="aiRemember">在本机记住 API Key（取消后只在当前页面使用，关闭或刷新即需重新填写）</label>
   <label class="chk ai-inc"><input type="checkbox" id="aiIncKey">导出备份时包含 API Key（不推荐）</label>
   <div class="actions"><button id="aiSave">保存</button><button class="ghost" id="aiTest">测试连接</button></div>
   <div id="aiTestOut"></div>
@@ -1205,9 +1206,13 @@ a.chip{display:inline-flex;align-items:center;justify-content:center;gap:4px;tex
   <div class="row" style="margin-top:8px" id="csvTpl"></div>
  </details>
  <div class="card"><h2>数据备份</h2>
-  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
+  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选），可加密。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
   <div class="st-status" id="stStatus"></div>
   <div class="actions bk-act"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
+  <details class="more bk-enc"><summary>加密备份（可选）</summary>
+   <div class="fg2"><div style="grid-column:1/-1"><label for="bkPw">备份密码</label><input id="bkPw" type="password" autocomplete="new-password" spellcheck="false" placeholder="留空则导出普通 JSON"></div></div>
+   <p class="mut">填写后，「导出 JSON」会用这个密码加密（AES-GCM，在本机完成）；导入加密备份时也在这里填写同一密码。密码不会保存，忘记后无法恢复。</p>
+  </details>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card" id="prefCard"><h2>显示与辅助</h2>
@@ -2383,12 +2388,12 @@ window.FIT_DATA = {"foods":{"version":4,"per":"100g","note":"常见食物每100g
  * FreeBody — 应用脚本（由 scripts/build.js 从 src/app/*.js 合并）
  * 单页离线健身记录：饮食 / 训练 / 补剂 / 睡眠 / 身体指标 / 激素与恢复 / 伤病与限制
  * 数据仅存于浏览器 localStorage（键：freeBody_v1，自动从旧键 fitTracker_v1 迁移），可导出/导入 JSON。
- * 模块：00-core.js、01-store.js、02-util.js、03-calc.js、04-import.js、05-demo.js、09-init.js、10-ui-shell.js、11-ui-today.js、12-ui-diet.js、13-ui-train.js、14-ui-records.js、15-ui-charts.js、16-ui-session.js、17-ui-quick.js、18-ui-settings.js、19-ui-ai.js、20-ui-import.js、21-ui-help.js、90-boot.js
+ * 模块：00-core.js、01-store.js、02-util.js、03-calc.js、04-import.js、05-demo.js、06-crypto.js、09-init.js、10-ui-shell.js、11-ui-today.js、12-ui-diet.js、13-ui-train.js、14-ui-records.js、15-ui-charts.js、16-ui-session.js、17-ui-quick.js、18-ui-settings.js、19-ui-ai.js、20-ui-import.js、21-ui-help.js、90-boot.js
  * 本项目不提供医疗建议。SPDX-License-Identifier: MIT · https://github.com/leenlbma/freebody
  */
 (function(){
 'use strict';
-var FB_VERSION = "2.9.0";
+var FB_VERSION = "2.10.0";
 /* 00-core.js — 常量、导航配置、预设 */
 /** localStorage 键名；LEGACY_KEYS 用于从旧版本自动迁移 */
 var KEY = 'freeBody_v1',
@@ -4582,6 +4587,92 @@ function demoData(day) {
 }
 function pad2(v) {
   return (v < 10 ? '0' : '') + v;
+}
+/* 06-crypto.js — 加密备份（可选）：PBKDF2-SHA256 派生密钥 + AES-GCM，全部在本机用 Web Crypto 完成 */
+/* ---------- 加密备份 ---------- */
+var BK_ITER = 310000; // OWASP 2023 对 PBKDF2-HMAC-SHA256 的建议下限
+/** 当前环境能否加密（需要安全上下文：https、localhost 或本地文件） */
+function bkCan() {
+  return !!(typeof crypto !== 'undefined' && crypto.subtle && crypto.getRandomValues);
+}
+/** @param {Uint8Array} u */
+function bkB64(u) {
+  var s = '';
+  for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]);
+  return btoa(s);
+}
+/** @param {string} s @returns {Uint8Array<ArrayBuffer>} */
+function bkUnB64(s) {
+  var b = atob(s),
+    u = new Uint8Array(b.length);
+  for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+  return u;
+}
+/** @param {string} pw @param {Uint8Array<ArrayBuffer>} salt @param {number} iter */
+function bkKey(pw, salt, iter) {
+  return crypto.subtle
+    .importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey'])
+    .then(function (base) {
+      return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', hash: 'SHA-256', salt: salt, iterations: iter },
+        base,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    });
+}
+/** 是否为加密备份文件 */
+function bkIsEnc(d) {
+  return !!(d && typeof d === 'object' && d.freebody === 'backup-enc');
+}
+/**
+ * 加密一段文本（备份 JSON）。返回可直接 JSON.stringify 的对象，不含明文或密码。
+ * @param {string} text @param {string} pw
+ * @returns {Promise<Object<string, any>>}
+ */
+function bkEncrypt(text, pw) {
+  var salt = crypto.getRandomValues(new Uint8Array(16)),
+    iv = crypto.getRandomValues(new Uint8Array(12));
+  return bkKey(pw, salt, BK_ITER)
+    .then(function (k) {
+      return crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, k, new TextEncoder().encode(text));
+    })
+    .then(function (buf) {
+      return {
+        freebody: 'backup-enc',
+        v: 1,
+        kdf: 'PBKDF2-SHA256',
+        iter: BK_ITER,
+        salt: bkB64(salt),
+        iv: bkB64(iv),
+        alg: 'AES-GCM-256',
+        data: bkB64(new Uint8Array(buf))
+      };
+    });
+}
+/**
+ * 解密。密码错误或文件被改动时 reject，错误信息可直接展示。
+ * @param {Object<string, any>} d @param {string} pw
+ * @returns {Promise<string>}
+ */
+function bkDecrypt(d, pw) {
+  if (!bkIsEnc(d) || d.v !== 1 || d.kdf !== 'PBKDF2-SHA256' || d.alg !== 'AES-GCM-256')
+    return Promise.reject(new Error('不支持的加密备份格式'));
+  var iter = +d.iter;
+  if (!(iter >= 100000 && iter <= 10000000)) return Promise.reject(new Error('加密参数无效'));
+  return bkKey(pw, bkUnB64(d.salt), iter)
+    .then(function (k) {
+      return crypto.subtle.decrypt({ name: 'AES-GCM', iv: bkUnB64(d.iv) }, k, bkUnB64(d.data));
+    })
+    .then(
+      function (buf) {
+        return new TextDecoder().decode(buf);
+      },
+      function () {
+        throw new Error('密码不正确，或文件已损坏');
+      }
+    );
 }
 /* ---------- 初始化状态 ----------
  * 00–05 只定义常量与函数，这里才真正读取本机数据（演示模式则生成虚构数据）。
@@ -10496,28 +10587,58 @@ $('#imp').onchange = function () {
   if (!f) return;
   var rd = new FileReader();
   rd.onload = function () {
+    var d;
     try {
-      var d = JSON.parse(String(rd.result));
-      if (!d || typeof d !== 'object' || !Array.isArray(d.meals) || !d.goals) throw new Error('格式不符');
-      if (!confirm('导入将覆盖当前全部数据，确定？')) return;
-      if (d.aiConfig) {
-        aiImport(d.aiConfig);
-      }
-      delete d.aiConfig;
-      localStorage.setItem(KEY, JSON.stringify(d));
-      S = load();
-      rStoreBanner();
-      applyTheme();
-      applyTitle();
-      toast('导入成功');
-      render();
+      d = JSON.parse(String(rd.result));
     } catch (e) {
       toast('导入失败：' + e.message);
+      return;
     }
+    if (!bkIsEnc(d)) {
+      bkRestore(d);
+      return;
+    }
+    var pw = $('#bkPw').value;
+    if (!pw) {
+      $('.bk-enc').open = true;
+      $('#bkPw').focus();
+      toast('这是加密备份：请在「加密备份」中填写密码后再导入');
+      return;
+    }
+    bkDecrypt(d, pw).then(
+      function (t) {
+        bkRestore(JSON.parse(t));
+      },
+      function (e) {
+        toast('导入失败：' + e.message);
+      }
+    );
   };
   rd.readAsText(f);
   this.value = '';
 };
+/** 用完整备份覆盖当前数据（确认后） */
+function bkRestore(d) {
+  if (DEMO) {
+    toast('演示模式中不能导入备份，请先退出演示');
+    return;
+  }
+  try {
+    if (!d || typeof d !== 'object' || !Array.isArray(d.meals) || !d.goals) throw new Error('格式不符');
+    if (!confirm('导入将覆盖当前全部数据，确定？')) return;
+    if (d.aiConfig) aiImport(d.aiConfig);
+    delete d.aiConfig;
+    localStorage.setItem(KEY, JSON.stringify(d));
+    S = load();
+    rStoreBanner();
+    applyTheme();
+    applyTitle();
+    toast('导入成功');
+    render();
+  } catch (e) {
+    toast('导入失败：' + e.message);
+  }
+}
 $('#wipe').onclick = function () {
   if (DEMO) {
     exitDemo();
@@ -10542,18 +10663,41 @@ $('#wipe').onclick = function () {
 
 /* ---------- 存储安全（v2.6）：提示条、导出、持久存储、状态 ---------- */
 /** 导出完整备份（JSON）；记录 lastBackup，关闭备份提醒 */
+/** 导出备份；「加密备份」中填了密码时导出加密文件 */
 function doExport() {
   var out = {};
   for (var k in S) out[k] = S[k];
   out.aiConfig = aiExport();
-  download('freebody-' + today() + '.json', JSON.stringify(out, null, 2), 'application/json');
+  var json = JSON.stringify(out, null, 2),
+    pw = $('#bkPw') ? $('#bkPw').value : '';
+  if (!pw) {
+    download('freebody-' + today() + '.json', json, 'application/json');
+    bkDone(false);
+    return;
+  }
+  if (!bkCan()) {
+    toast('当前浏览器环境不支持加密，未导出。可清空密码导出普通 JSON');
+    return;
+  }
+  toast('正在加密…');
+  bkEncrypt(json, pw).then(
+    function (enc) {
+      download('freebody-' + today() + '.enc.json', JSON.stringify(enc), 'application/json');
+      bkDone(true);
+    },
+    function (e) {
+      toast('加密失败：' + e.message);
+    }
+  );
+}
+function bkDone(enc) {
   META.lastBackup = today();
   delete META.snooze;
   metaSave();
   if (STORE.banner === 'backup') STORE.banner = null;
   rStoreBanner();
   rStore();
-  toast(AIC.incKey && AIC.key ? '已导出（含 API Key，请妥善保管）' : '已导出');
+  toast((enc ? '已导出加密备份' : '已导出') + (AIC.incKey && AIC.key ? '（含 API Key，请妥善保管）' : ''));
 }
 $('#exp').onclick = doExport;
 var ST_MSG = {
@@ -10823,13 +10967,17 @@ function aiLoad() {
     base: typeof c.base === 'string' ? c.base : p[2],
     model: typeof c.model === 'string' ? c.model : p[3],
     key: typeof c.key === 'string' ? c.key : '',
-    incKey: !!c.incKey
+    incKey: !!c.incKey,
+    remember: c.remember !== false // 旧配置默认记住
   };
 }
 var AIC = aiLoad();
+/** 不记住 key 时只把服务商与模型写入本机，key 只留在内存中 */
 function aiSave() {
+  var o = { prov: AIC.prov, base: AIC.base, model: AIC.model, incKey: AIC.incKey, remember: AIC.remember };
+  if (AIC.remember) o.key = AIC.key;
   try {
-    localStorage.setItem(AIKEY, JSON.stringify(AIC));
+    localStorage.setItem(AIKEY, JSON.stringify(o));
   } catch (e) {
     toast('保存失败：' + e.message);
   }
@@ -10885,7 +11033,10 @@ function rAiCard() {
   $('#aiModel').value = AIC.model;
   $('#aiKey').value = AIC.key;
   $('#aiIncKey').checked = AIC.incKey;
-  $('#aiSum').textContent = aiReady() ? aiProvName() + ' · ' + AIC.model : '未配置';
+  $('#aiRemember').checked = AIC.remember;
+  $('#aiSum').textContent = aiReady()
+    ? aiProvName() + ' · ' + AIC.model + (AIC.remember ? '' : ' · Key 仅本次')
+    : '未配置';
   $('#aiClear').disabled = !AIC.key;
 }
 $('#aiProv').addEventListener('change', function () {
@@ -10915,13 +11066,20 @@ function aiFromForm() {
   AIC.model = $('#aiModel').value.trim();
   AIC.key = $('#aiKey').value.trim();
   AIC.incKey = $('#aiIncKey').checked;
+  AIC.remember = $('#aiRemember').checked;
   return true;
 }
 $('#aiSave').onclick = function () {
   if (!aiFromForm()) return;
   aiSave();
   rAiCard();
-  toast(aiReady() ? '已保存（仅本机）' : '已保存，尚缺 ' + (!AIC.key ? 'API Key' : !AIC.base ? '接口地址' : '模型'));
+  toast(
+    aiReady()
+      ? AIC.remember
+        ? '已保存（仅本机）'
+        : '已保存，Key 只在本次使用'
+      : '已保存，尚缺 ' + (!AIC.key ? 'API Key' : !AIC.base ? '接口地址' : '模型')
+  );
 };
 $('#aiClear').onclick = function () {
   if (!confirm('清除本机保存的 API Key？')) return;

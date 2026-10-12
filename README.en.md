@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.9.0-2148b8" alt="version 2.9.0">
+<img src="https://img.shields.io/badge/version-2.10.0-2148b8" alt="version 2.10.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -166,12 +166,13 @@ The repository includes `.github/workflows/pages.yml`. Every push to `main` buil
 ## Privacy
 
 - **Data stays on your device.** Every record lives in your browser's localStorage under the key `freeBody_v1`, and nothing is uploaded. Data from the old `fitTracker_v1` key is migrated automatically, and old backups import as they are.
-- **Your API key stays on your device.** The photo-recognition key is stored locally and separately, under `freeBody_ai_v1`. Backups leave it out **by default**; you can opt in, but we don't recommend it.
+- **Your API key stays on your device.** The photo-recognition key is stored locally and separately, under `freeBody_ai_v1`. Backups leave it out **by default**; you can opt in, but we don't recommend it. You can also untick "在本机记住 API Key" (remember the key on this device): the key then lives only in the open page's memory, and you enter it again after a reload.
 - **Imports are processed locally.** Both paste import and link import (`#import=`) are parsed in the browser. Browsers never send anything after `#` to a server, and nothing is written until you confirm.
 - **Photo recognition goes online only after you enter a model key.** Without a key, FreeBody makes no network requests: taking or choosing a photo stays on the device, and the recognition screen points you to manual logging. With a key, a request is sent only when you tap recognise or test the connection. The compressed photo (or the test request) then goes straight from your browser to the provider you chose, never through a FreeBody server, under that provider's privacy policy. FreeBody does not keep the photo.
 - Apart from that, loading the page and updating the offline cache (service worker) only contact the address FreeBody is served from, and carry none of your data.
 - **Storage safety.** Clearing browser data or switching devices loses your records. At startup FreeBody asks for persistent storage (`navigator.storage.persist()`). It warns once when local storage reaches about 70% and once at 90%. If a save fails because storage is full, it tells you straight away and offers an export. It also reminds you 30 days after your last backup (you can snooze for 7 days). All of this is shown under 我的 › 数据备份 (Me › Backup). Reminder state and the last backup date are kept in `freeBody_meta_v1`, which holds none of your records.
 - **Back up regularly.** Backups contain personal health information: keep them safe and never commit them to a repository.
+- **Encrypt backups you share.** To put a backup in cloud storage or send it to someone, enter a password under "数据备份 › 加密备份" (encrypted backup) before exporting. The key is derived with PBKDF2-SHA256 (310,000 iterations) and the data is encrypted with AES-GCM, all on your device. The password is never stored and cannot be recovered.
 
 ## Photo recognition setup
 
@@ -255,7 +256,7 @@ freebody/
 │   ├── icons.js               # inline SVG line icons
 │   ├── charts.js              # dependency-free SVG charts
 │   ├── app/                   # application modules, concatenated in file-name order into one IIFE at build time
-│   │   ├── 00-core.js … 05-demo.js     # state, storage, utilities, core calculations, import merge, demo data (no DOM; unit-tested)
+│   │   ├── 00-core.js … 06-crypto.js   # state, storage, utilities, core calculations, import merge, demo data, encrypted backups (no DOM; unit-tested)
 │   │   ├── 09-init.js                  # reads stored data (keeps the raw text and pauses saving if it is corrupt)
 │   │   └── 10-ui-*.js … 90-boot.js     # page UI and startup
 │   └── sw.template.js         # service worker template

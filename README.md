@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.9.0-2148b8" alt="version 2.9.0">
+<img src="https://img.shields.io/badge/version-2.10.0-2148b8" alt="version 2.10.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -147,12 +147,12 @@ npm test         # 或 node --test tests/     → 单元测试
 ## 隐私说明
 
 - **数据只存本地**：所有记录只保存在本机浏览器的 localStorage（键名 `freeBody_v1`），不上传任何服务器。旧版 `fitTracker_v1` 数据会自动迁移，旧备份可直接导入。
-- **Key 只存本地**：拍照识别的 API Key 单独保存在本机（`freeBody_ai_v1`），导出备份时**默认不包含 Key**（可在设置中勾选包含，不推荐）。
+- **Key 只存本地**：拍照识别的 API Key 单独保存在本机（`freeBody_ai_v1`），导出备份时**默认不包含 Key**（可在设置中勾选包含，不推荐）。也可以取消「在本机记住 API Key」，Key 只留在当前页面内存中，刷新或关闭后需重新填写。
 - **导入只在本机处理**：粘贴导入与链接导入（`#import=`）都在浏览器中解析，`#` 之后的内容不会发送给任何服务器，确认前不写入。
 - **拍照识别只有在你填写模型 Key 之后才会联网**。没有填写 Key 时，FreeBody 不发起任何网络请求：拍照、选图都只在本机处理，识别入口会引导你手动记录。填写 Key 后，只有你主动点「识别」或「测试连接」时，压缩后的照片（或测试请求）才会直接从浏览器发送到你所选的服务商，不经过 FreeBody 的任何服务器，并受该服务商的隐私政策约束。FreeBody 不保存照片。
 - 除此之外，打开网页、离线缓存更新（Service Worker）只会访问 FreeBody 自身所在的网址，不包含你的任何数据。
 - **存储安全**：清除浏览器数据或换设备会丢失记录。FreeBody 会在启动时申请持久存储（`navigator.storage.persist()`），本机存储用到约 70% 和 90% 时各提醒一次，写满导致保存失败时立即提示并提供导出；距上次备份满 30 天会提醒（可推迟 7 天）。这些状态都显示在「我的 › 数据备份」。提醒状态与上次备份日期保存在 `freeBody_meta_v1`，不含记录内容。
-- 备份含个人健康信息，请妥善保管，不要提交到仓库。
+- 备份含个人健康信息，请妥善保管，不要提交到仓库。需要放进网盘或发给别人时，可在「数据备份 › 加密备份」中填写密码再导出：用 PBKDF2-SHA256（31 万次）派生密钥、AES-GCM 加密，全部在本机完成；密码不保存，忘记后无法恢复。
 
 ## AI 识别配置说明
 
@@ -230,7 +230,7 @@ freebody/
 │   ├── icons.js               # 内联 SVG 线条图标
 │   ├── charts.js              # 零依赖 SVG 图表库
 │   ├── app/                   # 应用逻辑模块，构建时按文件名顺序合并进一个 IIFE
-│   │   ├── 00-core.js … 05-demo.js     # 状态、存储、工具函数、核心计算、导入合并、演示数据（不依赖 DOM，可单测）
+│   │   ├── 00-core.js … 06-crypto.js   # 状态、存储、工具函数、核心计算、导入合并、演示数据、加密备份（不依赖 DOM，可单测）
 │   │   ├── 09-init.js                  # 读取本机数据（损坏时保留原文、暂停保存）
 │   │   └── 10-ui-*.js … 90-boot.js     # 各页面界面与启动
 │   └── sw.template.js         # Service Worker 模板

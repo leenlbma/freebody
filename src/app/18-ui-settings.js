@@ -211,28 +211,58 @@ $('#imp').onchange = function () {
   if (!f) return;
   var rd = new FileReader();
   rd.onload = function () {
+    var d;
     try {
-      var d = JSON.parse(String(rd.result));
-      if (!d || typeof d !== 'object' || !Array.isArray(d.meals) || !d.goals) throw new Error('格式不符');
-      if (!confirm('导入将覆盖当前全部数据，确定？')) return;
-      if (d.aiConfig) {
-        aiImport(d.aiConfig);
-      }
-      delete d.aiConfig;
-      localStorage.setItem(KEY, JSON.stringify(d));
-      S = load();
-      rStoreBanner();
-      applyTheme();
-      applyTitle();
-      toast('导入成功');
-      render();
+      d = JSON.parse(String(rd.result));
     } catch (e) {
       toast('导入失败：' + e.message);
+      return;
     }
+    if (!bkIsEnc(d)) {
+      bkRestore(d);
+      return;
+    }
+    var pw = $('#bkPw').value;
+    if (!pw) {
+      $('.bk-enc').open = true;
+      $('#bkPw').focus();
+      toast('这是加密备份：请在「加密备份」中填写密码后再导入');
+      return;
+    }
+    bkDecrypt(d, pw).then(
+      function (t) {
+        bkRestore(JSON.parse(t));
+      },
+      function (e) {
+        toast('导入失败：' + e.message);
+      }
+    );
   };
   rd.readAsText(f);
   this.value = '';
 };
+/** 用完整备份覆盖当前数据（确认后） */
+function bkRestore(d) {
+  if (DEMO) {
+    toast('演示模式中不能导入备份，请先退出演示');
+    return;
+  }
+  try {
+    if (!d || typeof d !== 'object' || !Array.isArray(d.meals) || !d.goals) throw new Error('格式不符');
+    if (!confirm('导入将覆盖当前全部数据，确定？')) return;
+    if (d.aiConfig) aiImport(d.aiConfig);
+    delete d.aiConfig;
+    localStorage.setItem(KEY, JSON.stringify(d));
+    S = load();
+    rStoreBanner();
+    applyTheme();
+    applyTitle();
+    toast('导入成功');
+    render();
+  } catch (e) {
+    toast('导入失败：' + e.message);
+  }
+}
 $('#wipe').onclick = function () {
   if (DEMO) {
     exitDemo();
@@ -257,18 +287,41 @@ $('#wipe').onclick = function () {
 
 /* ---------- 存储安全（v2.6）：提示条、导出、持久存储、状态 ---------- */
 /** 导出完整备份（JSON）；记录 lastBackup，关闭备份提醒 */
+/** 导出备份；「加密备份」中填了密码时导出加密文件 */
 function doExport() {
   var out = {};
   for (var k in S) out[k] = S[k];
   out.aiConfig = aiExport();
-  download('freebody-' + today() + '.json', JSON.stringify(out, null, 2), 'application/json');
+  var json = JSON.stringify(out, null, 2),
+    pw = $('#bkPw') ? $('#bkPw').value : '';
+  if (!pw) {
+    download('freebody-' + today() + '.json', json, 'application/json');
+    bkDone(false);
+    return;
+  }
+  if (!bkCan()) {
+    toast('当前浏览器环境不支持加密，未导出。可清空密码导出普通 JSON');
+    return;
+  }
+  toast('正在加密…');
+  bkEncrypt(json, pw).then(
+    function (enc) {
+      download('freebody-' + today() + '.enc.json', JSON.stringify(enc), 'application/json');
+      bkDone(true);
+    },
+    function (e) {
+      toast('加密失败：' + e.message);
+    }
+  );
+}
+function bkDone(enc) {
   META.lastBackup = today();
   delete META.snooze;
   metaSave();
   if (STORE.banner === 'backup') STORE.banner = null;
   rStoreBanner();
   rStore();
-  toast(AIC.incKey && AIC.key ? '已导出（含 API Key，请妥善保管）' : '已导出');
+  toast((enc ? '已导出加密备份' : '已导出') + (AIC.incKey && AIC.key ? '（含 API Key，请妥善保管）' : ''));
 }
 $('#exp').onclick = doExport;
 var ST_MSG = {
