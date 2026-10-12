@@ -9,6 +9,7 @@
 ### 变更
 - **规则只写在 skill 里**：README、README.en.md 与 `skills/freebody-coach/PROMPT.md` 中「复制给你的 AI」的提示词精简为 4 行，只请 AI 担任 FreeBody 教练、读取并严格遵守 skill（附 raw 地址），打不开链接时请用户粘贴 SKILL.md 全文。提示词下方说明：不能联网的 AI，可以直接复制 SKILL.md 全文给它。
 - SKILL.md / SKILL.en.md 正文补齐原提示词中的要点：schema 的 raw 地址、条目类型与必填字段、base64url 按 UTF-8 编码且不加填充。
+- skill 安全边界：「不解读化验结果」改为可以解释化验和激素指标（如皮质醇、睾酮）的含义、参考范围及其与训练恢复的关系，但不做诊断、不开药；数值异常或有症状时建议就医。中英文同步。
 - `npm run check`：删除「提示词必须含要点」与提示词内示例的校验，保留 README 与 PROMPT.md 的一致性校验，提示词须为 3–6 行；新增校验 skill 正文必须包含 `#import=` 链接格式、`"estimated": true` 与 schema 地址。
 
 ## [2.5.1] - 2026-10-13
