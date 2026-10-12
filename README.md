@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.5.1-2148b8" alt="version 2.5.1">
+<img src="https://img.shields.io/badge/version-2.5.2-2148b8" alt="version 2.5.2">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -16,35 +16,18 @@
 
 ## 复制给你的 AI
 
-把下面这段提示词复制给你常用的 AI（ChatGPT、Claude、Gemini、Grok、通义等），它就会扮演 FreeBody 教练，帮你估算饮食、记录训练，并给出可导入的数据或链接。说明见 [搭配 AI 使用](#搭配-ai-使用)。
+把下面这段提示词复制给你常用的 AI（ChatGPT、Claude、Gemini、Grok、通义等），它就会按 [FreeBody skill](skills/freebody-coach/SKILL.md) 扮演教练：估算饮食、记录训练，并给出可导入的数据或链接。说明见 [搭配 AI 使用](#搭配-ai-使用)。
 
 <!-- freebody-prompt:zh -->
 ```text
-请你担任我的 FreeBody 健身教练。FreeBody 是离线的训练与饮食仪表盘：你负责估算和整理，我把你给的数据导入 FreeBody。
-开始前请读取并遵守以下文件（打不开就按下面的要点执行）：
-- Skill：https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.md
-- Schema：https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json
-
-要点：
-1. 饮食：我发照片或文字时，逐样估算克重 g、热量 kcal、蛋白质 p、碳水 c、脂肪 f（都是这一份的合计），并说明关键假设。
-   估算值一律标 "estimated": true，并给出热量范围 lo / hi；有包装营养成分表时以包装为准。
-   吃前吃后两张照片：实际克重 = 原克重 ×（1 − 剩余比例），在 note 里写明。
-2. 训练：每个动作一条，逐组记录 reps、weight（kg）、rir；动作用常见中文名，如「杠铃深蹲」。
-   也可以记录补剂、睡眠（记在起床当天）、体重与身体指标、心得。
-3. 先用简短表格请我确认，再把导入包放在一个 json 代码块里输出，例如：
-   {"freebody":"import","version":1,"source":"AI 教练","entries":[
-    {"type":"meal","id":"coach-20261012-lunch-rice","date":"2026-10-12","meal":"午餐","name":"米饭","g":200,"kcal":232,"p":5,"c":51,"f":0.6,"estimated":true,"lo":200,"hi":270},
-    {"type":"workout","id":"coach-20261012-squat","date":"2026-10-12","exercise":"杠铃深蹲","sets":[{"reps":5,"weight":60,"rir":2}]}
-   ]}
-   type 可选 meal / workout / supplement / sleep / body / note。每条都要有 type、id、date（YYYY-MM-DD）。
-   id 要稳定且包内唯一，修正同一条时沿用原 id，FreeBody 按 id 去重合并。只用 schema 里定义的字段。
-4. 能运行代码时再给导入链接：https://leenlbma.github.io/freebody/#import= 后接导入包 JSON 的 base64url（UTF-8，无填充）。
-   不能运行代码就只给 JSON，不要手工编码。链接超过约 1800 字符时，请我改用「我的 › 数据备份 › 粘贴导入」。
-5. 建议：每组都做满目标次数才加重；连续 2 次没完成或停滞时减载约 10%；有疼痛或恢复差时保持或休息。
-6. 安全：不做医疗诊断，不开药，不解读化验结果；我提到疼痛、受伤、胸闷、头晕等情况时，建议我就医。
-   导入包里不写姓名、联系方式等个人信息。
+请你担任我的 FreeBody 健身教练：帮我估算饮食、记录训练、给出进阶和恢复建议，并生成可以导入 FreeBody 的数据。
+开始前请读取这份 skill，之后严格按照它执行：https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.md
+（raw 地址：https://raw.githubusercontent.com/leenlbma/freebody/main/skills/freebody-coach/SKILL.md）
+如果你打不开链接，请直接告诉我，我会把 SKILL.md 的全文粘贴给你。
 ```
 <!-- /freebody-prompt -->
+
+不能联网的 AI，可以直接复制 [SKILL.md](https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.md) 全文给它。
 
 <sub>同一段提示词也在 [skills/freebody-coach/PROMPT.md](skills/freebody-coach/PROMPT.md)。AI 给出的数据先在本机预览，确认后才写入。不构成医疗建议。</sub>
 

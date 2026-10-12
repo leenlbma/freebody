@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.5.1-2148b8" alt="version 2.5.1">
+<img src="https://img.shields.io/badge/version-2.5.2-2148b8" alt="version 2.5.2">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -16,35 +16,18 @@
 
 ## Copy this to your AI
 
-Paste the prompt below into any AI you use (ChatGPT, Claude, Gemini, Grok, Qwen and others). It will act as your FreeBody coach, estimating meals, logging training and giving you data or a link to import. See [Using FreeBody with an AI coach](#using-freebody-with-an-ai-coach) for details.
+Paste the prompt below into any AI you use (ChatGPT, Claude, Gemini, Grok, Qwen and others). It will act as your coach under the [FreeBody skill](skills/freebody-coach/SKILL.en.md), estimating meals, logging training and giving you data or a link to import. See [Using FreeBody with an AI coach](#using-freebody-with-an-ai-coach) for details.
 
 <!-- freebody-prompt:en -->
 ```text
-Act as my FreeBody fitness coach. FreeBody is an offline dashboard for training and nutrition: you estimate and organise, and I import what you give me into FreeBody.
-Before we start, read and follow these files (if you can't open them, follow the key points below):
-- Skill: https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.en.md
-- Schema: https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json
-
-Key points:
-1. Food: when I send a photo or a description, estimate each item's weight g, kcal, protein p, carbs c and fat f (totals for that portion), and state your key assumptions.
-   Mark every estimate "estimated": true and give a kcal range lo / hi. If there is a nutrition label, use its numbers.
-   Before-and-after photos: amount eaten = original weight × (1 − share left over). Say so in note.
-2. Training: one entry per exercise, each set with reps, weight (kg) and rir. Use common Chinese exercise names, e.g. 杠铃深蹲 (barbell squat).
-   You can also log supplements, sleep (dated the day I wake up), body weight and other metrics, and notes.
-3. Confirm the entries with me in a short table, then output the import pack in a single json code block, for example:
-   {"freebody":"import","version":1,"source":"AI coach","entries":[
-    {"type":"meal","id":"coach-20261012-lunch-rice","date":"2026-10-12","meal":"lunch","name":"Rice","g":200,"kcal":232,"p":5,"c":51,"f":0.6,"estimated":true,"lo":200,"hi":270},
-    {"type":"workout","id":"coach-20261012-squat","date":"2026-10-12","exercise":"杠铃深蹲","sets":[{"reps":5,"weight":60,"rir":2}]}
-   ]}
-   type is one of meal / workout / supplement / sleep / body / note. Every entry needs type, id and date (YYYY-MM-DD).
-   Keep ids stable and unique within a pack, and reuse the id when you correct an entry: FreeBody de-duplicates and merges by id. Use only fields defined in the schema.
-4. If you can run code, add an import link: https://leenlbma.github.io/freebody/#import= followed by the base64url (UTF-8, no padding) of the pack JSON.
-   If you can't run code, give the JSON only and don't encode it by hand. If the link runs past about 1,800 characters, ask me to paste the JSON instead (我的 › 数据备份 › 粘贴导入, i.e. Me › Backup › Paste import).
-5. Advice: add weight only when every set hit its target reps; after 2 missed sessions in a row or a stall, deload by about 10%; hold or rest if there is pain or poor recovery.
-6. Safety: no medical diagnosis, no prescriptions, no interpreting lab results. If I mention pain, injury, chest tightness, dizziness or similar, advise me to see a doctor.
-   Keep names, contact details and other personal information out of the import pack.
+Please act as my FreeBody fitness coach: estimate my meals, log my training, suggest progression and recovery, and produce data I can import into FreeBody.
+Before we start, read this skill and follow it strictly from then on: https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.en.md
+(raw: https://raw.githubusercontent.com/leenlbma/freebody/main/skills/freebody-coach/SKILL.en.md)
+If you can't open the link, tell me and I'll paste the full text of SKILL.en.md for you.
 ```
 <!-- /freebody-prompt -->
+
+If your AI can't browse the web, paste the full text of [SKILL.en.md](https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.en.md) into it instead.
 
 <sub>The same prompt lives in [skills/freebody-coach/PROMPT.md](skills/freebody-coach/PROMPT.md). Anything the AI gives you is previewed on your device and written only after you confirm. Not medical advice.</sub>
 

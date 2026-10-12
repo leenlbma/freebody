@@ -121,15 +121,16 @@ for (const [readme, lang] of [['README.md', 'zh'], ['README.en.md', 'en']]) {
     const la = a[0].split('\n'), lb = b[0].split('\n'); let i = 0; while (i < la.length && la[i] === lb[i]) i++;
     throw new Error(`${readme} 与 ${promptMd} 的提示词（${lang}）不一致，第 ${i + 1} 行：\n  ${la[i]}\n  ${lb[i]}`);
   }
-  const t = a[0], n = t.split('\n').length;
-  if (n > 30) throw new Error(`提示词（${lang}）共 ${n} 行，应不超过 30 行`);
-  for (const must of ['https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL', 'https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json', 'https://leenlbma.github.io/freebody/#import=', '"estimated": true'])
-    if (!t.includes(must)) throw new Error(`提示词（${lang}）缺少 ${must}`);
-  const ex = /^\s*(\{"freebody":"import"[\s\S]*?^\s*\]\})\s*$/m.exec(t);
-  if (!ex) throw new Error(`提示词（${lang}）缺少导入包示例`);
-  checkPack(JSON.parse(ex[1]), `提示词（${lang}）中的示例`);
+  const n = a[0].split('\n').length;
+  if (n < 3 || n > 6) throw new Error(`提示词（${lang}）共 ${n} 行，应为 3–6 行（规则只写在 skill 里）`);
+}
+// 规则只写在 skill 正文里：正文必须包含导入链接格式、估算标注与 schema 地址
+for (const f of ['SKILL.md', 'SKILL.en.md']) {
+  const body = fs.readFileSync(path.join(root, 'skills', 'freebody-coach', f), 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '');
+  for (const must of ['https://leenlbma.github.io/freebody/#import=', '"estimated": true', 'https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json'])
+    if (!body.includes(must)) throw new Error(`skills/freebody-coach/${f} 正文缺少 ${must}`);
 }
 console.log(`[ok] 导入包 schema 校验通过（示例 ${nPack} 个、${nEnt} 条；文档示例 ${nDoc} 个；反例均被拒绝）`);
-console.log('[ok] skill frontmatter 合规；README 与 PROMPT.md 的提示词（中 / 英）一致');
+console.log('[ok] skill frontmatter 与正文要点齐全；README 与 PROMPT.md 的提示词（中 / 英）一致');
 console.log(`[ok] 食物库 ${foods.length} 项，id / ref 校验通过`);
 console.log(`[ok] 语法检查通过（${scripts.length} 段脚本）`);

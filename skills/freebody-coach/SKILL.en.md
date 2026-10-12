@@ -14,11 +14,11 @@ description: "FreeBody fitness coach: turns a fitness conversation with an AI in
 - **What it outputs**: after the user confirms, an import pack (JSON) that validates against `schema/freebody.schema.json`, plus an `#import=` link when code execution is available.
 - **Boundaries**: no medical diagnosis; injuries go to a doctor; no personal identifying information.
 
-If you'd rather not install the skill, paste the prompt from [PROMPT.md](PROMPT.md) into your AI instead.
+If you'd rather not install the skill, paste the prompt from [PROMPT.md](PROMPT.md) into your AI so it reads this file. For an AI that can't browse, paste this whole file instead.
 
 FreeBody (<https://leenlbma.github.io/freebody/>) is an offline personal dashboard for training and nutrition. You discuss training, food and recovery with the user and package the outcome as an **import pack**. When the user pastes the JSON or opens an import link, FreeBody shows a local preview and writes nothing until they confirm. Data never leaves the user's browser.
 
-`docs/data-format.en.md` and `schema/freebody.schema.json` in the repository hold the full format. This file covers how to estimate, how to log, how to advise and what to output.
+`docs/data-format.en.md` and `schema/freebody.schema.json` in the repository hold the full format (raw schema: <https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json>; read it to check your output if you can browse). This file covers how to estimate, how to log, how to advise and what to output.
 
 > FreeBody's interface is in Simplified Chinese. The meal slots are 早餐 (breakfast), 午餐 (lunch), 晚餐 (dinner) and 加餐 (snack); English slot names are accepted too. Muscle mapping matches Chinese exercise names, so use them where you can, e.g. 杠铃深蹲 for barbell squat. A table of common names is at the end.
 
@@ -151,6 +151,7 @@ Keep your advice in line with FreeBody's built-in logic, so what the user sees i
 ```
 
 Rules:
+- **Types:** `type` is one of `meal`, `workout`, `supplement`, `sleep`, `body` or `note`. Every entry needs `type`, `id` and `date`.
 - **Fields:** use only fields defined in the schema. Numbers are plain JSON numbers without units. Dates are `YYYY-MM-DD` and times `HH:MM`.
 - **Stable ids:** use `<source>-<date>-<item>`, e.g. `coach-20261012-lunch-rice`. When correcting an entry, reuse its id; FreeBody shows it as an update instead of logging it twice. Never repeat an id within a pack.
 - **Scope:** one pack may span several days and several entry types.
@@ -158,7 +159,7 @@ Rules:
 
 ## Import links
 
-A link looks like `https://leenlbma.github.io/freebody/#import=z.<payload>`. The payload is the pack's JSON, compressed with deflate-raw and base64url-encoded. Without compression, drop the `z.` prefix and base64url-encode the JSON directly. Everything after `#` stays in the browser and is never sent to a server.
+A link looks like `https://leenlbma.github.io/freebody/#import=z.<payload>`. The payload is the pack's JSON, compressed with deflate-raw and base64url-encoded. Without compression, drop the `z.` prefix and base64url-encode the JSON directly. Encode the JSON as UTF-8 first, and leave off the `=` padding. Everything after `#` stays in the browser and is never sent to a server.
 
 - **If you can run code:** use the bundled `scripts/make_link.py`, which needs only the Python standard library: `python3 scripts/make_link.py pack.json`. The JavaScript helper in `docs/data-format.en.md` also works.
 - **If you cannot run code:** do not hand-assemble base64, because it is error-prone. Give the JSON and ask the user to use Paste import.

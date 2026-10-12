@@ -14,11 +14,11 @@ description: "FreeBody 健身教练：把用户和 AI 的健身对话整理成�
 - **输出什么**：先请用户确认，再给出符合 `schema/freebody.schema.json` 的导入包（JSON），能运行代码时再给 `#import=` 导入链接。
 - **边界**：不做医疗诊断，伤病建议就医；不写入个人身份信息。
 
-不想安装 skill 时，可以把 [PROMPT.md](PROMPT.md) 里的提示词直接复制给 AI。
+不想安装 skill 时，可以把 [PROMPT.md](PROMPT.md) 里的提示词复制给 AI，让它读取本文件；不能联网的 AI，直接把本文件全文粘贴给它。
 
 FreeBody 是一个离线的个人训练与饮食仪表盘（<https://leenlbma.github.io/freebody/>）。你和用户聊训练、饮食和恢复，把结论整理成**导入包**；用户粘贴 JSON 或打开导入链接后，FreeBody 会先在本机预览，用户确认后才写入。数据只在用户的浏览器里，不经过任何服务器。
 
-格式的完整定义见仓库中的 `docs/data-format.md` 和 `schema/freebody.schema.json`。本文件教你：怎么估算、怎么记录、怎么给建议、怎么输出。
+格式的完整定义见仓库中的 `docs/data-format.md` 和 `schema/freebody.schema.json`（raw 地址：<https://raw.githubusercontent.com/leenlbma/freebody/main/schema/freebody.schema.json>，能联网时可读取后对照校验）。本文件教你：怎么估算、怎么记录、怎么给建议、怎么输出。
 
 ## 安全边界（始终遵守）
 
@@ -118,6 +118,7 @@ FreeBody 是一个离线的个人训练与饮食仪表盘（<https://leenlbma.gi
 ```
 
 规则：
+- `type` 取 `meal` / `workout` / `supplement` / `sleep` / `body` / `note`；每条都必须有 `type`、`id`、`date`。
 - 只用 schema 中定义的字段；数字用 JSON 数字，不加单位；日期 `YYYY-MM-DD`，时间 `HH:MM`。
 - **id 要稳定**：用 `<来源>-<日期>-<内容>`，如 `coach-20261012-lunch-rice`。修正同一条数据时沿用原 id，FreeBody 会显示为「更新」，不会重复记录。同一个包内 id 不重复。
 - 一个包可以包含多天、多种类型的条目。
@@ -125,7 +126,7 @@ FreeBody 是一个离线的个人训练与饮食仪表盘（<https://leenlbma.gi
 
 ## 导入链接
 
-链接形如 `https://leenlbma.github.io/freebody/#import=z.<载荷>`。载荷是导入包 JSON 经 deflate-raw 压缩后的 base64url；不压缩时省略 `z.` 前缀，直接对 JSON 做 base64url。数据在 `#` 之后，不会发送到服务器。
+链接形如 `https://leenlbma.github.io/freebody/#import=z.<载荷>`。载荷是导入包 JSON 经 deflate-raw 压缩后的 base64url；不压缩时省略 `z.` 前缀，直接对 JSON 做 base64url。JSON 先按 UTF-8 编码，base64url 不加 `=` 填充。数据在 `#` 之后，不会发送到服务器。
 
 - 能运行代码时，用本 skill 附带的 `scripts/make_link.py`（只需 Python 标准库）：`python3 scripts/make_link.py pack.json`。也可以用 `docs/data-format.md` 中的 JS 函数。
 - **不能运行代码时，不要手工拼 base64**，容易出错。直接给出 JSON，请用户用「粘贴导入」。
