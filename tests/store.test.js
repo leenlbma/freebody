@@ -81,11 +81,39 @@ test('首次保存记录 firstUse 为最早的记录日期', () => {
 });
 
 test('load：从旧键名迁移且保留旧键；缺字段用默认值补齐', () => {
-  const a = load({ storage: { fitTracker_v1: JSON.stringify({ v: 1, meals: [{ date: '2026-10-01', kcal: 300 }], goals: { kcal: 2000 } }) } });
+  const a = load({
+    storage: {
+      fitTracker_v1: JSON.stringify({ v: 1, meals: [{ date: '2026-10-01', kcal: 300 }], goals: { kcal: 2000 } })
+    }
+  });
   assert.equal(a.S.meals.length, 1);
   assert.equal(a.S.goals.kcal, 2000);
   assert.equal(a.S.goals.sleepH, 7);
   assert.ok(Array.isArray(a.S.notes));
   assert.ok(a.storage.getItem('freeBody_v1'));
   assert.ok(a.storage.getItem('fitTracker_v1'));
+});
+
+test('本机数据损坏：保留原文，不用默认值覆盖，并提示', () => {
+  for (const raw of ['{broken', '[1,2]', '42']) {
+    const a = load({ storage: { freeBody_v1: raw } });
+    assert.equal(a.STORE.bad, raw, raw);
+    assert.equal(a.save(), false, raw);
+    assert.equal(a.storage.getItem('freeBody_v1'), raw, raw);
+    assert.ok(a.calls.alert.includes('corrupt'), raw);
+  }
+});
+
+test('本机数据部分字段类型不对时仍能读取（goals / profile 回退默认）', () => {
+  const a = load({ storage: { freeBody_v1: JSON.stringify({ v: 1, meals: [], goals: null, profile: 3 }) } });
+  assert.equal(a.STORE.bad, null);
+  assert.equal(typeof a.S.goals.kcal, 'number');
+  assert.equal(typeof a.S.profile, 'object');
+  assert.equal(a.save(), true);
+});
+
+test('空存储不算损坏', () => {
+  const a = load();
+  assert.equal(a.STORE.bad, null);
+  assert.equal(a.save(), true);
 });

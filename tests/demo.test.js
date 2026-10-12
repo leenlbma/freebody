@@ -30,7 +30,10 @@ test('演示数据：可直接用于核心计算，同一天结果确定', () =>
 });
 
 test('演示模式（#demo）：不读取也不写入本机存储', () => {
-  const real = JSON.stringify({ v: 1, meals: [{ id: 'm1', date: '2026-10-12', meal: '午餐', name: '真实记录', kcal: 500 }] });
+  const real = JSON.stringify({
+    v: 1,
+    meals: [{ id: 'm1', date: '2026-10-12', meal: '午餐', name: '真实记录', kcal: 500 }]
+  });
   const a = load({ hash: '#demo', storage: { freeBody_v1: real } });
   assert.equal(a.DEMO, true);
   assert.ok(!a.S.meals.some((m) => m.name === '真实记录'));

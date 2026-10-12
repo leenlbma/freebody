@@ -1,0 +1,10 @@
+index.html
+sw.js
+data/
+examples/
+schema/
+node_modules/
+*.md
+src/index.template.html
+src/styles.css
+.github/

@@ -14,3 +14,8 @@ freebody-*.json
 fitness-tracker-*.json
 *-backup*.json
 private/
+
+# 测试产物
+test-results/
+playwright-report/
+coverage/

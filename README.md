@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.7.0-2148b8" alt="version 2.7.0">
+<img src="https://img.shields.io/badge/version-2.8.0-2148b8" alt="version 2.8.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -101,13 +101,14 @@ FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pa
 
 **更新**：发布新版本后，再次打开时页面底部会出现「有新版本，点此刷新」，点一下即切换到新版本；不点则继续使用当前版本。
 
-**本地构建**　需要 Node.js ≥ 18，无第三方依赖。
+**本地构建**　需要 Node.js ≥ 18。应用运行时零依赖；构建只用 Node 内置模块，开发检查工具为 devDependencies。
 
 ```bash
 git clone https://github.com/leenlbma/freebody.git && cd freebody
-npm run build    # 生成根目录 index.html 与 sw.js
+npm run build    # 生成根目录 index.html 与 sw.js（无需 npm ci）
 npm run check    # 语法、emoji、占位符、食物库、导入包 schema 校验
-npm test         # 核心计算单元测试（node:test）
+npm test         # 单元测试（node:test）
+npm ci && npm run lint && npm run typecheck && npm run test:e2e   # 贡献代码时：lint、类型检查、端到端
 ```
 
 也可以只下载 `index.html` 直接用浏览器打开（`file://` 下没有离线缓存与更新提示，其余功能照常）。
@@ -133,7 +134,7 @@ npm test         # 核心计算单元测试（node:test）
 2. Settings → Pages → Build and deployment → Source 选择 **GitHub Actions**（或 `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow`）。
 3. 在 Actions 里运行一次「Deploy to GitHub Pages」（或推送任意提交），完成后访问 `https://<owner>.github.io/<repo>/`。
 
-**从源码构建**（需 Node.js ≥ 18，无第三方依赖）：
+**从源码构建**（需 Node.js ≥ 18，构建无第三方依赖）：
 
 ```bash
 npm run build    # 或 node scripts/build.js  → 生成根目录 index.html
@@ -230,6 +231,7 @@ freebody/
 │   ├── charts.js              # 零依赖 SVG 图表库
 │   ├── app/                   # 应用逻辑模块，构建时按文件名顺序合并进一个 IIFE
 │   │   ├── 00-core.js … 05-demo.js     # 状态、存储、工具函数、核心计算、导入合并、演示数据（不依赖 DOM，可单测）
+│   │   ├── 09-init.js                  # 读取本机数据（损坏时保留原文、暂停保存）
 │   │   └── 10-ui-*.js … 90-boot.js     # 各页面界面与启动
 │   └── sw.template.js         # Service Worker 模板
 ├── data/foods.json            # 食物营养库（322 项，每条带 ref 来源）
@@ -238,7 +240,11 @@ freebody/
 ├── skills/freebody-coach/     # 通用 Agent Skill：教 AI 生成导入包与链接（含 PROMPT.md、make_link.py）
 ├── scripts/build.js           # 内联构建 + 生成 sw.js
 ├── scripts/check.js           # 语法 / emoji / 食物库 / 导入包 schema 校验
-├── tests/                     # node:test 单元测试（核心计算、进阶规则、导入合并、存储预警）
+├── tests/                     # node:test 单元测试（核心计算、快速记录、CSV、导入合并、存储与损坏数据）
+│   └── e2e/                   # Playwright 端到端测试（Chromium + WebKit：冒烟、axe、导入、演示、损坏数据）
+├── types/                     # tsc --checkJs 用的类型声明（数据结构 model.d.ts、全局 globals.d.ts）
+├── eslint.config.js · .prettierrc.json · tsconfig.json · playwright.config.js   # 开发工具配置
+├── scripts/serve.js           # 本地静态服务器（端到端测试用）
 ├── scripts/gen-foods.js       # 食物库生成（原料值 + 自拟配方 → foods.json）
 ├── docs/                      # 数据格式、数据结构、食物库扩展、CSV 导入、真机测试清单、截图
 ├── .github/                   # CI、Pages 部署、issue / PR 模板（含真机测试报告）

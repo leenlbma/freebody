@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.7.0-2148b8" alt="version 2.7.0">
+<img src="https://img.shields.io/badge/version-2.8.0-2148b8" alt="version 2.8.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -119,13 +119,14 @@ Every chart is dependency-free inline SVG. Tap any point to read its value, and 
 
 **Updates.** When a new version is published, a "有新版本，点此刷新" (new version, tap to refresh) bar appears at the bottom. Tap it to switch, or ignore it to keep the current version.
 
-**Build locally.** You need Node.js 18 or later; there are no dependencies.
+**Build locally.** You need Node.js 18 or later. The app has no runtime dependencies, the build uses only Node's built-in modules, and the development checks are devDependencies.
 
 ```bash
 git clone https://github.com/leenlbma/freebody.git && cd freebody
-npm run build    # writes index.html and sw.js at the repository root
+npm run build    # writes index.html and sw.js at the repository root (no npm ci needed)
 npm run check    # syntax, emoji, placeholders, food library and import-pack schema
-npm test         # unit tests for the core calculations (node:test)
+npm test         # unit tests (node:test)
+npm ci && npm run lint && npm run typecheck && npm run test:e2e   # when contributing code
 ```
 
 You can also download `index.html` and open it directly. Over `file://` there is no offline cache and no update prompt, but everything else works.
@@ -255,6 +256,7 @@ freebody/
 │   ├── charts.js              # dependency-free SVG charts
 │   ├── app/                   # application modules, concatenated in file-name order into one IIFE at build time
 │   │   ├── 00-core.js … 05-demo.js     # state, storage, utilities, core calculations, import merge, demo data (no DOM; unit-tested)
+│   │   ├── 09-init.js                  # reads stored data (keeps the raw text and pauses saving if it is corrupt)
 │   │   └── 10-ui-*.js … 90-boot.js     # page UI and startup
 │   └── sw.template.js         # service worker template
 ├── data/foods.json            # food library (322 entries, each with a ref)
@@ -263,7 +265,11 @@ freebody/
 ├── skills/freebody-coach/     # generic Agent Skill for producing packs and links (with PROMPT.md, make_link.py)
 ├── scripts/build.js           # inlining build + sw.js generation
 ├── scripts/check.js           # syntax, emoji, food library and import-pack schema checks
-├── tests/                     # node:test unit tests (calculations, progression, import merge, storage warnings)
+├── tests/                     # node:test unit tests (calculations, quick entry, CSV, import merge, storage and corrupt data)
+│   └── e2e/                   # Playwright end-to-end tests (Chromium + WebKit: smoke, axe, import, demo, corrupt data)
+├── types/                     # type declarations for tsc --checkJs (model.d.ts data model, globals.d.ts)
+├── eslint.config.js · .prettierrc.json · tsconfig.json · playwright.config.js   # dev tool config
+├── scripts/serve.js           # local static server (for the end-to-end tests)
 ├── scripts/gen-foods.js       # food library generator (ingredient values + recipes → foods.json)
 ├── docs/                      # data format, data model, food library, CSV import, device test checklist, screenshots
 ├── .github/                   # CI, Pages deployment, issue / PR templates (including device test reports)
