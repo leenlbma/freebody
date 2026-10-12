@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 21-ui-help.js — 显示与辅助（主题、动效）、演示模式入口、设备自检 */
 /* ---------- 显示与辅助 ---------- */
 var PREF_THEME = [

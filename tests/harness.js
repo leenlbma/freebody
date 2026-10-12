@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 /**
  * 单元测试工具：把 src/app 中不依赖 DOM 的模块（00–09：常量、存储、工具、计算、导入、演示数据、初始化）

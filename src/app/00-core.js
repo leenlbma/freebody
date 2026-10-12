@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 00-core.js — 常量、导航配置、预设 */
 /** localStorage 键名；LEGACY_KEYS 用于从旧版本自动迁移 */
 var KEY = 'freeBody_v1',

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 16-ui-session.js — 肌群热图、训练计划与按组训练 */
 /* ---------- 自绘简化人体肌群图（非第三方路径数据） ---------- */
 var mapMode = 'status',

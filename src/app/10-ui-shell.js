@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 10-ui-shell.js — 界面外壳：主题、导航、日期栏、渲染调度 */
 /* ---------- 主题 ---------- */
 function applyTheme() {

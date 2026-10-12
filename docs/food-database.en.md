@@ -43,6 +43,14 @@ Names, categories, units and labels are in Chinese because they appear in the in
 - **Cooked dishes, dumplings and buns, soups and congee:** each is built from a home-style recipe written for this project, with raw weights. The ingredient values are summed and converted to per-100 g values with a cooked-weight yield that accounts for water lost in cooking. Recipes, names, ids and categories are all original to this project.
 - **No wholesale copying:** no third-party food composition table or dataset is copied wholesale. That includes the China Food Composition Tables and the data of other open-source apps. No online database is scraped in bulk.
 - **Older entries:** entries from v2.1–v2.3 keep their original ids and values and only gain a `ref`, so existing logs are unaffected.
+
+**How verifiable the values are** (`npm run check` prints the current counts; 322 entries as of v2.9.0):
+
+| `ref` type | Count | How to check it |
+|---|---|---|
+| `USDA FDC: <English description>` | 133 | Search for the description on [FoodData Central](https://fdc.nal.usda.gov/) and compare Energy, Protein, Carbohydrate and Total lipid per 100 g |
+| Project recipe (`配方：…；熟重系数 …`) | 108 | Sum the library values for the raw ingredient weights in `ref` and divide by the cooked-weight factor; `node scripts/gen-foods.js` reproduces it |
+| `参考 USDA FoodData Central 同类条目（v2.1 自整理近似值）` | 81 | Older entries that only say a similar USDA entry was used, **without naming it**, so they are hard to check one by one. Adding the specific USDA description in the format above is welcome (see the good first issues) |
 - **Estimates only:** every value is an estimate for reference. Packaging labels take precedence, and nothing here is nutritional or medical advice.
 
 ### How quick entry matches foods

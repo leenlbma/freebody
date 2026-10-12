@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // 无障碍：axe-core 扫描所有页面（浅色 / 深色，展开所有折叠区），要求 0 违规
 const fs = require('fs');
 const { test, expect } = require('@playwright/test');

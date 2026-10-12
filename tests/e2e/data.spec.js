@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // 数据：演示模式不碰本机存储；链接导入；损坏数据不被覆盖
 const fs = require('fs');
 const path = require('path');

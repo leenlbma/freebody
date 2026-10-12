@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 // 快速记录解析、食物匹配、CSV 导入与基础工具函数
 const test = require('node:test');

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // 端到端测试：npm run test:e2e（需先 npx playwright install chromium webkit）
 const { defineConfig, devices } = require('@playwright/test');
 

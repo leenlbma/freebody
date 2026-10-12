@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 // 核心计算：饮食合计、预警信号、准备度、1RM、BMR / 目标、疲劳半衰期
 const test = require('node:test');

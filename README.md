@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.8.1-2148b8" alt="version 2.8.1">
+<img src="https://img.shields.io/badge/version-2.9.0-2148b8" alt="version 2.9.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -246,14 +246,14 @@ freebody/
 ├── eslint.config.js · .prettierrc.json · tsconfig.json · playwright.config.js   # 开发工具配置
 ├── scripts/serve.js           # 本地静态服务器（端到端测试用）
 ├── scripts/gen-foods.js       # 食物库生成（原料值 + 自拟配方 → foods.json）
-├── docs/                      # 数据格式、数据结构、食物库扩展、CSV 导入、真机测试清单、截图
+├── docs/                      # 架构、测试、数据格式、数据结构、食物库扩展、CSV 导入、真机测试清单、截图
 ├── .github/                   # CI、Pages 部署、issue / PR 模板（含真机测试报告）
 ├── CODE_OF_CONDUCT.md · SECURITY.md
 ├── LICENSE                    # MIT
 └── NOTICE                     # 第三方声明
 ```
 
-数据结构详见 [docs/data-model.md](docs/data-model.md)，更新记录见 [CHANGELOG.md](CHANGELOG.md)。
+代码组织见 [docs/architecture.md](docs/architecture.md)，测试见 [docs/testing.md](docs/testing.md)，数据结构详见 [docs/data-model.md](docs/data-model.md)，更新记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 </details>
 

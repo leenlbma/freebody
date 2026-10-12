@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 90-boot.js — 全局事件、启动、可访问性、日期输入、快捷键、PWA、调试钩子 */
 /* 通用点击：删除/模板 */
 document.addEventListener('click', function (e) {

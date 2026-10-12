@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: MIT
 /**
  * 构建脚本：把 src/ 模板、样式、脚本与 data/、examples/ 中的 JSON 内联成单文件 index.html。
  * 用法：node scripts/build.js   （无第三方依赖，Node >= 14）
@@ -10,6 +11,8 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
+/** 源文件首行的 SPDX 标识在合并后的脚本头部统一声明一次 */
+const noSpdx = (s) => s.replace(/^\/\/ SPDX-License-Identifier: MIT\n/, '');
 
 // 1) 读取并校验食物库
 const foods = JSON.parse(read('data/foods.json'));
@@ -71,14 +74,14 @@ const app =
     ' * 单页离线健身记录：饮食 / 训练 / 补剂 / 睡眠 / 身体指标 / 激素与恢复 / 伤病与限制',
     ' * 数据仅存于浏览器 localStorage（键：freeBody_v1，自动从旧键 fitTracker_v1 迁移），可导出/导入 JSON。',
     ' * 模块：' + appFiles.join('、'),
-    ' * 本项目不提供医疗建议。MIT License.',
+    ' * 本项目不提供医疗建议。SPDX-License-Identifier: MIT · https://github.com/leenlbma/freebody',
     ' */',
     '(function(){',
     "'use strict';",
     'var FB_VERSION = ' + JSON.stringify(require(path.join(root, 'package.json')).version) + ';'
   ].join('\n') +
   '\n' +
-  appFiles.map((n) => fs.readFileSync(path.join(appDir, n), 'utf8')).join('') +
+  appFiles.map((n) => noSpdx(fs.readFileSync(path.join(appDir, n), 'utf8'))).join('') +
   '})();\n';
 
 // 4) 内联：样式、数据、图标、图表库、应用脚本依次注入模板（JSON 中的 "</" 转义，避免提前闭合 <script>）
@@ -86,8 +89,8 @@ const data = 'window.FIT_DATA = ' + JSON.stringify({ foods, examples }).replace(
 const html = read('src/index.template.html')
   .replace('/*__STYLES__*/', () => read('src/styles.css'))
   .replace('/*__DATA__*/', () => data)
-  .replace('/*__ICONS__*/', () => read('src/icons.js'))
-  .replace('/*__CHARTS__*/', () => read('src/charts.js'))
+  .replace('/*__ICONS__*/', () => noSpdx(read('src/icons.js')))
+  .replace('/*__CHARTS__*/', () => noSpdx(read('src/charts.js')))
   .replace('/*__APP__*/', () => app);
 
 const banner = `<!-- 由 scripts/build.js 生成，请勿直接编辑；修改 src/、data/、examples/ 后重新构建 -->\n`;

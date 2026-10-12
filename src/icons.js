@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*!
  * icons.js — 内联 SVG 线条图标（24×24 视图，1.5px 描边，currentColor）
  * 用法：FitIcons.svg('moon')；或在 HTML 中写 <i data-ic="moon"></i>，由 FitIcons.hydrate() 替换。

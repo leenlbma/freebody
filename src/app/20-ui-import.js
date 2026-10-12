@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 20-ui-import.js — 导入预览页与心得 */
 function rImp() {
   var h = '',

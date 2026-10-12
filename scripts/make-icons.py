@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 # 由 assets/*.svg 生成 PWA 图标 PNG（icons/）。需要 Python Playwright 与 Chrome：python3 scripts/make-icons.py
 # 图标为构建产物之外的静态资源，修改 logo 后手动运行一次并提交 icons/。
 from playwright.sync_api import sync_playwright

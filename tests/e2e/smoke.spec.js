@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // 冒烟：空数据与演示数据下，每个页面都能打开且没有脚本错误
 const { test, expect } = require('@playwright/test');
 const { SECTIONS, openSection, watchErrors } = require('./helpers');

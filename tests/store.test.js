@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 // 存储安全：用量阈值只提示一次、写满兜底、备份提醒、旧键迁移
 const test = require('node:test');

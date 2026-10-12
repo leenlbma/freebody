@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: MIT
 /** 自检：确认 index.html 为最新构建、内联脚本可被解析。用法：node scripts/check.js */
 'use strict';
 const fs = require('fs');
@@ -220,5 +221,13 @@ for (const f of ['SKILL.md', 'SKILL.en.md']) {
 }
 console.log(`[ok] 导入包 schema 校验通过（示例 ${nPack} 个、${nEnt} 条；文档示例 ${nDoc} 个；反例均被拒绝）`);
 console.log('[ok] skill frontmatter 与正文要点齐全；README 与 PROMPT.md 的提示词（中 / 英）一致');
-console.log(`[ok] 食物库 ${foods.length} 项，id / ref 校验通过`);
+const prov = { fdc: 0, recipe: 0, legacy: 0 };
+for (const f of foods) {
+  if (/^USDA FDC: /.test(f.ref)) prov.fdc++;
+  else if (/配方/.test(f.ref)) prov.recipe++;
+  else prov.legacy++;
+}
+console.log(
+  `[ok] 食物库 ${foods.length} 项，id / ref 校验通过（具体 USDA 条目 ${prov.fdc}、自拟配方 ${prov.recipe}、旧版同类近似 ${prov.legacy}）`
+);
 console.log(`[ok] 语法检查通过（${scripts.length} 段脚本）`);

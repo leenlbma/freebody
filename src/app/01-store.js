@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 01-store.js — 存储：默认数据、读写 localStorage、存储安全（v2.6） */
 function defaults() {
   return {

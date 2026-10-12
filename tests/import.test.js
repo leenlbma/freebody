@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 // 导入包：校验、预览状态、合并去重、撤销快照
 const test = require('node:test');

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 // 进阶规则：线性 / 双重进阶 / 保持；未做满不加重；连续未完成减载；恢复期与伤处不适保持
 const test = require('node:test');

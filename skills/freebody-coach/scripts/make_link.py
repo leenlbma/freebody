@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """Turn a FreeBody import pack (JSON) into an import link.
 
 把 FreeBody 导入包（JSON）转换为导入链接。只用 Python 标准库。

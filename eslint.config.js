@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 /**
  * ESLint 配置。src/app/*.js 在构建时拼接进同一个作用域，

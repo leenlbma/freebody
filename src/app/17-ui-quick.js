@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 17-ui-quick.js — 快速输入与一键操作 */
 function qPreview(inp, box) {
   var v = $(inp).value.trim();

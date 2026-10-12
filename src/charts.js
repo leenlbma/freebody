@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*!
  * charts.js — 零依赖 SVG 图表（时间折线/双轴、柱状/堆叠柱、堆叠面积、环图、横向条、热力日历）
  * - 颜色一律使用 CSS 变量（var(--acc) 等），切换深浅色无需重绘

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 03-calc.js — 核心计算（无 DOM）：饮食合计、份量换算、预警、恢复期、BMR / 目标、1RM、准备度、肌群疲劳、进阶规则、快速输入解析 */
 /* ---------- 计算 ---------- */
 function dayMeals(d) {

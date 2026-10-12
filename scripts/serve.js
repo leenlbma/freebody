@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 'use strict';
 /**
  * 本地静态服务器（仅开发与端到端测试用，无依赖）：node scripts/serve.js [端口]

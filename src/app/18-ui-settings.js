@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 18-ui-settings.js — 设置与备份 */
 function download(name, content, mime) {
   var a = document.createElement('a');

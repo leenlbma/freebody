@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.8.1-2148b8" alt="version 2.8.1">
+<img src="https://img.shields.io/badge/version-2.9.0-2148b8" alt="version 2.9.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -271,14 +271,14 @@ freebody/
 ├── eslint.config.js · .prettierrc.json · tsconfig.json · playwright.config.js   # dev tool config
 ├── scripts/serve.js           # local static server (for the end-to-end tests)
 ├── scripts/gen-foods.js       # food library generator (ingredient values + recipes → foods.json)
-├── docs/                      # data format, data model, food library, CSV import, device test checklist, screenshots
+├── docs/                      # architecture, testing, data format, data model, food library, CSV import, device test checklist, screenshots
 ├── .github/                   # CI, Pages deployment, issue / PR templates (including device test reports)
 ├── CODE_OF_CONDUCT.md · SECURITY.md
 ├── LICENSE                    # MIT
 └── NOTICE                     # third-party notices
 ```
 
-The full data model is documented in [docs/data-model.md](docs/data-model.md) (Chinese), and every release is listed in [CHANGELOG.md](CHANGELOG.md).
+Code organisation is described in [docs/architecture.en.md](docs/architecture.en.md) and the tests in [docs/testing.en.md](docs/testing.en.md). The full data model is documented in [docs/data-model.md](docs/data-model.md) (Chinese), and every release is listed in [CHANGELOG.md](CHANGELOG.md).
 
 </details>
 

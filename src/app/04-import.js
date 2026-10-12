@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 04-import.js — 导入（无 DOM）：CSV 解析、导入包校验 / 合并 / 去重 / 撤销、链接解码 */
 /* ---------- 批量导入 CSV ---------- */
 var CSV_ALIAS = {

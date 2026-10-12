@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 19-ui-ai.js — 拍照识别（v2.4） */
 /* ---------- 拍照识别（v2.4）：模型 API 配置 / 照片压缩 / 识别 / 确认后记录 ----------
  * 配置单独存于 localStorage「freeBody_ai_v1」，不进入主数据 S；导出时默认去掉 key。

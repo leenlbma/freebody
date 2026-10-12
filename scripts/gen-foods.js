@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// SPDX-License-Identifier: MIT
 /**
  * 生成 data/foods.json（v2.4.0 起）。用法：node scripts/gen-foods.js
  *

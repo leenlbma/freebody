@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 11-ui-today.js — 今天页与数据页 */
 /* ---------- 今天（一屏：准备度 / 推荐训练 / 营养剩余 / 打卡） ---------- */
 function activeInjury() {

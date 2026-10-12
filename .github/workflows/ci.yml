@@ -23,6 +23,8 @@ jobs:
       - run: npm run check
       - run: npm run lint
       - run: npm run typecheck
+      - name: 开发依赖许可证
+        run: npm run licenses
       - name: 单元测试与覆盖率（纯逻辑模块行覆盖 ≥ 85%）
         run: node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=85 tests/*.test.js
 

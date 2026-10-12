@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* FreeBody service worker（由 scripts/build.js 生成 sw.js，请勿直接编辑 sw.js）
  * 策略：缓存优先；安装时预缓存应用外壳；新版本安装后等待页面确认（"有新版本，点此刷新"）再接管。 */
 'use strict';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 14-ui-records.js — 补剂、睡眠、身体指标、激素与恢复、伤病 */
 function rSupp() {
   var dn = suppDone(sel);

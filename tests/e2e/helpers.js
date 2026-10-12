@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // 端到端测试共用：页面列表、打开子页、收集报错
 const SECTIONS = [
   'overview',

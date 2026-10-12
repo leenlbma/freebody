@@ -1,5 +1,5 @@
 FreeBody
-Copyright (c) FreeBody contributors
+Copyright (c) 2026 leenlbma and FreeBody contributors
 （v2.0.0 起由 "Fitness Tracker" 更名为 FreeBody）
 本项目以 MIT 许可证发布，见 LICENSE。
 
@@ -75,3 +75,21 @@ assets/options/ 中的备选方案字标另使用 Manrope、Sora、Outfit 的字
   · 食物名称、id、分类、别名、份量与配方均为本项目自拟；未整表复制《中国食物
     成分表》或任何第三方数据集，未批量访问任何在线食物数据库。
   仅供估算，不构成医疗或营养建议。
+
+----------------------------------------------------------------------
+开发工具（不随应用分发）
+----------------------------------------------------------------------
+
+以下工具只在开发与测试时通过 npm 安装（package.json 的 devDependencies，版本锁定在
+package-lock.json），不会进入 index.html，也不随 GitHub Pages 发布：
+
+  Prettier（MIT）、ESLint 与 @eslint/js（MIT）、globals（MIT）、
+  TypeScript（Apache-2.0，仅用于 tsc --checkJs 类型检查）、
+  Playwright / @playwright/test（Apache-2.0，端到端测试）、
+  axe-core（MPL-2.0，端到端测试时注入页面做无障碍审计，未修改、未分发）。
+
+scripts/licenses.js 会检查 node_modules 中全部间接依赖的许可证，只允许 MIT、ISC、
+BSD、Apache-2.0、MPL-2.0 等宽松或弱著佐权许可证；出现 GPL / AGPL / LGPL / SSPL 或
+未声明许可证的包时 CI 失败。
+
+源码文件首行带 SPDX-License-Identifier: MIT。

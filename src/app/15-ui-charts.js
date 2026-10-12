@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 15-ui-charts.js — 可视化（图表由 src/charts.js 绘制） */
 /* ---------- 可视化（图表由 src/charts.js 绘制） ---------- */
 /** 时间范围：每组图表独立，0=全部 */

@@ -4,6 +4,18 @@
 
 ## [未发布]
 
+## [2.9.0] - 2026-10-13
+
+### 新增
+- **架构与测试文档**：`docs/architecture.md`（模块分层、数据流、钩子、修改边界）与 `docs/testing.md`（各层测试、如何运行、已知局限），均有英文版。
+- **许可证检查**：`npm run licenses`（`scripts/licenses.js`）检查 node_modules 中全部 93 个开发依赖（含间接依赖）的许可证，出现 GPL / AGPL / LGPL / SSPL 或未声明许可证的包时失败，已接入 CI。
+- **食物库可核验程度**：`npm run check` 统计 `ref` 类型（具体 USDA 条目 133、自拟配方 108、旧版同类近似 81），`docs/food-database.md` 写明每类如何核验。旧版 81 项没有写具体条目，如实标注。
+
+### 变更
+- `LICENSE` 与 `NOTICE` 的版权方写为「leenlbma and FreeBody contributors」。
+- `NOTICE` 新增「开发工具」一节，列出 devDependencies 及其许可证：axe-core 为 MPL-2.0，只在测试中使用、不分发。
+- 源码文件首行加 `SPDX-License-Identifier: MIT`，构建时合并为脚本头部的一处声明。应用功能没有改动。
+
 ## [2.8.1] - 2026-10-13
 
 ### 修复

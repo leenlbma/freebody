@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 02-util.js — 工具函数：转义、数字、日期、提示 */
 /**
  * 按选择器取第一个元素。界面代码中多为表单控件，类型按表单控件处理（含 value / checked / files 等）。

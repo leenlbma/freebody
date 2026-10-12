@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* 13-ui-train.js — 训练：力量 / 有氧 / 表现表单 */
 function rTrain() {
   rSession();
