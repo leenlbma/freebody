@@ -37,19 +37,22 @@
 <main>
 <div class="subnav" id="subnav"></div>
 <!-- 总览 -->
-<section id="overview" class="on">
+<section id="overview" data-lay="fixed" class="on">
  <div id="ovAlerts"></div>
- <div class="card tap" data-go="hormone" id="ovReady"></div>
- <div class="card" id="ovTrain"></div>
+ <div class="ov-main" id="ovMain">
+  <div class="card tap" data-go="hormone" id="ovReady"></div>
+  <div class="card" id="ovTrain"></div>
+ </div>
  <div class="card tap" data-sub="diet" id="ovNut"></div>
  <div class="checks" id="ovChecks"></div>
+ <div class="card ov-trend" id="ovTrend"></div>
 </section>
 
 <!-- 饮食 -->
-<section id="diet">
+<section id="diet" data-lay="fixed">
  <div class="card dsum" id="dietSum"></div>
  <div id="mealCards"></div>
- <div class="row" style="margin:-2px 0 10px"><button class="ghost sm" id="dRepeat"><i data-ic="repeat"></i>重复昨天</button><button class="ghost sm" data-go-cal="1"><i data-ic="cal"></i>日历</button></div>
+ <div class="tools" id="dTools"><button class="ghost sm" id="dRepeat"><i data-ic="repeat"></i>重复昨天</button><button class="ghost sm" data-go-cal="1"><i data-ic="cal"></i>日历</button></div>
  <details class="card" id="calCard"><summary><b>饮食月历</b> <span class="mut" id="calSum"></span></summary><div id="calBox"></div></details>
  <details class="card"><summary><b>饮食目标</b></summary>
   <div class="grid2" style="margin-top:8px">
@@ -60,7 +63,7 @@
   </div>
   <label style="margin-top:8px;display:block">每餐热量分配 %（早 / 午 / 晚 / 加餐）</label>
   <div class="grid4"><input id="gS0" type="number"><input id="gS1" type="number"><input id="gS2" type="number"><input id="gS3" type="number"></div>
-  <div class="row" style="margin-top:8px"><button id="gSave">保存</button><span class="mut" id="gHint"></span></div>
+  <div class="actions"><button id="gSave">保存</button><span class="mut" id="gHint"></span></div>
   <p class="mut">按 2–3 周体重/腰围趋势，每次 ±100–150 kcal 微调。</p>
  </details>
  <details class="card" id="tgtCard"><summary><b>目标怎么来的</b> <span class="mut">BMR × 活动 → 缺口 → 偏移</span></summary><div id="tgtBox"></div></details>
@@ -93,7 +96,7 @@
     <div class="grid2"><div><label>钠 mg</label><input id="mNa" type="number" inputmode="numeric"></div><div><label>膳食纤维 g</label><input id="mFib" type="number" inputmode="decimal" step="0.1"></div></div>
    </details>
    <input id="mG" type="hidden"><div id="foodTpl" hidden></div>
-   <div class="row" style="margin-top:8px"><button id="mAdd">添加</button><button class="ghost" id="mCancel" hidden>取消</button><button class="ghost sm" id="mSaveFav">存为常用</button><button class="ghost sm danger" id="mDel" hidden>删除</button></div>
+   <div class="actions"><button id="mAdd">添加</button><button class="ghost" id="mCancel" hidden>取消</button></div><div class="actions"><button class="ghost sm" id="mSaveFav">存为常用</button><button class="danger sm" id="mDel" hidden>删除</button></div>
   </div>
  </div>
  <div id="faCustom" hidden>
@@ -116,7 +119,7 @@
    <div style="margin-top:6px"><label>组成（同快速输入写法）</label><input id="coText" placeholder="如：鸡胸肉150g 青椒100g 米饭1碗"></div>
    <div class="mut" id="coPrev"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="cuAdd">保存</button><span class="mut" style="font-size:12px">保存后快速输入名称即可记录（优先匹配）</span></div>
+  <div class="actions"><button id="cuAdd">保存</button><span class="mut" style="font-size:12px">保存后快速输入名称即可记录（优先匹配）</span></div>
   <ul class="list" id="cuList"></ul>
   </details>
  </div>
@@ -131,8 +134,8 @@
   <div class="grid2"><div><label>数量</label><input id="dfQty" type="number" inputmode="decimal" step="any"></div><div><label>单位</label><select id="dfUnit"></select></div></div>
   <div class="row df-pre" id="dfPre"></div>
   <div style="margin-top:8px"><label>添加到</label><div class="tabs4" id="dfMeal"></div></div>
-  <div class="row" style="margin-top:10px"><button class="btn-big" id="dfAdd" style="flex:1"></button></div>
-  <div class="row" style="margin-top:6px" id="dfEditRow" hidden><button class="ghost sm danger" id="dfDel">删除此条</button></div>
+  <div class="actions"><button class="btn-big" id="dfAdd"></button></div>
+  <div class="danger-zone" id="dfEditRow" hidden><button class="danger" id="dfDel">删除此条</button></div>
  </div>
 </section>
 
@@ -146,7 +149,7 @@
 </section>
 
 <!-- 训练 -->
-<section id="train">
+<section id="train" data-lay="fixed">
  <div id="sessBox"></div>
  <div id="musWrap"><div class="card"><div class="hrow"><h2><i data-ic="body"></i>肌群恢复</h2><div class="rng" id="mapMode"></div></div>
   <div id="bodyMap"></div><div id="mapLegend"></div><div id="musDetail"></div>
@@ -173,7 +176,7 @@
   </details>
   <div id="wRestr"></div>
   <div id="wSug"></div>
-  <div class="row" style="margin-top:8px"><button id="wAdd">添加</button><span class="mut" id="wLast"></span></div>
+  <div class="actions"><button id="wAdd">添加</button><span class="mut" id="wLast"></span></div>
  </details>
  <details class="card"><summary><b>恢复期设置</b> <span class="mut">停训回归用</span></summary>
   <div class="grid2"><div><label>恢复训练起始日</label><input type="date" id="rStart"></div><div style="display:flex;align-items:flex-end"><button id="rSave">保存</button></div></div>
@@ -210,7 +213,7 @@
    <div><label>层数</label><input id="cFl" type="number" inputmode="numeric"></div>
    <div><label>平均心率</label><input id="cHr" type="number" inputmode="numeric"></div>
   </div></details>
-  <div class="row" style="margin-top:8px"><button id="cAdd">添加</button></div>
+  <div class="actions"><button id="cAdd">添加</button></div>
   <div id="cList"></div>
  </div>
  <div class="card"><h2><i data-ic="swim"></i>游泳</h2>
@@ -223,7 +226,7 @@
    <div><label>SWOLF</label><input id="swSw" type="number" inputmode="numeric"></div>
    <div><label>备注</label><input id="swN"></div>
   </div></details>
-  <div class="row" style="margin-top:8px"><button id="swAdd">添加</button><span class="mut" id="swPace"></span></div>
+  <div class="actions"><button id="swAdd">添加</button><span class="mut" id="swPace"></span></div>
   <div id="swList"></div>
  </div>
 </section>
@@ -239,7 +242,7 @@
    <div><label>日期</label><input type="date" id="pbD"></div>
    <div><label>备注（泳池25/50m、出发方式等）</label><input id="pbN"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="pbAdd">记录成绩</button><span class="mut">图表越低越快</span></div>
+  <div class="actions"><button id="pbAdd">记录成绩</button><span class="mut">图表越低越快</span></div>
   <div class="rng" data-rng="perf"></div><div class="chart" id="chPb"></div><div id="pbList"></div>
  </div>
  <div class="card"><h2><i data-ic="run"></i>运动表现 · 800m 跑步</h2>
@@ -254,7 +257,7 @@
    <div><label>日期</label><input type="date" id="rnD"></div>
    <div><label>备注（场地、天气等）</label><input id="rnN"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="rnAdd">记录成绩</button><span class="mut">虚线=历史最佳/当前最佳，越低越快</span></div>
+  <div class="actions"><button id="rnAdd">记录成绩</button><span class="mut">虚线=历史最佳/当前最佳，越低越快</span></div>
   <div class="chart" id="chRun"></div><div id="rnList"></div>
   <p class="mut">停练后恢复期内不建议直接全力测800m；建议先完成4-6周基础期并与私教确认后再计时。</p>
  </div>
@@ -266,7 +269,7 @@
    <div><label>日期</label><input type="date" id="ptD"></div>
    <div><label>备注</label><input id="ptN"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="ptAdd">记录成绩</button></div>
+  <div class="actions"><button id="ptAdd">记录成绩</button></div>
   <details style="margin-top:10px"><summary class="mut">添加测试项目</summary>
    <div class="grid2" style="margin-top:6px">
     <div><label>名称</label><input id="peName" placeholder="如 立定跳远"></div>
@@ -274,7 +277,7 @@
     <div><label>方向</label><select id="peBetter"><option value="higher">越高越好</option><option value="lower">越低越好</option></select></div>
     <div><label>历史最佳（可选）</label><input id="peHist"></div>
    </div>
-   <div class="row" style="margin-top:8px"><button class="ghost" id="peAdd">添加项目</button></div>
+   <div class="actions"><button class="ghost" id="peAdd">添加项目</button></div>
   </details>
   <div id="ptList"></div>
  </div>
@@ -289,7 +292,7 @@
    <div><label>剂量</label><input id="sDose" placeholder="如 5g"></div>
    <div><label>计划时间</label><input id="sTime" placeholder="如 早餐后 / 练后 / 08:00"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="sAdd">添加</button></div>
+  <div class="actions"><button id="sAdd">添加</button></div>
  </details>
  <div class="card"><h2>近7天完成率</h2><div id="s7"></div><div class="mut" style="font-size:12px;margin-top:6px">剂量仅作记录，以产品说明或医生建议为准。</div></div>
 </section>
@@ -303,7 +306,7 @@
   </div>
   <label style="margin-top:6px">质量（1差-5好）</label><div class="seg" id="slQ"></div>
   <details class="more"><summary>备注</summary><input id="slNote"></details>
-  <div class="row" style="margin-top:8px"><button id="slSave">保存当日睡眠</button><button class="ghost" id="slReuse"><i data-ic="repeat"></i>沿用上次</button><span class="mut" id="slDur"></span></div>
+  <div class="actions"><button id="slSave">保存当日睡眠</button><button class="ghost" id="slReuse"><i data-ic="repeat"></i>沿用上次</button><span class="mut" id="slDur"></span></div>
  </div>
  <div class="card"><div class="hrow"><h2>睡眠时长与质量</h2><div class="rng" data-rng="sleep"></div></div><div class="mut" id="slAvg"></div><div class="chart" id="chSleep"></div><div id="slList"></div></div>
 </section>
@@ -319,7 +322,7 @@
    <div><label>腰围 cm</label><input id="bWa" type="number" step="0.1" inputmode="decimal"></div>
    <div><label>静息心率 bpm</label><input id="bHr" type="number" inputmode="numeric"></div>
   </div></details>
-  <div class="row" style="margin-top:8px"><button id="bSave">保存当日</button><span class="mut">建议晨起空腹测量</span></div>
+  <div class="actions"><button id="bSave">保存当日</button><span class="mut">建议晨起空腹测量</span></div>
  </div>
  <div class="card"><div class="hrow"><h2><i data-ic="chart"></i>身体趋势</h2><div class="rng" data-rng="body"></div></div><div class="mut" id="bTxt"></div>
   <h3>体重与体脂</h3><div class="chart" id="chBody"></div>
@@ -339,7 +342,7 @@
    <div><label>HRV ms（同一设备/时段）</label><input id="rvHrv" type="number" inputmode="numeric"></div>
   </div>
   <div id="rvScales"></div>
-  <div class="row" style="margin-top:8px"><button id="rvSave">保存当日</button></div>
+  <div class="actions"><button id="rvSave">保存当日</button></div>
  </div>
  <div class="card"><div class="hrow"><h2><i data-ic="chart"></i>恢复趋势</h2><div class="rng" data-rng="rec"></div></div>
   <div id="readyNow"></div>
@@ -358,7 +361,7 @@
    <div><label>参考上限</label><input id="lbHi" type="number" step="any"></div>
    <div style="grid-column:1/-1"><label>备注</label><input id="lbNote" placeholder="采血时间、是否空腹"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="lbAdd">添加</button></div>
+  <div class="actions"><button id="lbAdd">添加</button></div>
  </details>
  <div class="card"><h2>化验趋势</h2><div class="seg" id="lbSeg"></div><div class="mut" id="lbTxt"></div><div class="chart" id="chLab"></div><div id="lbList"></div></div>
 </section>
@@ -371,23 +374,23 @@
   <div class="grid2" style="margin-top:8px">
    <div><label>部位/名称</label><input id="injName" placeholder="如：左肩"></div>
    <div><label>受伤时间/说明</label><input id="injDesc"></div>
-  </div><div class="row" style="margin-top:8px"><button class="ghost" id="injAdd">添加伤病</button></div>
+  </div><div class="actions"><button class="ghost" id="injAdd">添加伤病</button></div>
  </div>
  <div class="card"><h2>今日伤处疼痛 <span class="mut" id="wpDate"></span></h2>
   <label>疼痛评分（0无痛 - 10极痛）</label><div class="seg" id="wpSeg"></div>
   <label style="margin-top:6px">触发动作（点选，可多选）</label><div class="seg" id="wpTrig"></div>
   <details class="more"><summary>备注</summary><input id="wpNote" placeholder="如：拧毛巾、撑地起身"></details>
-  <div class="row" style="margin-top:8px"><button id="wpSave">保存当日</button><span class="mut" id="wpHint"></span></div>
+  <div class="actions"><button id="wpSave">保存当日</button><span class="mut" id="wpHint"></span></div>
  </div>
  <div class="card"><div class="hrow"><h2>疼痛趋势 <span class="mut" id="wpAvg"></span></h2><div class="rng" data-rng="pain"></div></div><div class="chart" id="chWp"></div><div class="mut">0 分画在基线上；红点 = 当日训练标记了「<span class="flagLbl">伤处不适</span>」</div></div>
  <div class="card"><h2><i data-ic="pulse"></i>康复打卡 <span class="mut" id="rhRate"></span></h2><ul class="list" id="rhList"></ul>
   <div class="grid2" style="margin-top:8px"><div><label>康复动作</label><input id="rhName"></div><div><label>组次/说明</label><input id="rhDose" placeholder="遵康复师安排"></div></div>
-  <div class="row" style="margin-top:8px"><button class="ghost" id="rhAdd">添加康复动作</button></div>
+  <div class="actions"><button class="ghost" id="rhAdd">添加康复动作</button></div>
   <div id="rh7" style="margin-top:8px"></div>
  </div>
  <div class="card"><h2><i data-ic="block"></i>受限动作 → 替代建议</h2><div class="mut" style="margin-bottom:6px">训练时自动提醒；替代方案请与私教确认。</div><ul class="list" id="rsList"></ul>
   <div class="grid2" style="margin-top:8px"><div><label>受限动作</label><input id="rsName"></div><div><label>替代建议</label><input id="rsAlt"></div></div>
-  <div class="row" style="margin-top:8px"><button class="ghost" id="rsAdd">添加</button></div>
+  <div class="actions"><button class="ghost" id="rsAdd">添加</button></div>
  </div>
  <details class="card"><summary><b>关节友好策略示例</b></summary><ul style="margin:0;padding-left:18px;font-size:14px">
   <li><b>调整幅度</b>：在无痛范围内训练，如箱式深蹲、缩短动作行程</li>
@@ -399,7 +402,7 @@
 </section>
 
 <!-- 设置 -->
-<section id="settings">
+<section id="settings" data-lay="dense">
  <div class="card"><h2>常用</h2><div class="row"><button class="chip" data-go="supp">补剂清单</button><button class="chip" data-go="injury">伤病与限制</button><button class="chip" data-go="perf">运动表现</button><button class="chip" data-go="nutri">营养分析</button></div></div>
  <div class="card"><h2>个人配置</h2>
   <div class="grid2 w3">
@@ -407,11 +410,11 @@
    <div><label>身高 cm（用于 BMI）</label><input id="pfH" type="number"></div>
    <div><label>训练伤处标记名称</label><input id="pfFlag" placeholder="伤处不适"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="pfSave">保存</button></div>
+  <div class="actions"><button id="pfSave">保存</button></div>
  </div>
- <details class="card"><summary><b>示例配置（可选）</b></summary><p class="mut">合并示例的伤病、受限动作、康复清单配置，不含记录数据。</p><ul class="list" id="exList2"></ul><div class="row" style="margin-top:8px"><button class="ghost sm" id="exFileBtn">从文件加载配置</button><input type="file" id="exFile" accept=".json,application/json" hidden></div><p class="mut" style="font-size:12px">可加载与 examples/ 同格式的本地 JSON（如个人配置），只合并配置与清单。</p></details>
+ <details class="card"><summary><b>示例配置（可选）</b></summary><p class="mut">合并示例的伤病、受限动作、康复清单配置，不含记录数据。</p><ul class="list" id="exList2"></ul><div class="actions"><button class="ghost" id="exFileBtn">从文件加载配置</button><input type="file" id="exFile" accept=".json,application/json" hidden></div><p class="mut" style="font-size:12px">可加载与 examples/ 同格式的本地 JSON（如个人配置），只合并配置与清单。</p></details>
  <details class="card"><summary><b>食物库</b></summary><p class="mut" id="cfInfo"></p>
-  <div class="row"><button class="ghost" id="cfBtn">导入自定义食物 JSON</button><button class="ghost" id="cfClear">清空自定义</button><input type="file" id="cfFile" accept=".json,application/json" hidden></div>
+  <div class="actions"><button class="ghost" id="cfBtn">导入自定义食物 JSON</button><button class="danger" id="cfClear">清空自定义</button><input type="file" id="cfFile" accept=".json,application/json" hidden></div>
   <p class="mut">格式见 docs/food-database.md。欢迎向 data/foods.json 贡献条目。</p>
  </details>
  <details class="card"><summary><b>其他目标</b></summary>
@@ -421,17 +424,17 @@
    <div><label>每周爬楼目标 分钟</label><input id="gSt" type="number"></div>
    <div><label>目标体重 kg（可选）</label><input id="gWt" type="number" step="0.1"></div>
   </div>
-  <div class="row" style="margin-top:8px"><button id="g2Save">保存</button></div>
+  <div class="actions"><button id="g2Save">保存</button></div>
  </details>
  <details class="card"><summary><b>批量导入 CSV</b></summary>
   <p class="mut">自动识别饮食、力量、身体、睡眠、化验、爬楼、游泳；中英文表头均可，日期 YYYY-MM-DD。</p>
-  <div class="row"><button class="ghost" id="csvBtn">选择 CSV 文件</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div>
+  <div class="actions"><button class="ghost" id="csvBtn">选择 CSV 文件</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div>
   <div class="row" style="margin-top:8px" id="csvTpl"></div>
  </details>
  <div class="card"><h2>数据备份</h2>
   <p class="mut">数据只存本机。换设备或清缓存前请导出。</p>
-  <div class="row"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
-  <div class="row" style="margin-top:10px"><button class="ghost" id="wipe" style="color:var(--bad)">清空全部数据</button></div>
+  <div class="actions"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
+  <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card mut" style="font-size:12px">FreeBody · 数据只存本机 · 不构成医疗建议</div>
 </section>

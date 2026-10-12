@@ -222,7 +222,7 @@ details.more>summary::-webkit-details-marker{display:none}details.more>summary::
 .ck-t input[type=range]{accent-color:var(--acc);padding:0}
 .target{display:flex;align-items:baseline;justify-content:center;gap:6px;margin:14px 0 10px}
 .target b{font-size:44px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em}.target span{color:var(--mut)}.target i{font-style:normal;color:var(--mut);font-size:22px;margin:0 6px}
-.act2{display:grid;grid-template-columns:2fr 1fr;gap:8px}.act2 .btn-big{margin-top:6px}
+.act2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.act2 .btn-big{margin-top:6px}
 .tc{text-align:center}
 .dmain{margin:-2px 0 6px}
 .mini{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mut);background:var(--in);border-radius:12px;padding:8px 10px;cursor:pointer}.mini span{flex:1}
@@ -296,14 +296,86 @@ button:focus:not(:focus-visible),[tabindex]:focus:not(:focus-visible){outline:no
 .card:focus-visible,.frow:focus-visible,.entries li:focus-visible{outline-offset:-2px;border-radius:12px}
 .sw-upd{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:12;border-radius:99px;padding:10px 18px;min-height:44px;box-shadow:0 6px 24px rgba(0,0,0,.25);white-space:nowrap}
 @media(hover:hover){.tap:hover,.frow:hover,.entries li:hover{background:color-mix(in srgb,var(--fg) 4%,var(--card))}.frow:hover{background:transparent}.frow:hover b{color:var(--acc)}}
-/* 两栏：卡片按列流式排布；警示条、会话、日期栏等跨栏 */
+/* ===== v2.3.1 统一按钮系统 ===== */
+:root{--bh:44px;--bhs:36px}
+button{min-height:var(--bh);padding:0 16px;border-radius:12px;border:1px solid transparent;font-size:15px;font-weight:600;line-height:1.25}
+button.sm{min-height:var(--bhs);padding:0 12px;border-radius:10px;font-size:13px}
+button.ghost{background:var(--in);color:var(--fg);border-color:transparent}
+button.danger,button.ghost.danger{background:transparent;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--bd))}
+button:disabled{opacity:.45;cursor:default}
+.btn-big{width:100%;min-height:var(--bh);font-size:16px}
+@media(hover:hover){button:not(.ghost):not(.danger):not(.del):not(.chip):not(.plus):hover{filter:brightness(1.07)}button.ghost:hover{background:color-mix(in srgb,var(--fg) 7%,var(--in))}button.danger:hover{background:color-mix(in srgb,var(--bad) 8%,transparent)}}
+input,select{min-height:var(--bh);padding:10px 12px}
+textarea{padding:10px 12px}
+.dnav{gap:8px}.dnav button{width:var(--bhs);min-height:var(--bhs);padding:0}.dnav input{min-height:var(--bhs);padding:4px 10px}
+#themeBtn{width:var(--bhs);padding:0}
+/* 表单底部操作：全宽；多个按钮等宽排列；说明文字另起一行 */
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.actions>button{flex:1 1 0;min-width:0}
+.actions>.mut{flex:1 0 100%;font-size:12px}
+.actions+.actions{margin-top:8px}
+/* 工具按钮：等宽网格，靠左 */
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;margin:0 0 12px}
+@media(min-width:600px){.tools{grid-template-columns:repeat(auto-fill,minmax(160px,200px))}}
+/* 危险区：与上方对齐，全宽描边 */
+.danger-zone{margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)}
+.danger-zone>button{width:100%}
+.grid2>div>button{width:100%}
+.grid2>div:has(>input),.grid2>div:has(>select){display:flex;flex-direction:column;justify-content:flex-end}
+.card .btn-big{margin-top:12px}
+/* 间距刻度 8/12/16/24/32 */
+.card{padding:16px;margin-bottom:12px}
+#overview .card{padding:16px}
+.alert,.disc{margin-bottom:12px}
+.checks{gap:8px;margin-bottom:12px}
+.ck-t{padding:12px;gap:8px}
+.nut-wide,.ov-trend{display:none}
+main{padding:12px 12px 24px}
+/* ===== v2.3.1 布局网格 ===== */
+/* 平板（600–1024，竖屏）：8 列、间距 16 */
 @media(min-width:600px){
- main{max-width:1040px;padding:14px 18px 24px}
- #diet.on,#train.on,#tstats.on,#cardio.on,#perf.on,#supp.on,#sleep.on,#body.on,#hormone.on,#injury.on,#settings.on,#dietFood.on,#dataBox,#faQuick:not([hidden]),#overview.on{columns:2;column-gap:14px}
- section.on>*,#dataBox>*,#faQuick>*{break-inside:avoid}
- #overview>#ovAlerts,#overview>.checks,#diet>.row,#train>#sessBox,#train>#recBanner,#hormone>.disc,#hormone>#otAlert,#injury>.disc,#injury>#injAlert,#dietFood>#dfDay{column-span:all}
- #dietAdd.on{max-width:720px;margin:0 auto}
- #mealCards>.card:last-child{margin-bottom:10px}
+ :root{--gap:16px}
+ header{padding:8px 16px}
+ main{max-width:none;padding:16px 16px 24px}
+ .subnav{margin-bottom:16px}
+ section.on{--cols:8;--span:4;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:var(--gap);align-items:stretch}
+ section.on>*{grid-column:span var(--span);margin:0!important;min-width:0}
+ section.on>:empty,section.on>[hidden]{display:none}
+ section.on>details,section.on>.disc,section.on>.alert,section.on>.tools,section.on>.actions,#ovAlerts,#otAlert,#injAlert,#sessBox,#recBanner,#dfDay,#dataBox,#data>.card,#mealCards,#dietSum,#ovMain,#ovNut,#ovChecks,#ovTrend{grid-column:1/-1}
+ #dataBox>.card{display:flex;flex-direction:column}
+ section.on>.card.mut{grid-column:1/-1;background:none;box-shadow:none;padding:0 4px}
+ #settings.on{grid-auto-flow:row dense}#settings>.card:nth-last-child(2){grid-column:1/-1}
+ #dietAdd.on{display:block;max-width:720px;margin:0 auto}#dietAdd.on>*{margin-bottom:12px}
+ #nutri.on{display:block}
+ /* 今天：主卡（准备度 + 今日训练）合并为一张；营养环横排；打卡三等分；近 7 天趋势 */
+ .ov-main{background:var(--card);border-radius:18px;box-shadow:var(--sh);display:flex;flex-direction:column;overflow:hidden}
+ .ov-main>.card{box-shadow:none;border-radius:0;margin:0;background:transparent}
+ .ov-main>.card+.card{border-top:1px solid var(--bd);flex:1;display:flex;flex-direction:column}
+ #ovTrain .btn-big{margin-top:auto}#ovTrain>.mut:nth-of-type(2){margin-bottom:16px}
+ #ovNut .nut1,#ovNut>.bar{display:none}
+ .nut-wide{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;margin-top:8px}
+ .nut-wide .ring{width:132px;height:132px}
+ .nut-wide .mbars{grid-template-columns:1fr;gap:12px;margin:0}
+ .nut-wide .mbar .hrow{flex-direction:row;justify-content:space-between;align-items:baseline}
+ .ov-trend{display:block}
+ .ov-trend .hrow h2{margin:0}.ov-trend .hrow{margin-bottom:12px}
+ .tr2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}.tr2 .mut{margin-bottom:4px}
+ #ovChecks{margin:0;gap:var(--gap)}
+ .ck-t{padding:16px}
+ /* 饮食：汇总全宽，餐次 2×2 等高 */
+ #mealCards{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+ #mealCards>.card{margin:0}
+ #dietSum{margin:0}
+ #dTools{margin:0}
+ /* 训练：肌群图全宽，计划 / 今日记录两栏 */
+ #train>#sessBox,#train>#musWrap,#train>#plansBox,#train>#wTodayCard{grid-column:1/-1}
+ #sessBox>.card:last-child,#musWrap>.card,#plansBox>.card,#plansBox>details{margin-bottom:0}
+ #musWrap>.card{height:100%}
+ /* 数据：四张核心卡 2×2，图表贴底对齐 */
+ #dataBox{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+ #dataBox>.card{margin:0}
+ #dataBox .chart,#dataBox .mini{margin-top:auto}
+ #dataBox .dmain{margin:0 0 12px}
  .bm svg{max-width:300px}
  #toast{bottom:96px}
 }
@@ -315,20 +387,54 @@ button:focus:not(:focus-visible),[tabindex]:focus:not(:focus-visible){outline:no
  header{padding-top:calc(6px + env(safe-area-inset-top))}
  .sw-upd{bottom:16px}#toast{bottom:20px}
 }
-/* 桌面：左侧导航 + 内容居中 */
-@media(min-width:1025px){
- body{padding-bottom:24px;padding-left:220px}
- nav{top:0;bottom:0;right:auto;width:220px;flex-direction:column;justify-content:flex-start;gap:2px;padding:76px 12px 12px;border-top:0;border-right:1px solid var(--bd)}
- nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;padding:10px 14px;font-size:15px;border-radius:10px;min-height:44px}
+/* 桌面（>1024）与平板横屏：左侧导航、12 列、内容最大宽 1200、边距与列间距 24 */
+@media(min-width:1025px),(min-width:900px) and (orientation:landscape) and (min-height:521px){
+ :root{--gap:24px;--side:220px}
+ body{padding-bottom:32px;padding-left:var(--side)}
+ nav{top:0;bottom:0;right:auto;width:var(--side);flex-direction:column;justify-content:flex-start;gap:4px;padding:calc(var(--hh,104px) + 24px) 16px 16px;border-top:0;border-right:1px solid var(--bd);background:var(--card)}
+ nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;padding:0 12px;font-size:15px;border-radius:10px;min-height:var(--bh)}
  nav button.on{background:color-mix(in srgb,var(--acc) 12%,transparent)}
  nav button:hover:not(.on){background:var(--in);color:var(--fg)}
- header{position:sticky}
- header>.hrow{max-width:1180px;margin-left:auto;margin-right:auto}
- main{max-width:1180px;padding:18px 24px 32px}
- #injury.on,#settings.on,#hormone.on,#dataBox{columns:3}
+ header{position:sticky;padding:12px 24px}
+ header>.hrow{max-width:1200px;margin-left:auto;margin-right:auto}
+ header>.hrow+.hrow{margin-top:8px!important}
+ main{max-width:1248px;padding:24px 24px 32px}
+ .subnav{margin-bottom:24px}
+ section.on{--cols:12;--span:6}
+ #injury.on,#settings.on,#hormone.on,#supp.on{--span:4}
  #dietAdd.on{max-width:760px}
- .sw-upd{bottom:24px;margin-left:110px}#toast{bottom:28px;margin-left:110px}
+ .card,#overview .card{padding:24px}
+ details.card:not([open]){padding-top:16px;padding-bottom:16px}
+ #settings>.card:nth-last-child(2){grid-column:span 4}
+ section.on>.card.mut{padding:0 4px}
+ .ck-t{padding:16px 24px}
+ .ov-main>.card{padding:24px}
+ h2{font-size:16px}
+ .rec-t{font-size:22px}
+ /* 今天：左 8 列主卡，右 4 列营养环；打卡 3×4 列；趋势全宽 */
+ #ovMain{grid-column:span 8}#ovNut{grid-column:span 4}
+ .nut-wide{grid-template-columns:1fr;justify-items:center;gap:16px;margin-top:16px}
+ .nut-wide .ring{width:150px;height:150px}
+ .nut-wide .mbars{width:100%}
+ #ovChecks{grid-template-columns:repeat(12,minmax(0,1fr))}
+ #ovChecks>.ck-t{grid-column:span 4}
+ #ovChecks>.ck-t:first-child:nth-last-child(2),#ovChecks>.ck-t:first-child:nth-last-child(2)~.ck-t{grid-column:span 6}
+ #ovChecks>.ck-t.wide{grid-column:1/-1}
+ /* 饮食：左 4 列汇总，右 8 列餐次 2×2 */
+ #dietSum{grid-column:span 4}#mealCards{grid-column:span 8}
+ #dietSum{justify-content:center}
+ /* 训练：肌群图左 6 列，右侧依次为今日推荐 / 计划 / 今日记录；训练进行中肌群图隐藏，会话全宽 */
+ #train.on{grid-template-rows:auto auto 1fr}
+ #train>#musWrap{grid-column:1/span 6;grid-row:1/span 3}
+ #train>#sessBox{grid-column:7/span 6;grid-row:1}
+ #train>#plansBox{grid-column:7/span 6;grid-row:2}
+ #train>#wTodayCard{grid-column:7/span 6;grid-row:3;align-self:stretch}
+ #train>#sessBox,#train>#plansBox{align-self:start}
+ #train:has(>#musWrap[style*="none"])>#sessBox{grid-column:1/-1}
+ #train:has(>#musWrap[style*="none"])>#plansBox,#train:has(>#musWrap[style*="none"])>#wTodayCard{grid-column:span 6;grid-row:auto}
+ #train:has(>#musWrap[style*="none"]){grid-template-rows:none}
+ .sw-upd{bottom:24px;margin-left:calc(var(--side) / 2)}#toast{bottom:28px;margin-left:calc(var(--side) / 2)}
 }
-@media(min-width:1440px){#train.on,#body.on,#tstats.on{columns:3}#train>#musWrap{break-inside:avoid}}
+@media(min-width:1440px){:root{--side:240px}#dataBox{grid-template-columns:repeat(4,minmax(0,1fr))}}
 /* 大字体：允许换行，避免溢出 */
 .hrow{flex-wrap:wrap}.meal-h>div,.frow>div{min-width:0;overflow-wrap:anywhere}

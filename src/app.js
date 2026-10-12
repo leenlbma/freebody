@@ -151,7 +151,8 @@ function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(
  else th='<div class="mut">今日推荐</div><h2 class="rec-t">'+esc(rc.title)+'</h2><div class="mut">'+esc(rc.why)+'</div><button class="btn-big'+(rc.rest?' ghost':'')+'" data-ss="rec">'+IC('play')+(rc.rest?'仍要训练':'开始训练')+'</button>';
  $('#ovTrain').innerHTML=th;
  var left=Math.round(g.kcal-t.k),pl=Math.max(0,Math.round(g.p-t.p)),nm=dayMeals(sel).length;
- $('#ovNut').innerHTML='<div class="hrow"><span class="mut">营养剩余</span><span class="mut">'+(nm?nm+' 条记录':'未记录')+IC('right')+'</span></div><div class="nut1"><div><b class="xl">'+left+'</b> <span class="mut">kcal</span></div><div><b class="xl">'+pl+'</b> <span class="mut">g 蛋白</span></div></div><div class="bar"><i style="width:'+Math.min(100,g.kcal?t.k/g.kcal*100:0)+'%;background:'+(left<0?'var(--bad)':'var(--k)')+'"></i></div>';
+ $('#ovNut').innerHTML='<div class="hrow"><span class="mut">营养剩余</span><span class="mut">'+(nm?nm+' 条记录':'未记录')+IC('right')+'</span></div><div class="nut1"><div><b class="xl">'+left+'</b> <span class="mut">kcal</span></div><div><b class="xl">'+pl+'</b> <span class="mut">g 蛋白</span></div></div><div class="bar"><i style="width:'+Math.min(100,g.kcal?t.k/g.kcal*100:0)+'%;background:'+(left<0?'var(--bad)':'var(--k)')+'"></i></div>'+
+  '<div class="nut-wide">'+kcalRing(t.k,g.kcal)+'<div class="mbars">'+[['蛋白质',t.p,g.p,'var(--p)'],['碳水',t.c,g.c,'var(--c)'],['脂肪',t.f,g.f,'var(--f)']].map(function(m){var pc=m[2]?Math.min(m[1]/m[2]*100,100):0;return'<div class="mbar"><div class="hrow"><span>'+m[0]+'</span><span class="mut">'+Math.round(m[1])+' / '+m[2]+' g</span></div><div class="bar"><i style="width:'+pc+'%;background:'+m[3]+'"></i></div></div>';}).join('')+'</div></div>';
  var tile=function(done,ic,label,go,val,act){return'<div class="ck-t'+(done?' done':'')+'"><div class="ck-h" data-go="'+go+'">'+IC(ic)+'<span>'+label+'</span></div><div class="ck-v">'+val+'</div>'+(act||'')+'</div>';};
  var dsp=suppDone(sel),ns=S.supps.filter(function(x){return dsp[x.id];}).length,c='';
  if(S.supps.length)c+=tile(ns===S.supps.length,'check','补剂','supp',ns+' / '+S.supps.length,ns<S.supps.length?'<button class="sm" id="ovSuppAll">全部打卡</button>':'<span class="ck-ok">'+IC('ok')+'</span>');
@@ -161,6 +162,14 @@ function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(
  c+=tile(!!b,'chart','体重','body',b?b.weight+' kg':'','<input id="ovWt" type="number" inputmode="decimal" step="0.1" placeholder="'+(b?'修改':'kg')+'" enterkeyhint="done">');
  if(activeInjury()){var wp=wpOf(sel);c+='<div class="ck-t wide'+(wp?' done':'')+'"><div class="ck-h" data-go="injury">'+IC('bandage')+'<span>伤处疼痛</span><b id="ovPainV" class="ck-pv">'+(wp?wp.pain:'—')+'</b><span class="mut">/10</span></div><input type="range" id="ovPain" min="0" max="10" step="1" value="'+(wp?wp.pain:0)+'"></div>';}
  $('#ovChecks').innerHTML=c;
+ rOvTrend();
+}
+/** 平板 / 桌面首页趋势：近 7 天热量与睡眠（手机端隐藏，不渲染） */
+function rOvTrend(){var box=$('#ovTrend');if(!box)return;if(!(window.matchMedia&&matchMedia('(min-width:600px)').matches)){box.innerHTML='';return;}
+ var g=S.goals,d7=[],i;for(i=6;i>=0;i--)d7.push(addDays(sel,-i));
+ box.innerHTML='<div class="hrow"><h2>近 7 天</h2><button class="ghost sm" data-sub="data">数据'+IC('right')+'</button></div><div class="tr2"><div><div class="mut">热量 kcal</div><div class="chart" id="chOvK"></div></div><div><div class="mut">睡眠 h</div><div class="chart" id="chOvS"></div></div></div>';
+ CH.bars($('#chOvK'),{h:110,cats:d7.map(function(d){var k=Math.round(dayTot(d).k);return{l:md(d),d:d,v:k,color:'var(--k)',tip:d+'\n'+k+' kcal'};}),goal:g.kcal,goalName:'目标',unit:' kcal',emptyMsg:'暂无饮食记录'});
+ CH.bars($('#chOvS'),{h:110,cats:d7.map(function(d){var x=sleepOf(d);return{l:md(d),d:d,v:x?r1(x.dur):0,color:x&&x.dur>=g.sleepH?'var(--ok)':'var(--warn)',tip:d+'\n'+(x?r1(x.dur)+' h':'无记录')};}),goal:g.sleepH,goalName:'目标',unit:' h',emptyMsg:'暂无睡眠记录'});
 }
 document.addEventListener('input',function(e){if(e.target.id==='ovPain')$('#ovPainV').textContent=e.target.value;});
 document.addEventListener('change',function(e){var t=e.target;
@@ -391,7 +400,7 @@ function rTarget(){var c=tgtCfg(),r=calcTarget(c),opt=function(v,l,s){return'<op
   '<li><span>'+r.gm[0]+(r.gm[1]?' '+(r.gm[1]>0?'+':'')+Math.round(r.gm[1]*100)+'%':'')+'</span><b>'+Math.round(r.goal)+' kcal</b><em>'+(r.gm[1]<0?'热量缺口':r.gm[1]>0?'热量盈余':'不设缺口')+' '+Math.round(r.goal-r.tdee)+' kcal</em></li>'+
   '<li><span>手动偏移 '+(c.adj>=0?'+':'')+c.adj+'</span><b>'+r.kcal+' kcal</b><em>建议热量目标（取整到 10）</em></li>'+
   '<li><span>蛋白 '+c.pkg+' g/kg × '+r.w+' kg</span><b>'+r.p+' g</b><em>脂肪按热量 '+c.fatPct+'% ≈ '+r.f+' g，碳水为余量 ≈ '+r.c+' g</em></li></ol>'+
-  '<div class="row"><button class="sm" id="tcApply">应用到饮食目标</button><span class="mut" style="font-size:12px">当前目标 '+S.goals.kcal+' kcal / 蛋白 '+S.goals.p+' g</span></div>';
+  '<div class="actions"><button id="tcApply">应用到饮食目标</button><span class="mut" style="font-size:12px">当前目标 '+S.goals.kcal+' kcal / 蛋白 '+S.goals.p+' g</span></div>';
  h+='<details class="more"><summary>公式与文献</summary><div class="mut" style="font-size:12px;line-height:1.6">'+
   'Mifflin-St Jeor：男 10W + 6.25H − 5A + 5，女 10W + 6.25H − 5A − 161（W kg，H cm，A 岁）。Mifflin MD, St Jeor ST, et al. Am J Clin Nutr. 1990;51(2):241–247.<br>'+
   'Katch-McArdle：370 + 21.6 × 瘦体重（kg）。McArdle WD, Katch FI, Katch VL. Exercise Physiology: Nutrition, Energy, and Human Performance.<br>'+
@@ -763,7 +772,7 @@ function rMuscle(){var st=muscleState(),rc=recommend();
  var k=musSel;$('#musDetail').innerHTML=k?'<div class="mdet"><div class="hrow"><b>'+MUS[k][0]+'</b><span class="st-tag st-'+st[k].status+'">'+ST_LABEL[st[k].status]+'</span></div><div class="mut" style="margin-top:4px">近7天有效组数 '+r1(st[k].sets7)+' · 剩余疲劳 '+r1(st[k].f)+' 组 · '+(st[k].last?'上次训练 '+st[k].last:'暂无记录')+(st[k].eta?' · 约 '+st[k].eta+' 小时后恢复':'')+' · 恢复半衰期 '+MUS[k][1]+'h</div></div>':'<div class="mut" style="text-align:center;margin-top:6px">点按肌群查看详情</div>';
  $('#musList').innerHTML='<ul class="list tight">'+Object.keys(MUS).map(function(k){var s=st[k];return'<li data-mus="'+k+'" style="cursor:pointer"><div><b>'+MUS[k][0]+'</b> <span class="st">近7天 '+r1(s.sets7)+' 组'+(s.last?' · '+(s.days===0?'今天':s.days+'天前'):'')+'</span></div><span class="st-tag st-'+s.status+'">'+ST_LABEL[s.status]+'</span></li>';}).join('')+'</ul>';}
 function planHint(keys){var best=null,sc=0;S.plans.forEach(function(p){var n=0;p.items.forEach(function(it){var m=musclesOf(it.ex).p;if(m.some(function(x){return keys.indexOf(x)>=0;}))n++;});if(n/Math.max(1,p.items.length)>sc){sc=n/p.items.length;best=p;}});
- return best&&sc>=0.5?'<div class="row" style="margin-top:8px"><button class="sm" data-ss="start" data-plan="'+best.id+'">'+IC('play')+'开始「'+esc(best.name)+'」</button></div>':'';}
+ return best&&sc>=0.5?'<div class="actions"><button data-ss="start" data-plan="'+best.id+'">'+IC('play')+'开始「'+esc(best.name)+'」</button></div>':'';}
 document.addEventListener('click',function(e){var li=e.target.closest&&e.target.closest('li[data-ss]');if(li&&!e.target.closest('button')){sessAction(li.getAttribute('data-ss'),li);}});
 document.addEventListener('click',function(e){var m=e.target.closest&&e.target.closest('[data-mus]');if(m&&cur==='train'){musSel=m.getAttribute('data-mus');rMuscle();}});
 
@@ -899,20 +908,20 @@ function rSession(){var box=$('#sessBox');if(!box)return;var a=S.active,pb0=$('#
    '<div class="why">'+IC('bulb')+'<span>'+RULE_LABEL[it.rule||'linear']+' · 目标 '+it.sets[0].tr+' 次'+(it.sets[0].tw?' @ '+it.sets[0].tw+'kg':'')+'。'+esc(it.why)+'</span></div>'+
    '<ul class="sets">'+it.sets.map(function(x,i){return'<li class="'+(i===j?'cur':'')+(x.done?' done':'')+(x.miss?' miss':'')+'" '+(x.done?'data-ss="undo" data-v="'+i+'" title="点按撤销"':'')+'><span class="mut">第'+(i+1)+'组</span><span>'+(x.done?'<b>'+x.r+' × '+x.w+'kg</b> · RIR '+x.rir:x.tr+' × '+x.tw+'kg')+'</span><span class="ck">'+(x.done?IC('check'):'')+'</span></li>';}).join('')+'</ul>'+
    '<div class="mut" style="font-size:12px">RIR＝还能再做几次（0 力竭，2 留两次，4 很轻松）；RPE＝10−RIR。点已完成的组可撤销。</div>'+
-   '<div class="row" style="margin-top:8px"><button class="ghost sm" data-ss="addset">'+IC('plus')+'加一组</button><button class="ghost sm" data-ss="skip">'+IC('skip')+'下一个动作</button><button class="ghost sm" data-ss="flag" style="'+(it.wrist?'color:var(--warn)':'')+'">'+IC('bandage')+(it.wrist?'已标记':'')+esc(flagLabel())+'</button></div>'+
+   '<div class="actions"><button class="ghost sm" data-ss="addset">'+IC('plus')+'加一组</button><button class="ghost sm" data-ss="skip">'+IC('skip')+'下一个动作</button><button class="ghost sm" data-ss="flag" style="'+(it.wrist?'color:var(--warn)':'')+'">'+IC('bandage')+(it.wrist?'已标记':'')+esc(flagLabel())+'</button></div>'+
    '<h3 style="margin-top:12px">动作队列</h3><ul class="list queue">'+a.items.map(function(x,i){var d2=x.sets.filter(function(q){return q.done;}).length;return'<li data-ss="pick" data-v="'+i+'" class="'+(i===a.cur?'on':'')+'"><div><b>'+esc(x.ex)+'</b> <span class="st">'+d2+'/'+x.sets.length+'</span></div>'+(d2===x.sets.length?IC('check'):'')+'</li>';}).join('')+'</ul>'+
    '<div class="qrow"><input id="ssEx" list="exList" placeholder="添加动作"><button class="ghost" data-ss="addex">'+IC('plus')+'添加</button></div>'+
-   '<div class="row" style="margin-top:8px"><button class="ghost sm" data-ss="discard" style="color:var(--bad)">放弃本次训练</button></div></details>';
+   '<div class="danger-zone"><button class="danger" data-ss="discard">放弃本次训练</button></div></details>';
   box.innerHTML=h;return;}
  if(editPlan){var e=editPlan;box.innerHTML='<div class="card"><h2>'+(e.id?'编辑计划':'新建计划')+'</h2><div><label>名称</label><input id="peName2" value="'+esc(e.name)+'" placeholder="如 上肢 A"></div><div style="margin-top:10px">'+
   e.items.map(function(x,i){return'<div class="pe-row"><div><label>动作</label><input id="pe-ex-'+i+'" list="exList" value="'+esc(x.ex)+'"></div><div><label>组</label><input id="pe-sets-'+i+'" type="number" value="'+x.sets+'"></div><div><label>次数</label><input id="pe-lo-'+i+'" type="number" value="'+(x.lo||'')+'"></div><div><label>上限</label><input id="pe-hi-'+i+'" type="number" value="'+(x.hi||'')+'" placeholder="-"></div></div>'+
    '<div class="pe-row2"><div><label>进阶规则</label><select id="pe-rule-'+i+'">'+Object.keys(RULE_LABEL).map(function(k){return'<option value="'+k+'"'+(x.rule===k?' selected':'')+'>'+RULE_LABEL[k]+(k==='double'?'（次数到上限再加重）':k==='linear'?'（做满即加重）':'')+'</option>';}).join('')+'</select></div><div></div><button class="del" data-ss="pe-del" data-v="'+i+'" aria-label="删除动作">'+IC('x')+'</button></div>';}).join('')+
-  '</div><div class="row"><button class="ghost sm" data-ss="pe-add">'+IC('plus')+'添加动作</button></div><div class="row" style="margin-top:10px"><button data-ss="pe-save">保存</button><button class="ghost" data-ss="pe-cancel">取消</button>'+(e.id?'<button class="ghost" data-ss="pe-delplan" style="color:var(--bad)">删除</button>':'')+'</div></div>';return;}
+  '</div><div class="actions"><button class="ghost sm" data-ss="pe-add">'+IC('plus')+'添加动作</button></div><div class="actions"><button data-ss="pe-save">保存</button><button class="ghost" data-ss="pe-cancel">取消</button>'+(e.id?'<button class="ghost" data-ss="pe-delplan" style="color:var(--bad)">删除</button>':'')+'</div></div>';return;}
  var rc=recommend();
  box.innerHTML='<div class="card"><div class="mut">今日推荐</div><h2 class="rec-t">'+esc(rc.title)+'</h2><div class="mut">'+esc(rc.why)+'</div><button class="btn-big'+(rc.rest?' ghost':'')+'" data-ss="rec">'+IC('play')+(rc.rest?'仍要训练':'开始今日推荐')+'</button></div>';
  var pb=$('#plansBox');if(pb)pb.innerHTML='<details class="card" id="ssPlans"'+(plansOpen?' open':'')+'><summary><b>其他计划</b> <span class="mut">'+(S.plans.length?S.plans.length+' 个':'模板 / 自由训练')+'</span></summary>'+
   S.plans.map(function(p){return'<div class="plan"><div><b>'+esc(p.name)+'</b><div class="mut">'+p.items.length+' 个动作 · '+esc(planMuscles(p).join('、'))+'</div></div><div class="row" style="gap:6px"><button class="ghost sm" data-ss="editplan" data-v="'+p.id+'" aria-label="编辑计划">'+IC('edit')+'</button><button class="sm" data-ss="start" data-plan="'+p.id+'">开始</button></div></div>';}).join('')+
-  '<div class="row" style="margin-top:10px"><button class="ghost sm" data-ss="free">'+IC('play')+'自由训练</button><button class="ghost sm" data-ss="newplan">'+IC('plus')+'新建计划</button></div>'+
+  '<div class="actions"><button class="ghost sm" data-ss="free">'+IC('play')+'自由训练</button><button class="ghost sm" data-ss="newplan">'+IC('plus')+'新建计划</button></div>'+
   '<div class="row" style="margin-top:8px"><span class="mut">从模板添加：</span>'+PLAN_TPL.map(function(t,i){return'<button class="chip" data-ss="tpl" data-v="'+i+'">'+t[0]+'</button>';}).join('')+'</div></details>';}
 
 /* ---------- 自动化：快速输入 / 一键操作 / 训练建议 ---------- */
@@ -1088,7 +1097,14 @@ syncThemeColor();(function(){var _a=applyTheme;applyTheme=function(){_a();syncTh
 /** 非按钮的可点元素可用键盘聚焦，Enter / 空格触发 */
 var TAP_SEL='[data-go]:not(button),[data-sub]:not(button),[data-entry],[data-fopen],[data-calday]:not(button)';
 function a11y(){Array.prototype.forEach.call(document.querySelectorAll(TAP_SEL),function(el){if(!el.hasAttribute('tabindex')){el.setAttribute('tabindex','0');el.setAttribute('role','button');}});}
-(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();};})();a11y();
+/* 网格补位：平板 / 桌面下，一行未排满的卡片均分剩余列，避免零散留白；页头高度供侧边导航顶部对齐 */
+function layFill(){var hd=document.querySelector('header');if(hd)document.documentElement.style.setProperty('--hh',hd.offsetHeight+'px');
+ var sec=document.querySelector('section.on');if(!sec)return;var kids=[].slice.call(sec.children);kids.forEach(function(el){el.style.gridColumn='';});
+ var cs=getComputedStyle(sec);if(cs.display!=='grid'||sec.hasAttribute('data-lay'))return;var cols=parseInt(cs.getPropertyValue('--cols'),10)||0;if(!cols)return;
+ var row=[],used=0,flush=function(){if(row.length&&used<cols){var w=Math.floor(cols/row.length);if(w*row.length===cols)row.forEach(function(x){x.el.style.gridColumn='span '+w;});else row[row.length-1].el.style.gridColumn='span '+(row[row.length-1].s+cols-used);}row=[];used=0;};
+ kids.forEach(function(el){if(getComputedStyle(el).display==='none')return;var m=/span (\d+)/.exec(getComputedStyle(el).gridColumnStart),s=m?+m[1]:cols;
+  if(s>=cols){flush();return;}if(used+s>cols)flush();row.push({el:el,s:s});used+=s;if(used===cols){row=[];used=0;}});flush();}
+(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();layFill();};})();a11y();layFill();window.addEventListener('resize',layFill);
 function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
 /** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */
 document.addEventListener('keydown',function(e){var t=e.target;

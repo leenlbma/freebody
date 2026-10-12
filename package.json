@@ -1,6 +1,6 @@
 {
   "name": "freebody",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "FreeBody — 离线单文件训练与健康记录：饮食、训练、补剂、睡眠、身体指标、恢复与伤病记录（localStorage）",
   "license": "MIT",
   "private": true,
