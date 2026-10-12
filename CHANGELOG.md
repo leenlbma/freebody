@@ -4,6 +4,20 @@
 
 ## [未发布]
 
+## [2.6.0] - 2026-10-13
+
+### 新增
+- **数据安全**：本机存储用量到约 70% 和 90% 时各提醒一次；写入时捕获 QuotaExceededError，保存失败会立即提示并提供「立即导出」，空间恢复后提示自动消失；距上次备份满 30 天提醒（从未备份时从最早记录起算，可「7 天后提醒」），导出时记录 `lastBackup`；启动时调用 `navigator.storage.persist()` 申请持久存储（Firefox 不自动申请，可手动点「申请开启」）。存储用量、持久存储、上次备份与 iOS 主屏幕存储说明都显示在「我的 › 数据备份」。状态保存在新键 `freeBody_meta_v1`，不含记录内容，不进入备份。
+- **单元测试**：`tests/` 用 Node 内置的 `node:test`，覆盖 dayTot、过度训练信号、准备度、进阶规则（线性 / 双进阶 / 减载 / 恢复与伤处）、1RM、BMR（Mifflin / Katch）、肌群疲劳半衰期、导入合并去重与撤销、链接解码、存储预警与备份提醒。`npm test` 已接入 CI。
+
+### 变更
+- **模块拆分**：`src/app.js` 拆为 `src/app/` 下 17 个模块（core、store、util、calc、import 与各页 ui、boot），构建时按文件名顺序合并进同一个 IIFE，仍输出单文件 `index.html`；功能不变，以单元测试、`npm run check` 与浏览器回归为准。
+- **iPhone 主屏幕（独立窗口）布局**：修复 iOS 26 上底部导航没有贴住屏幕底边、下方空出黑条的问题。原因是 iOS 26 在声明了 manifest 或 `black-translucent` 状态栏时会使用旧的布局路径；现在 iOS 26 起不再声明这两项（旧版 iOS 与其他平台不变）。viewport 使用 `viewport-fit=cover`，高度改用 `100dvh` / `-webkit-fill-available`，底部导航 `position:fixed; bottom:0` 并留出 `env(safe-area-inset-bottom)`，页头留出 `env(safe-area-inset-top)`，内容区与底部操作栏避开导航和 home indicator。已在 WebKit 中注入 safe-area 模拟验证，仍需真机确认；旧图标可能需要删除后重新添加到主屏幕。
+- 手机上页头日期栏改为与页面左右边距对齐（全宽）；主题按钮与右边距对齐。
+- 禁用按钮改为中性灰底和次要文字色，不再只靠降低透明度，便于和可用的主按钮区分。（睡眠页「保存当日睡眠」是正常的主按钮，深色主题下为浅蓝色，并非禁用。）
+- 「我的 › 数据备份」三个按钮等宽且不换行。
+- 文档：隐私说明写明只有填写模型 Key 之后拍照识别才会联网；README 快速开始写明 iOS 添加到主屏幕后数据与 Safari 分开存储，需要先导出再导入；更新项目结构、贡献指南（模块结构与 `npm test`）、数据结构（`freeBody_meta_v1`）。构建与测试需要 Node.js ≥ 18。
+
 ## [2.5.2] - 2026-10-13
 
 ### 变更

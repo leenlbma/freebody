@@ -634,3 +634,40 @@ header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
 .nt-it p{margin:6px 0 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
 .nt-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .nt-del{flex:none}
+/* ===== v2.6 主屏幕（standalone）与安全区 ===== */
+html{background:var(--bg);min-height:100%}
+body{min-height:100vh;min-height:-webkit-fill-available;min-height:100dvh}
+@media(max-width:599px){
+ header{padding-top:calc(12px + env(safe-area-inset-top))}
+ /* 页头：logo / 主题按钮的可见边缘、日期栏两端与内容卡片对齐 */
+ header>.hrow:first-child #themeBtn{margin-right:-12px}
+ header .hrow+.hrow{gap:8px}
+ header .dnav{flex:1 1 auto!important;min-width:0}
+ header .dnav>.dtf-bar{flex:1 1 auto;min-width:0}
+ #dToday.is-today{display:none}
+ #toast{bottom:calc(90px + env(safe-area-inset-bottom))}
+}
+/* 主屏幕模式：iOS 26 部分版本 env(safe-area-inset-bottom) 会报 0，底部导航与吸底按钮保留最小间距，避开 home indicator */
+@media(display-mode:standalone) and (max-width:1024px) and (orientation:portrait){
+ nav{padding-bottom:max(env(safe-area-inset-bottom),12px)}
+ body{padding-bottom:calc(96px + max(env(safe-area-inset-bottom),12px))}
+ .imp-bar{bottom:calc(max(env(safe-area-inset-bottom),12px) + 72px)}
+}
+/* 禁用状态与主按钮区分更明显：灰底 + 次要文字，而不是只降低透明度 */
+button:disabled,button:disabled:hover{background:var(--in)!important;color:var(--mut)!important;border-color:var(--bd)!important;opacity:1;box-shadow:none}
+/* ===== v2.6 存储状态与提示条 ===== */
+#stBanner:empty{display:none}
+.st-banner{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 10px;margin-bottom:12px}
+.st-banner>.ic{flex:none;margin-top:2px}
+.st-b-tx{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:2px}.st-b-tx span{font-size:13px;color:var(--mut)}
+.st-b-act{display:flex;gap:8px;flex:1 1 100%;justify-content:flex-end}.st-b-act button{min-width:0}
+.st-b-act button .ic{width:16px;height:16px;margin-right:4px;vertical-align:-3px}
+.st-status{margin:12px 0 4px;padding:12px;border-radius:12px;background:var(--in);display:flex;flex-direction:column;gap:6px}
+.st-row{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
+.st-k{display:inline-flex;align-items:center;gap:6px;font-size:14px}.st-k .ic{width:16px;height:16px;color:var(--mut)}
+.st-v{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}.st-v.ok{color:var(--ok)}.st-v.warn{color:var(--warn)}.st-v.bad{color:var(--bad)}.st-v.mut{color:var(--mut);font-weight:500}
+.st-meter{height:6px;border-radius:99px;background:color-mix(in srgb,var(--fg) 10%,transparent);overflow:hidden;margin:0 0 4px}
+.st-meter i{display:block;height:100%;border-radius:99px;background:var(--ok)}.st-meter.warn i{background:var(--warn)}.st-meter.bad i{background:var(--bad)}
+.st-note{margin:-2px 0 2px;font-size:12px;color:var(--mut);line-height:1.5}.st-note button{min-height:32px;padding:0 10px;margin-left:4px;font-size:12px}
+.st-v .st-ask{border:1px solid color-mix(in srgb,var(--fg) 22%,transparent);background:var(--card);min-height:32px;padding:0 10px;margin-right:8px;font-size:12px;font-weight:600;vertical-align:middle}
+.bk-act{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bk-act button{white-space:nowrap;padding-left:6px;padding-right:6px;min-width:0}.bk-act button .ic{margin-right:4px}

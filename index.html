@@ -7,10 +7,19 @@
 <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101113" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FreeBody">
+<script>
+/* 主屏幕模式（v2.6）：iOS 26 起，页面声明 manifest 或 black-translucent 状态栏时，主屏幕应用走旧的布局路径，
+   窗口下方会空出一条与状态栏等高、无法绘制的黑条（页面内无法探测或修复）。因此 iOS 26+ 不声明这些项，
+   由系统默认以 Web App 打开、状态栏不透明；旧版 iOS 与其他平台保持原有的沉浸式与可安装声明。 */
+(function(){var d=document,h=d.documentElement,ua=navigator.userAgent,
+ ios=/iP(hone|ad|od)/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),
+ cs=window.CSS&&CSS.supports,ios26=ios&&!!(cs&&(CSS.supports('animation-timeline','scroll()')||CSS.supports('anchor-name','--a')));
+ window.__fbPwaMeta=!ios26;if(ios)h.classList.add('ios');
+ if(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))h.classList.add('standalone');
+ if(ios26)return;var m=[['mobile-web-app-capable','yes']];
+ if(ios)m.push(['apple-mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','black-translucent'],['apple-mobile-web-app-title','FreeBody']);
+ m.forEach(function(x){var e=d.createElement('meta');e.name=x[0];e.content=x[1];d.head.appendChild(e);});})();
+</script>
 <meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>FreeBody</title>
@@ -653,6 +662,43 @@ header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
 .nt-it p{margin:6px 0 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
 .nt-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .nt-del{flex:none}
+/* ===== v2.6 主屏幕（standalone）与安全区 ===== */
+html{background:var(--bg);min-height:100%}
+body{min-height:100vh;min-height:-webkit-fill-available;min-height:100dvh}
+@media(max-width:599px){
+ header{padding-top:calc(12px + env(safe-area-inset-top))}
+ /* 页头：logo / 主题按钮的可见边缘、日期栏两端与内容卡片对齐 */
+ header>.hrow:first-child #themeBtn{margin-right:-12px}
+ header .hrow+.hrow{gap:8px}
+ header .dnav{flex:1 1 auto!important;min-width:0}
+ header .dnav>.dtf-bar{flex:1 1 auto;min-width:0}
+ #dToday.is-today{display:none}
+ #toast{bottom:calc(90px + env(safe-area-inset-bottom))}
+}
+/* 主屏幕模式：iOS 26 部分版本 env(safe-area-inset-bottom) 会报 0，底部导航与吸底按钮保留最小间距，避开 home indicator */
+@media(display-mode:standalone) and (max-width:1024px) and (orientation:portrait){
+ nav{padding-bottom:max(env(safe-area-inset-bottom),12px)}
+ body{padding-bottom:calc(96px + max(env(safe-area-inset-bottom),12px))}
+ .imp-bar{bottom:calc(max(env(safe-area-inset-bottom),12px) + 72px)}
+}
+/* 禁用状态与主按钮区分更明显：灰底 + 次要文字，而不是只降低透明度 */
+button:disabled,button:disabled:hover{background:var(--in)!important;color:var(--mut)!important;border-color:var(--bd)!important;opacity:1;box-shadow:none}
+/* ===== v2.6 存储状态与提示条 ===== */
+#stBanner:empty{display:none}
+.st-banner{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 10px;margin-bottom:12px}
+.st-banner>.ic{flex:none;margin-top:2px}
+.st-b-tx{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:2px}.st-b-tx span{font-size:13px;color:var(--mut)}
+.st-b-act{display:flex;gap:8px;flex:1 1 100%;justify-content:flex-end}.st-b-act button{min-width:0}
+.st-b-act button .ic{width:16px;height:16px;margin-right:4px;vertical-align:-3px}
+.st-status{margin:12px 0 4px;padding:12px;border-radius:12px;background:var(--in);display:flex;flex-direction:column;gap:6px}
+.st-row{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:24px}
+.st-k{display:inline-flex;align-items:center;gap:6px;font-size:14px}.st-k .ic{width:16px;height:16px;color:var(--mut)}
+.st-v{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}.st-v.ok{color:var(--ok)}.st-v.warn{color:var(--warn)}.st-v.bad{color:var(--bad)}.st-v.mut{color:var(--mut);font-weight:500}
+.st-meter{height:6px;border-radius:99px;background:color-mix(in srgb,var(--fg) 10%,transparent);overflow:hidden;margin:0 0 4px}
+.st-meter i{display:block;height:100%;border-radius:99px;background:var(--ok)}.st-meter.warn i{background:var(--warn)}.st-meter.bad i{background:var(--bad)}
+.st-note{margin:-2px 0 2px;font-size:12px;color:var(--mut);line-height:1.5}.st-note button{min-height:32px;padding:0 10px;margin-left:4px;font-size:12px}
+.st-v .st-ask{border:1px solid color-mix(in srgb,var(--fg) 22%,transparent);background:var(--card);min-height:32px;padding:0 10px;margin-right:8px;font-size:12px;font-weight:600;vertical-align:middle}
+.bk-act{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bk-act button{white-space:nowrap;padding-left:6px;padding-right:6px;min-width:0}.bk-act button .ic{margin-right:4px}
 
 </style>
 </head>
@@ -672,6 +718,7 @@ header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
 </header>
 
 <main>
+<div id="stBanner" aria-live="polite"></div>
 <div class="subnav" id="subnav"></div>
 <!-- 总览 -->
 <section id="overview" data-lay="fixed" class="on">
@@ -1101,7 +1148,8 @@ header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
  </details>
  <div class="card"><h2>数据备份</h2>
   <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
-  <div class="actions"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
+  <div class="st-status" id="stStatus"></div>
+  <div class="actions bk-act"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card mut" style="font-size:12px">FreeBody · 数据只存本机 · 不构成医疗建议</div>
@@ -1136,6 +1184,8 @@ window.FIT_DATA = {"foods":{"version":4,"per":"100g","note":"常见食物每100g
     right: '<path d="M9.5 6l6 6-6 6"/>',
     pill: '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.2 8.1l5.6 7.8"/>',
     note: '<path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M14 3.5V8h5M9 12.5h7M9 16h5"/>',
+    database: '<ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/>',
+    download: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/>',
     paste: '<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3.5h6V5M9 11h6M9 15h4"/>',
     link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
     calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
@@ -1435,14 +1485,15 @@ window.FIT_DATA = {"foods":{"version":4,"per":"100g","note":"常见食物每100g
 </script>
 <script>
 /*!
- * FreeBody — app.js
+ * FreeBody — 应用脚本（由 scripts/build.js 从 src/app/*.js 合并）
  * 单页离线健身记录：饮食 / 训练 / 补剂 / 睡眠 / 身体指标 / 激素与恢复 / 伤病与限制
  * 数据仅存于浏览器 localStorage（键：freeBody_v1，自动从旧键 fitTracker_v1 迁移），可导出/导入 JSON。
- * 结构：常量与默认数据 → 存储 → 工具函数 → 主题/导航/日期 → 图表 → 计算与预警 → 各板块渲染与事件 → 设置/备份 → 全局点击委托
+ * 模块：00-core.js、01-store.js、02-util.js、03-calc.js、04-import.js、10-ui-shell.js、11-ui-today.js、12-ui-diet.js、13-ui-train.js、14-ui-records.js、15-ui-charts.js、16-ui-session.js、17-ui-quick.js、18-ui-settings.js、19-ui-ai.js、20-ui-import.js、90-boot.js
  * 本项目不提供医疗建议。MIT License.
  */
 (function(){
 'use strict';
+/* 00-core.js — 常量、导航配置、预设 */
 /** localStorage 键名；LEGACY_KEYS 用于从旧版本自动迁移 */
 var KEY='freeBody_v1',LEGACY_KEYS=['fitTracker_v1']; // 首次启动时自动从旧键名复制数据（旧键保留，不删除）
 /** 构建时注入的数据（见 scripts/build.js）；直接运行源码时为空 */
@@ -1459,6 +1510,7 @@ function IC(n){return window.FitIcons?FitIcons.svg(n):'';}
 var CH=window.FitCharts;
 var LAB_PRESETS=[['皮质醇','µg/dL'],['总睾酮','ng/dL'],['游离睾酮','pg/mL'],['TSH','mIU/L'],['FT3','pmol/L'],['FT4','pmol/L'],['T3','nmol/L'],['T4','nmol/L'],['空腹胰岛素','µIU/mL'],['空腹血糖','mmol/L'],['IGF-1','ng/mL'],['25(OH)维生素D','ng/mL'],['SHBG','nmol/L'],['肌酸激酶CK','U/L']];
 var EX_PRESETS=['杠铃卧推','哑铃卧推','杠铃深蹲','罗马尼亚硬拉','硬拉','高位下拉','坐姿划船','引体向上','站姿推举','腿举','腿弯举','侧平举','二头弯举','绳索下压','平板支撑'];
+/* 01-store.js — 存储：默认数据、读写 localStorage、存储安全（v2.6） */
 function defaults(){return{v:1,
  profile:{name:'',height:null,injuryFlagLabel:'伤处不适',swimNote:'',run800HistLabel:''},goals:{kcal:2200,p:140,c:260,f:65,sleepH:7,trainDays:4,stairMin:120,weight:null,mealSplit:{'早餐':25,'午餐':35,'晚餐':30,'加餐':10}},
  meals:[],favFoods:[],workouts:[],cardio:[],recoveryStart:'',
@@ -1471,9 +1523,39 @@ function defaults(){return{v:1,
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 var S;
 function load(){var d=defaults();try{var raw=localStorage.getItem(KEY);if(raw==null){for(var li=0;li<LEGACY_KEYS.length;li++){raw=localStorage.getItem(LEGACY_KEYS[li]);if(raw!=null){localStorage.setItem(KEY,raw);break;}}}var r=JSON.parse(raw||'null');if(r&&typeof r==='object'){for(var k in d){if(r[k]===undefined)r[k]=d[k];}for(var g in d.goals){if(r.goals[g]===undefined)r.goals[g]=d.goals[g];}for(var pk in d.profile){if(r.profile[pk]===undefined)r.profile[pk]=d.profile[pk];}return r;}}catch(e){}return d;}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('保存失败：'+e.message);}}
+/* ---------- 存储安全（v2.6）：用量预警 / 写满兜底 / 备份提醒 / 持久存储 ---------- */
+/** 辅助状态单独存放（不进入备份）：firstUse、lastBackup、已提示的用量阈值、备份提醒的推迟日期 */
+var METAKEY='freeBody_meta_v1';
+/** localStorage 上限按约 5 MB（UTF-16，每字符 2 字节）保守估算，单位：字符。各浏览器实际上限不同，仅用于提前预警 */
+var LS_QUOTA=2621440,QUOTA_STEPS=[70,90],BACKUP_DAYS=30;
+var STORE={err:null,used:0,pct:0,persist:null,banner:null};
+function metaLoad(){var m=null;try{m=JSON.parse(localStorage.getItem(METAKEY)||'null');}catch(e){}return m&&typeof m==='object'&&!Array.isArray(m)?m:{};}
+var META=metaLoad();
+function metaSave(){try{localStorage.setItem(METAKEY,JSON.stringify(META));}catch(e){}}
+/** 写满判断：各浏览器的名称 / 错误码不同 */
+function isQuotaErr(e){return!!e&&(e.name==='QuotaExceededError'||e.name==='NS_ERROR_DOM_QUOTA_REACHED'||e.code===22||e.code===1014);}
+/** 估算本应用在 localStorage 中占用的字符数（键 + 值）；json 为即将写入的主数据 */
+function lsUsage(json){var n=KEY.length+(json==null?0:json.length);try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k===KEY)continue;n+=k.length+(localStorage.getItem(k)||'').length;}}catch(e){}return n;}
+function quotaPct(used,quota){return Math.min(100,Math.round(used/(quota||LS_QUOTA)*100));}
+/** 应提示的用量阈值（90 / 70），没有则 0。每个阈值只提示一次（记在 warned），回落到阈值 5 个百分点以下后重新计入 */
+function quotaLevel(pct,warned){var w=warned||{};QUOTA_STEPS.forEach(function(t){if(pct<t-5)delete w[t];});
+ for(var i=QUOTA_STEPS.length-1;i>=0;i--){var t=QUOTA_STEPS[i];if(pct>=t){if(w[t])return 0;for(var j=0;j<=i;j++)w[QUOTA_STEPS[j]]=1;return t;}}return 0;}
+/** 是否该提醒备份：有数据，且距上次备份（从未备份时按首次使用日）满 30 天，且不在推迟期内 */
+function backupDue(meta,day,hasData){if(!hasData)return false;var ref=meta.lastBackup||meta.firstUse;if(!ref)return false;if(meta.snooze&&meta.snooze>day)return false;return diffDays(ref,day)>=BACKUP_DAYS;}
+/** 最早的记录日期（用于从未备份时的提醒起点） */
+function firstDataDate(s){var m=null;['meals','workouts','cardio','sleep','body','recov','labs','notes','wristLog'].forEach(function(k){(s[k]||[]).forEach(function(x){if(x&&typeof x.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&(!m||x.date<m))m=x.date;});});return m;}
+function hasUserData(s){return['meals','workouts','cardio','sleep','body','recov','labs','notes','sessions','wristLog'].some(function(k){return s[k]&&s[k].length;})||Object.keys(s.suppLog||{}).length>0;}
+/** 保存：写满时保留内存中的数据并给出导出出口；成功后更新用量并按阈值预警 */
+function save(){var json=JSON.stringify(S);
+ try{localStorage.setItem(KEY,json);}catch(e){if(isQuotaErr(e)){STORE.err='quota';storeAlert('quota');}else toast('保存失败：'+e.message);return false;}
+ if(STORE.err){STORE.err=null;if(STORE.banner==='quota'){STORE.banner=null;if(typeof rStoreBanner==='function')rStoreBanner();}}
+ STORE.used=lsUsage(json);STORE.pct=quotaPct(STORE.used);
+ var w=META.warned||(META.warned={}),before=JSON.stringify(w),lv=quotaLevel(STORE.pct,w),dirty=JSON.stringify(w)!==before;
+ if(!META.firstUse){META.firstUse=firstDataDate(S)||today();dirty=true;}
+ if(dirty)metaSave();if(lv)storeAlert(lv);return true;}
 S=load();
 (S.customFoods||[]).forEach(function(f){f.custom=true;}); // 自定义食物均优先匹配
+/* 02-util.js — 工具函数：转义、数字、日期、提示 */
 var $=function(s){return document.querySelector(s);};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function num(v){var n=parseFloat(v);return isNaN(n)?null:n;}
@@ -1494,34 +1576,7 @@ function allFoods(){return(FOOD_DB.foods||[]).concat(S.customFoods||[]);}
 function md(s){return(+s.slice(5,7))+'/'+(+s.slice(8,10));}
 function avg(a){a=a.filter(function(x){return x!=null&&!isNaN(x);});return a.length?a.reduce(function(s,x){return s+x;},0)/a.length:null;}
 var sel=today();var cur='overview';
-
-/* ---------- 主题 ---------- */
-function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme||'auto');}
-$('#themeBtn').onclick=function(){var o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast('主题：'+{auto:'跟随系统',light:'浅色',dark:'深色'}[S.theme]);drawCharts();};
-
-/* ---------- 导航 ---------- */
-$('#nav').innerHTML='<div class="nav-brand" aria-hidden="true">'+$('#appTitle').innerHTML.replace(/id="whd"/,'id="whd2"').replace(/url\(#whd\)/,'url(#whd2)')+'</div>'+GROUPS.map(function(g){return'<button data-go="'+g[0]+'">'+IC(ICONS[g[0]])+g[1]+'</button>';}).join('');
-function groupOf(sec){for(var i=0;i<GROUPS.length;i++)if(GROUPS[i][2].indexOf(sec)>=0)return GROUPS[i];return GROUPS[0];}
-document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(b.getAttribute('data-go'));var sb=e.target.closest('[data-sub]');if(sb)show(sb.getAttribute('data-sub'),true);});
-function show(id,direct){var toMus=id==='muscle';if(toMus){id='train';direct=true;} // 肌群热图位于 训练 › 力量 顶部
-var grp=!direct&&GROUPS.find(function(g){return g[0]===id;});if(grp)id=HUB[grp[0]]||lastSub[grp[0]]||grp[2][0];if(!document.getElementById(id))id='overview';grp=groupOf(id);lastSub[grp[0]]=id;
- var hub=HUB[grp[0]];
- var par=id==='dietAdd'?'diet':id==='dietAI'?'dietAdd':id==='dietFood'?dfBack:null;
- $('#subnav').innerHTML=hub?(id===hub?'':'<button data-sub="'+(par||hub)+'" class="back">'+IC('left')+(par?SEC_LABEL[par]:grp[1])+'</button><span class="sn-t">'+SEC_LABEL[id]+'</span>'):grp[2].length>1?grp[2].map(function(s){return'<button data-sub="'+s+'" class="'+(s===id?'on':'')+'">'+SEC_LABEL[s]+'</button>';}).join(''):'';
- cur=id;document.querySelectorAll('section').forEach(function(s){s.classList.toggle('on',s.id===id);});document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-go')===grp[0]);});window.scrollTo(0,0);render();if(toMus&&$('#musWrap'))$('#musWrap').scrollIntoView({block:'start'});}
-
-/* ---------- 日期 ---------- */
-$('#dSel').value=sel;
-$('#dSel').onchange=function(){if(this.value){sel=this.value;render();}};
-$('#dPrev').onclick=function(){sel=addDays(sel,-1);$('#dSel').value=sel;render();};
-$('#dNext').onclick=function(){sel=addDays(sel,1);$('#dSel').value=sel;render();};
-$('#dToday').onclick=function(){sel=today();$('#dSel').value=sel;render();};
-function todayBtn(){var b=$('#dToday');if(b)b.classList.toggle('is-today',sel===today());}
-
-/* ---------- 图表 ---------- */
-function ring(val,goal,color,label,unit){var pc=goal?Math.min(val/goal,1):0,r=34,C=2*Math.PI*r,over=goal&&val>goal*1.05;
- return'<div class="ring"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="'+r+'" fill="none" style="stroke:var(--in)" stroke-width="8"/><circle cx="42" cy="42" r="'+r+'" fill="none" style="stroke:'+(over?'var(--bad)':color)+';transition:stroke-dasharray .6s" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+(C*pc)+' '+C+'" transform="rotate(-90 42 42)"/><text x="42" y="47" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--fg)">'+Math.round(pc*100)+'%</text></svg><b>'+label+'</b>'+Math.round(val)+'/'+goal+unit+'</div>';}
-
+/* 03-calc.js — 核心计算（无 DOM）：饮食合计、份量换算、预警、恢复期、BMR / 目标、1RM、准备度、肌群疲劳、进阶规则、快速输入解析 */
 /* ---------- 计算 ---------- */
 function dayMeals(d){return S.meals.filter(function(m){return m.date===d;});}
 function dayTot(d){var t={k:0,p:0,c:0,f:0};dayMeals(d).forEach(function(m){t.k+=m.kcal||0;t.p+=m.p||0;t.c+=m.c||0;t.f+=m.f||0;});return t;}
@@ -1560,6 +1615,328 @@ function otSignals(d){var sig=[],recent=[],base=[];
  var mo=get(recent,f('mood'));if(mo!=null&&mo<=2)sig.push('情绪偏低（均 '+r1(mo)+'/5）');
  var ap=get(recent,f('appetite'));if(ap!=null&&ap<=2)sig.push('食欲下降（均 '+r1(ap)+'/5）');
  return sig;}
+var MEALS=['早餐','午餐','晚餐','加餐'],SPLIT0=[25,35,30,10];
+var SRC_LBL={lib:'内置库',quick:'快速输入',photo:'教练照片估算',ai:'拍照识别估算',import:'AI 导入',custom:'自定义'};
+function mealOfHour(h){return h<10?'早餐':h<14?'午餐':h<17?'加餐':h<21?'晚餐':'加餐';}
+/** 份量换算：优先 servings，兼容旧 units */
+function unitsOf(f){var u={};if(!f)return u;if(f.servings&&f.servings.length)f.servings.forEach(function(s){if(s&&s.unit&&s.g>0)u[s.unit]=s.g;});else if(f.units)for(var k in f.units)u[k]=f.units[k];return u;}
+function per100(f){var o={kcal:f.kcal,p:f.p,c:f.c,f:f.f};if(f.na!=null)o.na=f.na;if(f.fib!=null)o.fib=f.fib;return o;}
+/** 由食物（每100g）与克数生成记录字段（含营养快照） */
+function fromFood(f,g,amount,unit){var r=g/100,o={foodId:f.id,name:f.name.replace(/[（(].*?[）)]/g,''),amount:amount!=null?amount:Math.round(g),unit:unit||'g',g:Math.round(g),nutrimentsPer100g:per100(f),src:f.custom?'custom':'lib',
+ kcal:Math.round(f.kcal*r),p:r1(f.p*r),c:r1(f.c*r),f:r1(f.f*r)};if(f.na!=null)o.na=Math.round(f.na*r);if(f.fib!=null)o.fib=r1(f.fib*r);return o;}
+/* 目标怎么来的：BMR（Mifflin-St Jeor / Katch-McArdle）× PAL → 缺口 → 手动偏移；蛋白按 g/kg */
+var PAL=[[1.4,'久坐（PAL 1.4）'],[1.55,'轻度活动（1.55）'],[1.75,'中度活动（1.75）'],[2.0,'高活动（2.0）']];
+var GMODE={cut:['减脂',-0.15],keep:['维持',0],bulk:['增肌',0.1]};
+function tgtCfg(){var c=S.goals.calc||{};return{sex:c.sex||'',age:c.age!=null?c.age:null,pal:c.pal||1.55,mode:c.mode||'keep',adj:c.adj||0,pkg:c.pkg||1.6,fatPct:c.fatPct||25,km:!!c.km};}
+function latestBody(k){var b=S.body.filter(function(x){return x[k]!=null;}).sort(function(a,b){return a.date<b.date?1:-1;})[0];return b?b[k]:null;}
+function calcTarget(c){var w=latestBody('weight'),bf=latestBody('bf'),h=S.profile.height,miss=[],bmr=null,how='';
+ if(c.km&&w!=null&&bf!=null){var lbm=w*(1-bf/100);bmr=370+21.6*lbm;how='Katch-McArdle：370 + 21.6 × 瘦体重 '+r1(lbm)+' kg';}
+ else{if(w==null)miss.push('体重（数据 › 身体）');if(!h)miss.push('身高（我的 › 个人配置）');if(c.age==null)miss.push('年龄');if(!c.sex)miss.push('性别');
+  if(!miss.length){bmr=10*w+6.25*h-5*c.age+(c.sex==='m'?5:-161);how='Mifflin-St Jeor：10 × '+w+' + 6.25 × '+h+' − 5 × '+c.age+(c.sex==='m'?' + 5':' − 161');}}
+ if(bmr==null)return{miss:miss};
+ var tdee=bmr*c.pal,gm=GMODE[c.mode]||GMODE.keep,goal=tdee*(1+gm[1]),kcal=Math.round((goal+c.adj)/10)*10,p=w!=null?Math.round(c.pkg*w):null,fat=Math.round(kcal*c.fatPct/100/9),carb=p!=null?Math.max(0,Math.round((kcal-p*4-fat*9)/4)):null;
+ return{bmr:bmr,how:how,tdee:tdee,gm:gm,goal:goal,kcal:kcal,p:p,f:fat,c:carb,w:w,bf:bf};}
+function epley(w){if(!w.weight||!w.reps)return null;return w.reps===1?w.weight:w.weight*(1+w.reps/30);}
+/**
+ * 准备度分数（0-100，仅供参考）：
+ * 睡眠时长 20% · 睡眠质量 10% · 静息心率相对14天基线 20% · HRV 相对基线 20% · 主观（精力/情绪/酸痛/压力）30%
+ * 缺失项按剩余权重归一，至少需要 2 项。
+ */
+function readiness(d){var parts=[],add=function(w,v,n){if(v!=null&&!isNaN(v))parts.push({w:w,v:Math.max(0,Math.min(1,v)),n:n});};
+ var s=sleepOf(d),r=recovOf(d),g=S.goals;if(s){add(0.2,(s.dur-4)/(g.sleepH-4),'睡眠时长');if(s.q)add(0.1,(s.q-1)/4,'睡眠质量');}
+ var rhrOf=function(x){var rr=recovOf(x);if(rr&&rr.rhr!=null)return rr.rhr;var b=S.body.find(function(y){return y.date===x;});return b?b.rhr:null;};
+ var base=function(fn){var a=[];for(var i=1;i<=14;i++){var v=fn(addDays(d,-i));if(v!=null)a.push(v);}return a.length>=3?avg(a):null;};
+ var rh=rhrOf(d),rb=base(rhrOf);if(rh!=null&&rb!=null)add(0.2,0.6+(rb-rh)/10,'静息心率');
+ var hv=r&&r.hrv,hb=base(function(x){var q=recovOf(x);return q?q.hrv:null;});if(hv!=null&&hb)add(0.2,0.6+(hv-hb)/hb*2,'HRV');
+ if(r){var sub=[r.energy?(r.energy-1)/4:null,r.mood?(r.mood-1)/4:null,r.soreness?(5-r.soreness)/4:null,r.stress?(5-r.stress)/4:null].filter(function(x){return x!=null;});if(sub.length)add(0.3,avg(sub),'主观');}
+ if(parts.length<2)return null;var tw=parts.reduce(function(a,p){return a+p.w;},0);
+ return{score:Math.round(parts.reduce(function(a,p){return a+p.w*p.v;},0)/tw*100),parts:parts};}
+/* ==========================================================
+ * 肌群模型：动作 → 主/次要肌群，疲劳累计与恢复半衰期
+ * ========================================================== */
+/** 肌群：[名称, 恢复半衰期(小时)]；下肢与下背恢复较慢 */
+var MUS={chest:['胸',36],back:['背',36],delts:['肩',30],biceps:['二头',24],triceps:['三头',24],forearms:['前臂',20],core:['核心',20],lowback:['下背',54],glutes:['臀',48],quads:['股四头',48],hams:['腘绳',48],calves:['小腿',30]};
+/** 关键词 → [主要肌群, 次要肌群]（按顺序匹配，越具体越靠前；计入：主要 1 组，次要 0.5 组） */
+var EX_MUS=[
+ ['俯身飞鸟',['delts'],['back']],['反向飞鸟',['delts'],['back']],['面拉',['delts'],['back']],['侧平举',['delts'],[]],['前平举',['delts'],[]],
+ ['推举',['delts'],['triceps']],['肩推',['delts'],['triceps']],
+ ['卧推',['chest'],['triceps','delts']],['俯卧撑',['chest'],['triceps','delts','core']],['飞鸟',['chest'],['delts']],['夹胸',['chest'],[]],['胸推',['chest'],['triceps']],
+ ['臂屈伸',['triceps'],['chest']],['下压',['triceps'],[]],['三头',['triceps'],[]],
+ ['腿弯举',['hams'],[]],['弯举',['biceps'],['forearms']],
+ ['引体',['back'],['biceps','forearms']],['下拉',['back'],['biceps']],['划船',['back'],['biceps','lowback']],['耸肩',['back'],[]],
+ ['罗马尼亚',['hams','glutes'],['lowback']],['硬拉',['hams','glutes','lowback'],['back','forearms']],['背伸',['lowback'],['glutes']],['山羊挺身',['lowback'],['glutes','hams']],
+ ['深蹲',['quads','glutes'],['core','lowback']],['腿举',['quads','glutes'],[]],['腿屈伸',['quads'],[]],['弓步',['quads','glutes'],['hams']],['箭步',['quads','glutes'],['hams']],['保加利亚',['quads','glutes'],['hams']],
+ ['臀推',['glutes'],['hams']],['臀桥',['glutes'],['hams']],['提踵',['calves'],[]],
+ ['平板',['core'],[]],['卷腹',['core'],[]],['举腿',['core'],[]],['死虫',['core'],[]],['腹',['core'],[]],['农夫',['forearms'],['back','core']],['握力',['forearms'],[]]];
+function musclesOf(name){name=name||'';for(var i=0;i<EX_MUS.length;i++)if(name.indexOf(EX_MUS[i][0])>=0)return{p:EX_MUS[i][1],s:EX_MUS[i][2]};return{p:[],s:[]};}
+function rirOf(w){return w.rir!=null?w.rir:(w.rpe!=null?Math.max(0,10-w.rpe):null);}
+var FATIGUE_RECOVERING=1.5,FATIGUE_HIGH=4,STALE_DAYS=7;
+function trainTs(d){var a=d.split('-');return new Date(+a[0],a[1]-1,+a[2],18).getTime();}
+function nowTs(){if(sel===today())return Date.now();var a=sel.split('-');return new Date(+a[0],a[1]-1,+a[2],23,59).getTime();}
+/** 计算每个肌群：剩余疲劳 f（有效组数×0.5^(经过小时/半衰期)）、近7天有效组数、上次训练日期、状态 */
+function muscleState(){var now=nowTs(),st={};Object.keys(MUS).forEach(function(k){st[k]={f:0,sets7:0,last:null};});
+ S.workouts.forEach(function(w){if(w.date>sel)return;var r=rirOf(w);if(r!=null&&r>4)return;var m=musclesOf(w.exercise),n=w.sets||1,hrs=Math.max(0,(now-trainTs(w.date))/36e5);
+  [[m.p,1],[m.s,0.5]].forEach(function(pr){pr[0].forEach(function(k){var s=st[k];s.f+=n*pr[1]*Math.pow(0.5,hrs/MUS[k][1]);if(diffDays(w.date,sel)<7)s.sets7+=n*pr[1];if(!s.last||w.date>s.last)s.last=w.date;});});});
+ Object.keys(st).forEach(function(k){var s=st[k];s.days=s.last?diffDays(s.last,sel):null;
+  s.status=!s.last?'never':s.f>=FATIGUE_HIGH?'fatigued':s.f>=FATIGUE_RECOVERING?'recovering':s.days>STALE_DAYS?'stale':'recovered';
+  s.eta=s.f>=FATIGUE_RECOVERING?Math.ceil(MUS[k][1]*Math.log(s.f/FATIGUE_RECOVERING)/Math.LN2):0;});
+ return st;}
+var ST_LABEL={never:'未训练',fatigued:'恢复中（疲劳高）',recovering:'恢复中',recovered:'已恢复',stale:'太久没练'};
+var SPLITS=[['推','push',['chest','delts','triceps']],['拉','pull',['back','biceps','forearms']],['腿','legs',['quads','hams','glutes','calves']],['核心与下背','core',['core','lowback']]];
+/** 今日推荐：优先选择主要肌群均已恢复、且最久没练的部位；准备度低或无可练部位时建议休息/有氧 */
+function recommend(){var st=muscleState(),rd=readiness(sel),hasHist=S.workouts.length>0;
+ if(rd&&rd.score<50)return{rest:true,title:'今天以休息或轻松有氧为主',why:'准备度 '+rd.score+'，恢复信号偏弱。'};
+ var cands=SPLITS.map(function(sp){var ms=sp[2],ok=ms.slice(0,2).every(function(k){return['recovered','stale','never'].indexOf(st[k].status)>=0;}),days=Math.min.apply(null,ms.slice(0,2).map(function(k){return st[k].days==null?99:st[k].days;}));return{sp:sp,ok:ok,days:days};}).filter(function(c){return c.ok;});
+ if(!hasHist)return{title:'全身训练（入门）',why:'还没有训练记录，从全身动作开始，每个动作留 2–3 次余力。',keys:[]};
+ if(!cands.length)return{rest:true,title:'各部位仍在恢复，建议有氧或休息',why:'主要肌群剩余疲劳较高。'};
+ cands.sort(function(a,b){return b.days-a.days;});var c=cands[0];
+ var inj=S.injuries.some(function(x){return x.status!=='已恢复';})&&S.restricted.length?'；注意避开受限动作':'';
+ return{title:c.sp[0]+'（'+c.sp[2].map(function(k){return MUS[k][0];}).join('、')+'）',why:c.sp[2].map(function(k){return MUS[k][0];}).slice(0,2).join('、')+'已恢复，'+(c.days>=99?'尚未练过':'距上次训练 '+c.days+' 天')+inj+'。',keys:c.sp[2],split:c.sp[1]};}
+
+/* ==========================================================
+ * 自动进阶：线性 / 双重进阶 / 保持；未做满不加重，连续未完成减载
+ * ========================================================== */
+var RULE_LABEL={linear:'线性',double:'双重进阶',hold:'保持'};
+function exRule(ex){var r=(S.exRules||{})[ex]||{};return{rule:r.rule||'linear',lo:r.lo||null,hi:r.hi||null,inc:r.inc||null};}
+function defInc(ex,w){var p=musclesOf(ex).p,lower=p.some(function(k){return['quads','hams','glutes','lowback'].indexOf(k)>=0;});return lower?(w>=60?5:2.5):(w>=20?2.5:1);}
+/** 该动作在某日期之前的训练记录（按日分组，每组展开为单组） */
+function exHistory(ex,before){var by={};S.workouts.forEach(function(w){if(w.exercise===ex&&w.date<before)(by[w.date]=by[w.date]||[]).push(w);});
+ return Object.keys(by).sort().map(function(d){var sets=[];by[d].forEach(function(w){for(var k=0;k<(w.sets||1);k++)sets.push(w);});return{d:d,sets:sets,w:Math.max.apply(null,sets.map(function(x){return x.weight||0;})),minR:Math.min.apply(null,sets.map(function(x){return x.reps||0;})),tot:sets.reduce(function(a,x){return a+(x.reps||0);},0)};});}
+/** 是否完成：有目标次数则每组≥目标；双重进阶看是否全部达到上限；否则以首组次数为基准 */
+function sessComplete(s,rule,need){return s.sets.every(function(x){var t=x.target&&x.target.reps?x.target.reps:need;return(x.reps||0)>=t;});}
+function roundW(v,st){return Math.round(v/st)*st;}
+/**
+ * 下次目标：返回 {w, reps, sets, why, kind}；kind = up/reps/hold/deload
+ * 规则优先级：恢复期前2周 → 伤处不适 → 连续2次未完成/停滞减载 → 各规则
+ */
+function nextTarget(ex,setsN){var rule=exRule(ex),hist=exHistory(ex,sel),last=hist[hist.length-1],wk=recWeek(sel);if(!last)return null;
+ var w=last.w,inc=rule.inc||defInc(ex,w),n=setsN||last.sets.length,base=last.sets[0].target&&last.sets[0].target.reps||(rule.rule==='double'?(rule.lo||8):last.sets[0].reps);
+ var keepR=rule.rule==='double'?Math.max(rule.lo||1,last.minR):base;
+ var out=function(w2,r2,why,kind){return{w:r1(w2),reps:r2,sets:n,why:why,kind:kind,rule:rule.rule};};
+ if(wk&&wk<=2)return out(w,keepR,'恢复期第'+wk+'周，先保持 '+w+'kg，每组留 3–4 次余力。','hold');
+ if(last.sets.some(function(x){return x.wrist;}))return out(w,keepR,'上次标记了'+flagLabel()+'，先保持重量，确认无痛再加。','hold');
+ if(!w)return out(0,last.minR+1,'自重动作，下次每组争取多做 1 次。','reps');
+ var need=rule.rule==='double'?(rule.lo||8):base,done=sessComplete(last,rule,need);
+ var fails=0;for(var i=hist.length-1;i>=0&&hist[i].w>=w;i--){if(sessComplete(hist[i],rule,need))break;fails++;}
+ var flat=0;for(var j=hist.length-1;j>0&&hist[j].w===w&&hist[j].tot<=hist[j-1].tot&&hist[j-1].w===w;j--)flat++;
+ var top=rule.rule==='double'?last.minR>=(rule.hi||12):done;
+ if(rule.rule!=='hold'&&(fails>=2||(flat>=2&&!top)))return out(roundW(w*0.9,inc>=2.5?2.5:0.5),rule.rule==='double'?(rule.lo||8):base,(fails>=2?'连续 '+fails+' 次没做满':'连续 '+(flat+1)+' 次没有进步')+'，减载 10% 再重新往上加。','deload');
+ if(rule.rule==='hold')return out(w,keepR,'这个动作设为保持，维持重量和次数。','hold');
+ if(rule.rule==='double'){var lo=rule.lo||8,hi=rule.hi||12;
+  if(last.minR>=hi)return out(w+inc,lo,'每组都做到了 '+hi+' 次上限，加 '+inc+'kg，次数回到 '+lo+'。','up');
+  var t=Math.min(hi,Math.max(lo,last.minR+1));return out(w,t,'还没全部做到 '+hi+' 次，先在 '+w+'kg 把最少的那组提到 '+t+' 次。','reps');}
+ if(done){var rr=avg(last.sets.map(rirOf));return out(w+inc,base,'上次 '+last.sets.length+' 组都做满 '+base+' 次'+(rr!=null&&rr<=0.5?'（接近力竭，加重后注意动作）':'')+'，加 '+inc+'kg。','up');}
+ return out(w,base,'上次有组没做满 '+base+' 次，不加重，先在原重量做满。','hold');}
+
+/* ---------- 自动化：快速输入 / 一键操作 / 训练建议 ---------- */
+/** 当前时段默认餐次 */
+function mealByHour(){var h=new Date().getHours();return h<10?'早餐':h<14?'午餐':h<17?'加餐':h<21?'晚餐':'加餐';}
+function normName(n){return String(n).replace(/[（(].*?[）)]/g,'').replace(/\s/g,'').toLowerCase();}
+/** 在食物库中匹配名称：自定义优先；完全相等 > 文本包含最长关键字 > 关键字包含文本 */
+function matchFood(name){var t=normName(name);if(!t)return null;var best=null,score=0,cs=(S.customFoods||[]),list=cs.concat(FOOD_DB.foods||[]);
+ list.forEach(function(f){var bonus=f.custom?5:0;[f.name].concat(f.aliases||[]).forEach(function(k){k=normName(k);if(!k)return;var sc=0;if(k===t)sc=1000+bonus*100;else if(t.indexOf(k)>=0&&k.length>=2)sc=100+k.length+bonus;else if(k.indexOf(t)>=0&&t.length>=2)sc=50+t.length+bonus;if(sc>score){score=sc;best=f;}});});return best;}
+var CN_NUM={'半':0.5,'一':1,'两':2,'二':2,'三':3,'四':4,'五':5,'六':6};
+var COUNT_UNITS='个|只|勺|碗|杯|片|根|盒|份|袋|瓶|块|把',KCAL_UNITS='kcal|千卡|大卡|卡';
+/** 解析一行文字为营养估算：如 "鸡胸肉200g 米饭1碗 鸡蛋2个"、"外卖 650"（只填热量）、自定义食物或组合名 */
+function parseQuick(text){var out={items:[],miss:[]},cs=(S.customFoods||[]).filter(function(f){return f.custom;}).sort(function(a,b){return b.name.length-a.name.length;});
+ var U='(?:'+KCAL_UNITS+'|kg|g|克|ml|毫升|'+COUNT_UNITS+')';
+ text=String(text||'');
+ // 自定义名称（可能含 + 等分隔符）先整体替换为占位符，保证优先匹配
+ cs.forEach(function(f,i){if(f.name&&text.indexOf(f.name)>=0)text=text.split(f.name).join(' \u0001'+i+'\u0001');});
+ text=text.replace(new RegExp('([半一两二三四五六])('+COUNT_UNITS+')','g'),function(m,a,b){return CN_NUM[a]+b;})
+  .replace(new RegExp('([^\\s\\d,，、;；+])\\s+(\\d+(?:\\.\\d+)?\\s*'+U+'?)(?=$|[\\s,，、;；+])','gi'),'$1$2');
+ text.split(/[，,、;；\n+]+|\s+/).forEach(function(tok){tok=tok.trim();if(!tok)return;
+  var name=tok,q=null,u='',m=tok.match(new RegExp('^(.*?)(\\d+(?:\\.\\d+)?)\\s*('+U+')?$','i'));
+  if(m&&m[1]){name=m[1];q=+m[2];u=(m[3]||'').toLowerCase();}else{m=tok.match(new RegExp('^(\\d+(?:\\.\\d+)?)\\s*('+U+')?(.+)$','i'));if(m){q=+m[1];u=(m[2]||'').toLowerCase();name=m[3];}}
+  var ph=name.match(/^\u0001(\d+)\u0001$/),label=ph?cs[+ph[1]].name:name;
+  if(new RegExp('^(?:'+KCAL_UNITS+')$','i').test(u)){out.items.push({name:label,kcal:q,p:0,c:0,f:0,src:'quick',kcalOnly:true});return;}
+  var fav=!ph&&S.favFoods.find(function(x){return normName(x.food)===normName(name);});
+  if(fav&&(!u||u==='份')){var k=q||1;out.items.push({name:fav.food+(k!==1?' ×'+k:''),kcal:fav.kcal*k,p:fav.p*k,c:fav.c*k,f:fav.f*k,src:'custom'});return;}
+  var f=ph?cs[+ph[1]]:matchFood(name);
+  if(!f){if(q!=null&&!u&&q>=50&&name){out.items.push({name:name,kcal:q,p:0,c:0,f:0,src:'quick',kcalOnly:true});return;}out.miss.push(tok.replace(/\u0001(\d+)\u0001/,function(x,i){return cs[+i].name;}));return;}
+  var units=unitsOf(f),g,amt=q,unit=u||'';
+  if(u==='g'||u==='克'||u==='ml'||u==='毫升')g=q;else if(u==='kg')g=q*1000;
+  else if(u){if(units[u])g=q*units[u];else{out.miss.push(label+q+u+'（未知单位）');return;}}
+  else if(q!=null){var fu=Object.keys(units)[0];if(q>=10||!fu){g=q;unit='g';}else{g=q*units[fu];unit=fu;}}
+  else{var fu2=Object.keys(units)[0];g=fu2?units[fu2]:100;amt=fu2?1:100;unit=fu2||'g';}
+  if(unit==='克')unit='g';
+  var it=fromFood(f,g,amt,unit);it.name=f.custom?(f.name+(unit==='份'&&amt!==1?' ×'+amt:unit!=='份'?' '+Math.round(g)+'g':'')):it.name+' '+Math.round(g)+'g';out.items.push(it);});
+ return out;}
+/* 04-import.js — 导入（无 DOM）：CSV 解析、导入包校验 / 合并 / 去重 / 撤销、链接解码 */
+/* ---------- 批量导入 CSV ---------- */
+var CSV_ALIAS={'日期':'date','餐次':'meal','食物':'food','热量':'kcal','蛋白质':'p','蛋白':'p','碳水':'c','脂肪':'f','动作':'exercise','组数':'sets','次数':'reps','重量':'weight','备注':'note','体重':'weight','体脂':'bf','腰围':'waist','静息心率':'rhr','入睡':'bed','起床':'wake','质量':'q','指标':'name','数值':'value','单位':'unit','下限':'lo','上限':'hi','时长':'min','层数':'floors','心率':'hr','泳姿':'stroke','距离':'dist','用时':'time','swolf':'swolf'};
+/** 类型识别顺序即优先级；cols 为模板列 */
+var CSV_TYPES=[['workouts','力量训练',['date','exercise','sets','reps','weight','rpe','note'],['exercise','sets','reps']],['meals','饮食',['date','meal','food','kcal','p','c','f'],['food']],['labs','化验',['date','name','value','unit','lo','hi','note'],['name','value']],
+ ['sleep','睡眠',['date','bed','wake','q','note'],['bed','wake']],['swims','游泳',['date','stroke','dist','time','swolf','note'],['stroke','dist']],['cardio','爬楼',['date','min','floors','hr'],['min']],['body','身体指标',['date','weight','bf','waist','rhr'],[]]];
+function parseCSV(txt){txt=txt.replace(/^\ufeff/,'');var rows=[],row=[],f='',q=false;for(var i=0;i<txt.length;i++){var ch=txt[i];
+ if(q){if(ch==='"'){if(txt[i+1]==='"'){f+='"';i++;}else q=false;}else f+=ch;}
+ else if(ch==='"')q=true;else if(ch===','){row.push(f);f='';}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&txt[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f='';}else f+=ch;}
+ if(f||row.length){row.push(f);rows.push(row);}return rows.filter(function(r){return r.some(function(c){return c.trim();});});}
+function normDate(s){var m=String(s||'').trim().match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);return m?m[1]+'-'+pad(+m[2])+'-'+pad(+m[3]):null;}
+function normTime(s){var m=String(s||'').trim().match(/^(\d{1,2}):(\d{2})/);return m?pad(+m[1])+':'+m[2]:null;}
+function importCSV(txt){var rows=parseCSV(txt);if(rows.length<2)throw new Error('至少需要表头和一行数据');
+ var hd=rows[0].map(function(h){h=h.trim();return CSV_ALIAS[h]||h.toLowerCase();});
+ var type=CSV_TYPES.find(function(t){return hd.indexOf('date')>=0&&t[3].every(function(c){return hd.indexOf(c)>=0;})&&(t[3].length||['weight','bf','waist','rhr'].some(function(c){return hd.indexOf(c)>=0;}));});
+ if(!type)throw new Error('无法识别类型，请检查表头（需含 date 列）');
+ var data=rows.slice(1).map(function(r){var o={};hd.forEach(function(h,i){o[h]=(r[i]||'').trim();});return o;}),ok=0,bad=0;
+ if(!confirm('识别为「'+type[1]+'」，共 '+data.length+' 行，确定导入？'))return null;
+ data.forEach(function(o){var d=normDate(o.date);if(!d){bad++;return;}var n=function(k){return num(o[k]);};
+  if(type[0]==='meals'){var p=n('p')||0,c=n('c')||0,f=n('f')||0,k=n('kcal');if(k==null)k=p*4+c*4+f*9;S.meals.push({id:uid(),date:d,meal:o.meal||'加餐',food:o.food,kcal:k,p:p,c:c,f:f});}
+  else if(type[0]==='workouts'){if(!n('sets')||!n('reps')){bad++;return;}S.workouts.push({id:uid(),date:d,exercise:o.exercise,sets:n('sets'),reps:n('reps'),weight:n('weight')||0,rpe:n('rpe'),note:o.note||'',wrist:false});}
+  else if(type[0]==='labs'){if(n('value')==null){bad++;return;}S.labs.push({id:uid(),date:d,name:o.name,value:n('value'),unit:o.unit||'',lo:n('lo'),hi:n('hi'),note:o.note||''});}
+  else if(type[0]==='sleep'){var b=normTime(o.bed),w=normTime(o.wake);if(!b||!w){bad++;return;}S.sleep=S.sleep.filter(function(x){return x.date!==d;});S.sleep.push({id:uid(),date:d,bed:b,wake:w,dur:sleepDur(b,w),q:n('q'),note:o.note||''});}
+  else if(type[0]==='swims'){if(!n('dist')){bad++;return;}S.swims.push({id:uid(),date:d,stroke:o.stroke,dist:n('dist'),sec:parseT(o.time),swolf:n('swolf'),note:o.note||''});}
+  else if(type[0]==='cardio'){if(!n('min')){bad++;return;}S.cardio.push({id:uid(),date:d,min:n('min'),floors:n('floors'),hr:n('hr')});}
+  else if(type[0]==='body'){var ob={weight:n('weight'),bf:n('bf'),waist:n('waist'),rhr:n('rhr')};if(ob.weight==null&&ob.bf==null&&ob.waist==null&&ob.rhr==null){bad++;return;}S.body=S.body.filter(function(x){return x.date!==d;});ob.id=uid();ob.date=d;S.body.push(ob);}
+  ok++;});
+ save();return type[1]+'：导入 '+ok+' 行'+(bad?'，跳过 '+bad+' 行无效':'');}
+/* ===== v2.5 导入包：AI 教练生成数据 → 本机预览 → 确认后合并（只在本机处理，不经过服务器）。格式见 docs/data-format.md ===== */
+var IMP={phase:'paste',text:'',pack:null,rows:[],err:null,undo:null,res:null,viaLink:false};
+var IMP_MAX_LINK=60000,IMP_MAX_TEXT=2097152,IMP_MAX_N=2000;
+var IMP_TYPES={meal:['饮食','diet'],workout:['训练','train'],supplement:['补剂','pill'],sleep:['睡眠','moon'],body:['身体','body'],note:['心得','note']};
+var IMP_MEAL={breakfast:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐'};
+var IMP_ST={'new':['新增','ok'],update:['更新','acc'],merge:['合并','acc'],same:['已存在','mut'],bad:['无效','bad']};
+var IMP_ID=/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/,IMP_D=/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,IMP_T=/^([01]\d|2[0-3]):[0-5]\d$/;
+function impErr(m){var e=new Error(m);e.imp=true;return e;}
+/* 数字字段：缺省返回 undefined；类型或范围不对抛出说明 */
+function impN(e,k,lo,hi,int){var v=e[k];if(v==null)return undefined;if(typeof v!=='number'||!isFinite(v))throw impErr(k+' 应为数字');if(v<lo||v>hi)throw impErr(k+' 超出范围 '+lo+'–'+hi);if(int&&v!==Math.round(v))throw impErr(k+' 应为整数');return v;}
+function impS(e,k,max,req){var v=e[k];if(v==null||v===''){if(req)throw impErr('缺少 '+k);return undefined;}if(typeof v!=='string')throw impErr(k+' 应为文本');v=v.trim();if(!v&&req)throw impErr('缺少 '+k);if(v.length>max)throw impErr(k+' 超过 '+max+' 字');return v;}
+function impFind(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].imp===id||arr[i].id===id)return arr[i];return null;}
+function impSame(a,b,keys){for(var i=0;i<keys.length;i++){var k=keys[i],x=a[k],y=b[k];if(x==null&&y==null)continue;if(JSON.stringify(x)!==JSON.stringify(y))return false;}return true;}
+function impKcal(n){return Math.round(n)+' kcal';}
+/** 单条：校验 + 规范化为 FreeBody 记录 + 与本机数据比对，返回预览行 */
+function impRow(e,seen,src){var row={type:e&&e.type,id:e&&e.id,date:e&&e.date,status:'bad',title:'',detail:'',tags:[]};
+ try{
+  if(!e||typeof e!=='object'||Array.isArray(e))throw impErr('条目应为对象');
+  if(!IMP_TYPES[e.type])throw impErr('不支持的类型 '+(e.type==null?'(缺少 type)':String(e.type)));
+  if(typeof e.id!=='string'||!IMP_ID.test(e.id))throw impErr('id 缺失或格式不对（字母数字开头，可含 . _ : -，最长 64）');
+  if(seen[e.type+'|'+e.id])throw impErr('包内重复的 id');seen[e.type+'|'+e.id]=1;
+  if(typeof e.date!=='string'||!IMP_D.test(e.date))throw impErr('date 应为 YYYY-MM-DD');
+  var t=e.type,id=e.id,d=e.date,old,rec;
+  if(t==='meal'){
+   var nm=impS(e,'name',80,true),ml=e.meal==null?null:(IMP_MEAL[String(e.meal).toLowerCase()]||e.meal),tm=impS(e,'time',5);
+   if(tm&&!IMP_T.test(tm))throw impErr('time 应为 HH:MM');
+   if(ml==null&&tm)ml=mealOfHour(+tm.slice(0,2));if(MEALS.indexOf(ml)<0)throw impErr('meal 应为 早餐 / 午餐 / 晚餐 / 加餐');
+   var g=impN(e,'g',0,5000),k=impN(e,'kcal',0,10000);if(k==null)throw impErr('缺少 kcal');
+   var p=impN(e,'p',0,1000),c=impN(e,'c',0,2000),f=impN(e,'f',0,1000),fib=impN(e,'fib',0,300),na=impN(e,'na',0,50000),lo=impN(e,'lo',0,10000),hi=impN(e,'hi',0,10000);
+   if(e.estimated!=null&&typeof e.estimated!=='boolean')throw impErr('estimated 应为 true / false');
+   var disp=nm+(g&&!/\d\s*(g|克|ml|毫升)$/i.test(nm)?' '+Math.round(g)+'g':'');
+   rec={id:id,imp:id,date:d,meal:ml,food:disp,name:disp,kcal:r1(k),p:r1(p||0),c:r1(c||0),f:r1(f||0),src:'import',via:'import',est:!!e.estimated};
+   if(fib!=null)rec.fib=r1(fib);if(na!=null)rec.na=Math.round(na);if(lo!=null&&hi!=null&&hi>=lo){rec.lo=lo;rec.hi=hi;}
+   if(g){rec.g=r1(g);rec.amount=r1(g);rec.unit='g';var q=100/g;rec.nutrimentsPer100g={kcal:r1(k*q),p:r1((p||0)*q),c:r1((c||0)*q),f:r1((f||0)*q)};}
+   var nt=impS(e,'note',200);if(nt)rec.note=nt;
+   row.title=ml+' · '+disp;row.detail=impKcal(k)+' · 蛋白 '+r1(p||0)+' · 碳水 '+r1(c||0)+' · 脂肪 '+r1(f||0)+' g';if(rec.est)row.tags.push('估算');
+   old=impFind(S.meals,id);row.recs=[rec];row.old=old;row.status=!old?'new':impSame(old,rec,['date','meal','name','kcal','p','c','f','g','est','fib','na','note'])?'same':'update';
+  }else if(t==='workout'){
+   var ex=impS(e,'exercise',60,true);if(!Array.isArray(e.sets)||!e.sets.length)throw impErr('sets 应为非空数组');if(e.sets.length>50)throw impErr('sets 最多 50 组');
+   if(e.flag!=null&&typeof e.flag!=='boolean')throw impErr('flag 应为 true / false');var wn=impS(e,'note',200)||'';
+   rec=e.sets.map(function(s,i){if(!s||typeof s!=='object')throw impErr('第 '+(i+1)+' 组格式不对');var r=impN(s,'reps',0,500,true);if(r==null)throw impErr('第 '+(i+1)+' 组缺少 reps');
+    var w=impN(s,'weight',0,1000)||0,ri=impN(s,'rir',0,10);return{id:id+'#'+(i+1),imp:id,date:d,exercise:ex,sets:1,reps:r,weight:w,rir:ri==null?null:ri,rpe:ri==null?null:10-ri,note:impS(s,'note',100)||wn,wrist:!!e.flag,via:'import'};});
+   var grp={};rec.forEach(function(x){var k2=x.reps+'×'+(x.weight?x.weight+'kg':'自重');grp[k2]=(grp[k2]||0)+1;});
+   var ks=Object.keys(grp);row.title=ex;row.detail=rec.length+' 组 · '+ks.map(function(k2){return k2.replace('×',' 次 × ')+(grp[k2]>1?' ×'+grp[k2]:'');}).join('，')+(rec[0].rir!=null?' · RIR '+rec.map(function(x){return x.rir==null?'-':x.rir;}).join('/'):'');if(e.flag)row.tags.push(S.profile.injuryFlagLabel||'伤处不适');
+   old=S.workouts.filter(function(w){return w.imp===id;});row.recs=rec;row.old=old;
+   row.status=!old.length?'new':old.length===rec.length&&rec.every(function(x,i){return impSame(old[i],x,['date','exercise','reps','weight','rir','wrist','note']);})?'same':'update';
+  }else if(t==='supplement'){
+   var sn=impS(e,'name',40,true),ds=impS(e,'dose',40),at=impS(e,'time',5);if(at&&!IMP_T.test(at))throw impErr('time 应为 HH:MM');
+   var sp=S.supps.find(function(x){return x.name.trim().toLowerCase()===sn.toLowerCase();}),lg=sp&&S.suppLog[d]&&S.suppLog[d][sp.id];
+   row.title=sn+(ds?' '+ds:'');row.detail=(at?'打卡 '+at:'打卡')+(sp?'':' · 将新增到补剂清单');row.recs=[{name:sn,dose:ds||'',at:at||'',imp:id,date:d}];
+   row.status=!lg?'new':(!at||lg.at===at)?'same':'update';
+  }else if(t==='sleep'){
+   var bd=impS(e,'bed',5,true),wk=impS(e,'wake',5,true);if(!IMP_T.test(bd)||!IMP_T.test(wk))throw impErr('bed / wake 应为 HH:MM');
+   var qq=impN(e,'q',1,5,true),sn2=impS(e,'note',200);
+   old=impFind(S.sleep,id)||S.sleep.find(function(x){return x.date===d;});
+   rec={date:d,bed:bd,wake:wk,dur:sleepDur(bd,wk)};rec.q=qq!=null?qq:old?old.q:null;rec.note=sn2!=null?sn2:old?old.note||'':'';
+   row.title='睡眠 '+bd+'–'+wk;row.detail=r1(rec.dur)+' 小时'+(rec.q?' · 质量 '+rec.q+'/5':'');row.recs=[rec];row.old=old;
+   row.status=!old?'new':impSame(old,rec,['date','bed','wake','q','note'])?'same':(old.imp===id||old.id===id)?'update':'merge';
+  }else if(t==='body'){
+   var bo={weight:impN(e,'weight',20,400),bf:impN(e,'bf',2,75),waist:impN(e,'waist',30,250),rhr:impN(e,'rhr',20,220,true)};
+   if(bo.weight==null&&bo.bf==null&&bo.waist==null&&bo.rhr==null)throw impErr('weight / bf / waist / rhr 至少填一项');
+   old=impFind(S.body,id)||S.body.find(function(x){return x.date===d;});rec={date:d};['weight','bf','waist','rhr'].forEach(function(k2){rec[k2]=bo[k2]!=null?bo[k2]:old&&old[k2]!=null?old[k2]:null;});
+   row.title='身体指标';row.detail=[['weight','体重 ',' kg'],['bf','体脂 ','%'],['waist','腰围 ',' cm'],['rhr','静息心率 ',' bpm']].filter(function(x){return bo[x[0]]!=null;}).map(function(x){return x[1]+bo[x[0]]+x[2];}).join(' · ');row.recs=[rec];row.old=old;
+   row.status=!old?'new':impSame(old,rec,['weight','bf','waist','rhr'])?'same':(old.imp===id||old.id===id)?'update':'merge';
+  }else if(t==='note'){
+   var tx=impS(e,'text',2000,true),ti=impS(e,'title',60),tg=e.tags==null?[]:e.tags;
+   if(!Array.isArray(tg)||tg.length>10||tg.some(function(x){return typeof x!=='string'||!x.trim()||x.length>20;}))throw impErr('tags 应为最多 10 个、每个不超过 20 字的文本');
+   rec={id:id,imp:id,date:d,title:ti||'',text:tx,tags:tg.map(function(x){return x.trim();}),from:src||''};
+   row.title=ti||'心得';row.detail=tx.length>60?tx.slice(0,60)+'…':tx;old=impFind(S.notes,id);row.recs=[rec];row.old=old;
+   row.status=!old?'new':impSame(old,rec,['date','title','text','tags'])?'same':'update';
+  }
+ }catch(x){if(!x.imp)throw x;row.status='bad';row.reason=x.message;if(!row.title)row.title=IMP_TYPES[row.type]?IMP_TYPES[row.type][0]:'未知条目';}
+ return row;}
+/** 解析整包（对象）；包级错误抛出 */
+function impPlan(pk){
+ if(Array.isArray(pk))pk={freebody:'import',version:1,entries:pk};
+ if(!pk||typeof pk!=='object')throw impErr('内容不是 FreeBody 导入包');
+ if(pk.freebody!=='import'){if(pk.v===1&&(pk.meals||pk.workouts))throw impErr('这是完整备份文件，请用「导入 JSON」恢复备份。');throw impErr('缺少 "freebody": "import"，不是 FreeBody 导入包');}
+ if(pk.version!==1)throw impErr(typeof pk.version==='number'&&pk.version>1?'导入包版本 '+pk.version+' 较新，请先更新 FreeBody':'version 应为 1');
+ if(!Array.isArray(pk.entries)||!pk.entries.length)throw impErr('entries 为空');
+ if(pk.entries.length>IMP_MAX_N)throw impErr('一次最多导入 '+IMP_MAX_N+' 条，请拆分');
+ var seen={},src=typeof pk.source==='string'?pk.source.slice(0,60):'';
+ return pk.entries.map(function(e){return impRow(e,seen,src);});}
+function impStrip(t){t=String(t||'').trim();var m=/^```[a-z]*\s*([\s\S]*?)\s*```$/i.exec(t);if(m)t=m[1].trim();return t;}
+function impB64(s){s=s.replace(/-/g,'+').replace(/_/g,'/').replace(/\s/g,'');if(/[^A-Za-z0-9+/=]/.test(s))throw impErr('链接中含有无效字符');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+var IMP_CUT='链接内容不完整，可能在转发时被截断。请让 AI 改为输出 JSON，然后用「粘贴导入」。';
+/** 链接载荷 → JSON 文本（Promise）。z. 前缀 = deflate-raw 压缩；否则为未压缩 UTF-8 JSON 的 base64url */
+function impDecode(s){return new Promise(function(res,rej){
+ try{s=decodeURIComponent(s);}catch(e){}
+ if(s.length>IMP_MAX_LINK)return rej(impErr('链接过长（'+s.length+' 字符），请让 AI 输出 JSON，改用「粘贴导入」。'));
+ var z=s.slice(0,2)==='z.',u;try{u=impB64(z?s.slice(2):s);}catch(e){return rej(impErr(IMP_CUT));}
+ var txt=function(b){try{res(new TextDecoder('utf-8',{fatal:true}).decode(b));}catch(e){rej(impErr(IMP_CUT));}};
+ if(!z)return txt(u);
+ if(typeof DecompressionStream==='undefined')return rej(impErr('当前浏览器不支持压缩链接，请让 AI 输出 JSON，改用「粘贴导入」。'));
+ try{new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(ab){txt(new Uint8Array(ab));},function(){rej(impErr(IMP_CUT));});}catch(e){rej(impErr(IMP_CUT));}});}
+function impLinkPart(t){var m=/#import=([^\s]+)/.exec(t);return m?m[1]:null;}
+/** 文本 / 链接 → 预览 */
+function impLoad(t,viaLink){IMP.err=null;IMP.viaLink=!!viaLink;
+ var lp=viaLink?t:impLinkPart(t);
+ var go=function(json){var pk;if(json.length>IMP_MAX_TEXT){IMP.err='内容过大（超过 2 MB），请拆分后再导入。';return impShow();}
+  try{pk=JSON.parse(impStrip(json));}catch(e){IMP.err=(lp?IMP_CUT:'不是有效的 JSON：'+e.message);return impShow();}
+  try{IMP.rows=impPlan(pk);IMP.pack=pk;IMP.phase='preview';}catch(e){if(!e.imp)throw e;IMP.err=e.message;}impShow();};
+ if(lp)impDecode(lp).then(go,function(e){IMP.err=e.message;impShow();});else go(t);}
+function impShow(){if(IMP.err&&IMP.viaLink)IMP.phase='paste';if(cur!=='impPack')show('impPack',true);else rImp();}
+function impCount(){var c={'new':0,update:0,merge:0,same:0,bad:0};IMP.rows.forEach(function(r){c[r.status]++;});return c;}
+/** 写入：逐条按预览时的判断合并；写前保存快照，可撤销 */
+function impApply(){var rows=IMP.rows.filter(function(r){return r.status==='new'||r.status==='update'||r.status==='merge';});if(!rows.length)return;
+ IMP.undo=JSON.stringify(S);
+ rows.forEach(function(r){var rec=r.recs[0],i;
+  if(r.type==='meal'){i=S.meals.indexOf(r.old);if(i>=0)S.meals[i]=rec;else S.meals.push(rec);}
+  else if(r.type==='workout'){S.workouts=S.workouts.filter(function(w){return w.imp!==r.id;});r.recs.forEach(function(x){S.workouts.push(x);});}
+  else if(r.type==='supplement'){var sp=S.supps.find(function(x){return x.name.trim().toLowerCase()===rec.name.toLowerCase();});if(!sp){sp={id:uid(),name:rec.name,dose:rec.dose,time:''};S.supps.push(sp);}
+   var L=S.suppLog[rec.date]||(S.suppLog[rec.date]={}),n=new Date();L[sp.id]={at:rec.at||(L[sp.id]&&L[sp.id].at)||pad(n.getHours())+':'+pad(n.getMinutes()),imp:r.id};}
+  else if(r.type==='sleep'||r.type==='body'){var arr=S[r.type];if(r.old){for(var k in rec)r.old[k]=rec[k];r.old.imp=r.old.imp||r.id;}else{rec.id=r.id;rec.imp=r.id;arr.push(rec);}}
+  else if(r.type==='note'){i=S.notes.indexOf(r.old);if(i>=0)S.notes[i]=rec;else S.notes.push(rec);}});
+ save();var c=impCount();IMP.res={n:rows.length,c:c,dates:rows.map(function(r){return r.date;}).sort()};IMP.phase='done';impClearHash();toast('已导入 '+rows.length+' 条');rImp();}
+function impClearHash(){if(/^#import=/.test(location.hash))try{history.replaceState(null,'',location.pathname+location.search);}catch(e){location.hash='';}}
+function impReset(){IMP.phase='paste';IMP.rows=[];IMP.pack=null;IMP.err=null;IMP.res=null;IMP.viaLink=false;}
+function impWd(d){var x=new Date(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10));return(+d.slice(5,7))+'月'+(+d.slice(8,10))+'日 '+DT_WD[x.getDay()]+(d===today()?' · 今天':'');}
+/* 10-ui-shell.js — 界面外壳：主题、导航、日期栏、渲染调度 */
+/* ---------- 主题 ---------- */
+function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme||'auto');}
+$('#themeBtn').onclick=function(){var o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast('主题：'+{auto:'跟随系统',light:'浅色',dark:'深色'}[S.theme]);drawCharts();};
+
+/* ---------- 导航 ---------- */
+$('#nav').innerHTML='<div class="nav-brand" aria-hidden="true">'+$('#appTitle').innerHTML.replace(/id="whd"/,'id="whd2"').replace(/url\(#whd\)/,'url(#whd2)')+'</div>'+GROUPS.map(function(g){return'<button data-go="'+g[0]+'">'+IC(ICONS[g[0]])+g[1]+'</button>';}).join('');
+function groupOf(sec){for(var i=0;i<GROUPS.length;i++)if(GROUPS[i][2].indexOf(sec)>=0)return GROUPS[i];return GROUPS[0];}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(b.getAttribute('data-go'));var sb=e.target.closest('[data-sub]');if(sb)show(sb.getAttribute('data-sub'),true);});
+function show(id,direct){var toMus=id==='muscle';if(toMus){id='train';direct=true;} // 肌群热图位于 训练 › 力量 顶部
+var grp=!direct&&GROUPS.find(function(g){return g[0]===id;});if(grp)id=HUB[grp[0]]||lastSub[grp[0]]||grp[2][0];if(!document.getElementById(id))id='overview';grp=groupOf(id);lastSub[grp[0]]=id;
+ var hub=HUB[grp[0]];
+ var par=id==='dietAdd'?'diet':id==='dietAI'?'dietAdd':id==='dietFood'?dfBack:null;
+ $('#subnav').innerHTML=hub?(id===hub?'':'<button data-sub="'+(par||hub)+'" class="back">'+IC('left')+(par?SEC_LABEL[par]:grp[1])+'</button><span class="sn-t">'+SEC_LABEL[id]+'</span>'):grp[2].length>1?grp[2].map(function(s){return'<button data-sub="'+s+'" class="'+(s===id?'on':'')+'">'+SEC_LABEL[s]+'</button>';}).join(''):'';
+ cur=id;document.querySelectorAll('section').forEach(function(s){s.classList.toggle('on',s.id===id);});document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-go')===grp[0]);});window.scrollTo(0,0);render();if(toMus&&$('#musWrap'))$('#musWrap').scrollIntoView({block:'start'});}
+
+/* ---------- 日期 ---------- */
+$('#dSel').value=sel;
+$('#dSel').onchange=function(){if(this.value){sel=this.value;render();}};
+$('#dPrev').onclick=function(){sel=addDays(sel,-1);$('#dSel').value=sel;render();};
+$('#dNext').onclick=function(){sel=addDays(sel,1);$('#dSel').value=sel;render();};
+$('#dToday').onclick=function(){sel=today();$('#dSel').value=sel;render();};
+function todayBtn(){var b=$('#dToday');if(b)b.classList.toggle('is-today',sel===today());}
+
+/* ---------- 图表 ---------- */
+function ring(val,goal,color,label,unit){var pc=goal?Math.min(val/goal,1):0,r=34,C=2*Math.PI*r,over=goal&&val>goal*1.05;
+ return'<div class="ring"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="'+r+'" fill="none" style="stroke:var(--in)" stroke-width="8"/><circle cx="42" cy="42" r="'+r+'" fill="none" style="stroke:'+(over?'var(--bad)':color)+';transition:stroke-dasharray .6s" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+(C*pc)+' '+C+'" transform="rotate(-90 42 42)"/><text x="42" y="47" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--fg)">'+Math.round(pc*100)+'%</text></svg><b>'+label+'</b>'+Math.round(val)+'/'+goal+unit+'</div>';}
+
 function otHtml(d){var s=otSignals(d);if(!s.length)return'';var lvl=s.length>=3?'bad':s.length===2?'warn':'info';
  var head=s.length>=2?IC('alert')+' 恢复不足/过度训练预警（'+s.length+' 项信号）':IC('info')+' 恢复提示';
  return'<div class="alert '+lvl+'"><b>'+head+'</b><ul style="margin:4px 0 4px 18px;padding:0">'+s.map(function(x){return'<li>'+esc(x)+'</li>';}).join('')+'</ul>'+(s.length>=2?'建议：今天降低训练量/强度或安排休息，优先睡眠与饮食；持续数天或伴随不适请咨询医生，并与私教沟通。':'持续关注即可。')+'<div class="mut">基于近3天与前2周基线对比的简单规则，仅供参考，不构成医疗建议。</div></div>';}
@@ -1571,6 +1948,7 @@ function render(){
 }
 function drawCharts(){render();}
 
+/* 11-ui-today.js — 今天页与数据页 */
 /* ---------- 今天（一屏：准备度 / 推荐训练 / 营养剩余 / 打卡） ---------- */
 function activeInjury(){return S.injuries.some(function(x){return x.status!=='已恢复';});}
 function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(sel),wk=recWeek(sel);
@@ -1634,20 +2012,13 @@ function rData(){var g=S.goals,h='',d7=[],d14=[],i;for(i=6;i>=0;i--)d7.push(addD
  $('#dataMore').innerHTML=[['sleep','睡眠'],['notes','心得'],['hormone','恢复/化验'],['muscle','肌群'],['injury','伤病'],['supp','补剂'],['perf','运动表现'],['tstats','训练统计'],['nutri','营养分析']].map(function(x){return'<button class="chip" data-go="'+x[0]+'">'+x[1]+'</button>';}).join('');
 }
 
+/* 12-ui-diet.js — 饮食：餐次、添加食物、食物详情、日历、目标推导、自定义食物 */
 /* ---------- 饮食（v2.1）：餐次分配 / 记录快照 / 最近常吃 / 月历 / 目标推导 / 自定义与组合 ---------- */
-var MEALS=['早餐','午餐','晚餐','加餐'],SPLIT0=[25,35,30,10];
-var SRC_LBL={lib:'内置库',quick:'快速输入',photo:'教练照片估算',ai:'拍照识别估算',import:'AI 导入',custom:'自定义'};
 /** 旧版"练前/练后"等餐次计入加餐 */
 function mealGroup(m){return MEALS.indexOf(m)>=0?m:'加餐';}
 function mealSplit(){var s=S.goals.mealSplit||{},o={},sum=0;MEALS.forEach(function(m,i){o[m]=s[m]!=null?s[m]:SPLIT0[i];sum+=o[m];});o._sum=sum||100;return o;}
 function mealTarget(m){var s=mealSplit();return Math.round(S.goals.kcal*s[m]/s._sum);}
 var curMeal=null;function dMeal(){return curMeal||mealByHour();}
-/** 份量换算：优先 servings，兼容旧 units */
-function unitsOf(f){var u={};if(!f)return u;if(f.servings&&f.servings.length)f.servings.forEach(function(s){if(s&&s.unit&&s.g>0)u[s.unit]=s.g;});else if(f.units)for(var k in f.units)u[k]=f.units[k];return u;}
-function per100(f){var o={kcal:f.kcal,p:f.p,c:f.c,f:f.f};if(f.na!=null)o.na=f.na;if(f.fib!=null)o.fib=f.fib;return o;}
-/** 由食物（每100g）与克数生成记录字段（含营养快照） */
-function fromFood(f,g,amount,unit){var r=g/100,o={foodId:f.id,name:f.name.replace(/[（(].*?[）)]/g,''),amount:amount!=null?amount:Math.round(g),unit:unit||'g',g:Math.round(g),nutrimentsPer100g:per100(f),src:f.custom?'custom':'lib',
- kcal:Math.round(f.kcal*r),p:r1(f.p*r),c:r1(f.c*r),f:r1(f.f*r)};if(f.na!=null)o.na=Math.round(f.na*r);if(f.fib!=null)o.fib=r1(f.fib*r);return o;}
 function mkMeal(o){var m={id:uid(),date:sel,meal:o.meal||dMeal(),food:o.name||o.food,name:o.name||o.food,kcal:Math.round(o.kcal||0),p:r1(o.p||0),c:r1(o.c||0),f:r1(o.f||0),src:o.src||'custom'};
  ['foodId','amount','unit','g','nutrimentsPer100g','lo','hi','na','fib','kcalOnly','via'].forEach(function(k){if(o[k]!=null&&o[k]!=='')m[k]=o[k];});return m;}
 function cloneMeal(m){var o=JSON.parse(JSON.stringify(m));o.id=uid();o.date=sel;o.meal=dMeal();return o;}
@@ -1812,18 +2183,6 @@ function rCal(){var st=streakDays();$('#calSum').textContent=st?'连续记录 '+
   '<div class="mlg" style="margin-top:6px"><span><i class="cd ok"></i>达标 ±10%</span><span><i class="cd lo"></i>偏低</span><span><i class="cd hi"></i>偏高</span><span><i class="cd"></i>未记录</span></div>'+
   '<div class="mut" style="margin-top:8px;font-size:13px">连续记录 <b>'+st+'</b> 天 · '+e.msg+'</div>';}
 
-/* 目标怎么来的：BMR（Mifflin-St Jeor / Katch-McArdle）× PAL → 缺口 → 手动偏移；蛋白按 g/kg */
-var PAL=[[1.4,'久坐（PAL 1.4）'],[1.55,'轻度活动（1.55）'],[1.75,'中度活动（1.75）'],[2.0,'高活动（2.0）']];
-var GMODE={cut:['减脂',-0.15],keep:['维持',0],bulk:['增肌',0.1]};
-function tgtCfg(){var c=S.goals.calc||{};return{sex:c.sex||'',age:c.age!=null?c.age:null,pal:c.pal||1.55,mode:c.mode||'keep',adj:c.adj||0,pkg:c.pkg||1.6,fatPct:c.fatPct||25,km:!!c.km};}
-function latestBody(k){var b=S.body.filter(function(x){return x[k]!=null;}).sort(function(a,b){return a.date<b.date?1:-1;})[0];return b?b[k]:null;}
-function calcTarget(c){var w=latestBody('weight'),bf=latestBody('bf'),h=S.profile.height,miss=[],bmr=null,how='';
- if(c.km&&w!=null&&bf!=null){var lbm=w*(1-bf/100);bmr=370+21.6*lbm;how='Katch-McArdle：370 + 21.6 × 瘦体重 '+r1(lbm)+' kg';}
- else{if(w==null)miss.push('体重（数据 › 身体）');if(!h)miss.push('身高（我的 › 个人配置）');if(c.age==null)miss.push('年龄');if(!c.sex)miss.push('性别');
-  if(!miss.length){bmr=10*w+6.25*h-5*c.age+(c.sex==='m'?5:-161);how='Mifflin-St Jeor：10 × '+w+' + 6.25 × '+h+' − 5 × '+c.age+(c.sex==='m'?' + 5':' − 161');}}
- if(bmr==null)return{miss:miss};
- var tdee=bmr*c.pal,gm=GMODE[c.mode]||GMODE.keep,goal=tdee*(1+gm[1]),kcal=Math.round((goal+c.adj)/10)*10,p=w!=null?Math.round(c.pkg*w):null,fat=Math.round(kcal*c.fatPct/100/9),carb=p!=null?Math.max(0,Math.round((kcal-p*4-fat*9)/4)):null;
- return{bmr:bmr,how:how,tdee:tdee,gm:gm,goal:goal,kcal:kcal,p:p,f:fat,c:carb,w:w,bf:bf};}
 function rTarget(){var c=tgtCfg(),r=calcTarget(c),opt=function(v,l,s){return'<option value="'+v+'"'+(String(v)===String(s)?' selected':'')+'>'+l+'</option>';},hasBf=latestBody('bf')!=null&&latestBody('weight')!=null;
  var h='<div class="grid2" style="margin-top:8px">'+
   '<div><label>性别</label><select id="tcSex">'+opt('','请选择',c.sex)+opt('m','男',c.sex)+opt('f','女',c.sex)+'</select></div>'+
@@ -1879,6 +2238,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
  if((a=b.getAttribute('data-calm'))){calMonth=a;rCal();return;}
  if((a=b.getAttribute('data-delcu'))){if(!confirm('删除该自定义项？已记录的条目不受影响。'))return;S.customFoods=S.customFoods.filter(function(x){return x.id!==a;});save();render();}});
 
+/* 13-ui-train.js — 训练：力量 / 有氧 / 表现表单 */
 function rTrain(){rSession();if(cur==='train'&&!(S.active||showSummary||editPlan))rMuscle();var g=S.goals,ra=recAdvice(recWeek(sel));
  $('#recBanner').innerHTML=ra?'<div class="alert '+ra[0]+'">'+IC('cycle')+' '+esc(ra[1])+'</div>':'';
  $('#rStart').value=S.recoveryStart||'';
@@ -1929,6 +2289,7 @@ $('#rnAdd').onclick=function(){var t=parseT($('#rnT').value),d=$('#rnD').value;i
  S.run800.push({id:uid(),date:d,sec:t,type:$('#rnTy').value,note:$('#rnN').value.trim()});save();$('#rnT').value='';$('#rnN').value='';toast(S.run800Hist&&t<=S.run800Hist?'追平/超越历史最佳！':'已记录，距历史最佳 +'+r1(t-(S.run800Hist||t))+'s');render();};
 $('#cAdd').onclick=function(){var m=num($('#cMin').value);if(!m){toast('请填写时长');return;}S.cardio.push({id:uid(),date:sel,min:m,floors:num($('#cFl').value),hr:num($('#cHr').value)});save();['#cMin','#cFl','#cHr'].forEach(function(s){$(s).value='';});toast('已添加');render();};
 
+/* 14-ui-records.js — 补剂、睡眠、身体指标、激素与恢复、伤病 */
 function rSupp(){var dn=suppDone(sel);
  $('#sList').innerHTML=S.supps.length?S.supps.map(function(s){var v=dn[s.id];return'<li><label class="chk" style="font-size:15px;color:var(--fg)"><input type="checkbox" data-sup="'+s.id+'"'+(v?' checked':'')+'><span><b>'+esc(s.name)+'</b> '+(s.dose?'<span class="tag">'+esc(s.dose)+'</span>':'<span class="tag">剂量未填</span>')+'<div class="mut">'+(s.time?'计划：'+esc(s.time):'')+(v&&v.at?' · 已服 '+esc(v.at):'')+'</div></span></label><button class="ghost sm" data-edsup="'+s.id+'">编辑</button><button class="del" data-delsup="'+s.id+'">'+IC('x')+'</button></li>';}).join(''):'<li class="mut">清单为空</li>';
  var n=S.supps.filter(function(x){return dn[x.id];}).length;$('#sRate').textContent=n+'/'+S.supps.length;
@@ -2033,6 +2394,7 @@ $('#rsAdd').onclick=function(){var n=$('#rsName').value.trim();if(!n){toast('请
 $('#injAdd').onclick=function(){var n=$('#injName').value.trim();if(!n){toast('请填写名称');return;}S.injuries.push({id:uid(),name:n,desc:$('#injDesc').value.trim(),status:'康复中'});save();$('#injName').value='';$('#injDesc').value='';render();};
 
 
+/* 15-ui-charts.js — 可视化（图表由 src/charts.js 绘制） */
 /* ---------- 可视化（图表由 src/charts.js 绘制） ---------- */
 /** 时间范围：每组图表独立，0=全部 */
 var RANGE={};
@@ -2057,7 +2419,6 @@ function chNutrition(){var g=S.goals,from=since('nut',S.meals.map(function(m){re
  $('#protRate').innerHTML=n?'<div class="mut">蛋白质达标率（≥目标95%）</div><div class="kpi"><span class="big" style="color:'+(rate>=80?'var(--ok)':rate>=50?'var(--warn)':'var(--bad)')+'">'+rate+'%</span><span class="mut">'+hit+'/'+n+' 天</span></div><div class="bar" style="margin:6px 0"><i style="width:'+rate+'%;background:var(--p)"></i></div><div class="mut">日均蛋白 '+r1(aP)+' g / 目标 '+g.p+' g'+(S.body.length?' · 约 '+r1(aP/(sortPts(S.body.map(function(b){return{d:b.date,y:b.weight};})).pop()||{y:aP}).y)+' g/kg':'')+'</div>':'';
  CH.bars($('#chMacroBar'),{h:150,cats:days.map(function(d){var t=dayTot(d);return{l:md(d),d:d,stack:[{name:'蛋白质',v:Math.round(t.p*4),color:'var(--p)'},{name:'碳水',v:Math.round(t.c*4),color:'var(--c)'},{name:'脂肪',v:Math.round(t.f*9),color:'var(--f)'}]};}),unit:' kcal',emptyMsg:'暂无饮食记录',legend:[{name:'蛋白质',color:'var(--p)'},{name:'碳水',color:'var(--c)'},{name:'脂肪',color:'var(--f)'}]});}
 
-function epley(w){if(!w.weight||!w.reps)return null;return w.reps===1?w.weight:w.weight*(1+w.reps/30);}
 var ormSel=null;
 function chTrain(){var from=since('train',S.workouts.map(function(w){return w.date;}).concat(S.cardio.map(function(c){return c.date;}))),inR=function(x){return x.date>=from&&x.date<=sel;},ws=S.workouts.filter(inR);
  // 训练量：7天按日，其余按周
@@ -2115,20 +2476,6 @@ function chBody(){var from=since('body',S.body.map(function(b){return b.date;}))
  CH.stack($('#chComp'),{h:160,unit:' kg',series:[{name:'瘦体重',color:'var(--c)',pts:both.map(function(b){return{d:b.date,y:r1(b.weight*(1-b.bf/100))};})},{name:'脂肪量',color:'var(--f)',pts:both.map(function(b){return{d:b.date,y:r1(b.weight*b.bf/100)};})}],emptyMsg:'需要同日的体重与体脂',emptyHint:'瘦体重 = 体重 × (1 − 体脂%)'});
  CH.line($('#chWaist'),{h:140,series:[{name:'腰围',color:'var(--k)',pts:sortPts(bs.map(function(b){return{d:b.date,y:b.waist};})),unit:' cm',area:true}],emptyMsg:'暂无腰围记录',emptyHint:'每周固定时间测量一次即可'});}
 
-/**
- * 准备度分数（0-100，仅供参考）：
- * 睡眠时长 20% · 睡眠质量 10% · 静息心率相对14天基线 20% · HRV 相对基线 20% · 主观（精力/情绪/酸痛/压力）30%
- * 缺失项按剩余权重归一，至少需要 2 项。
- */
-function readiness(d){var parts=[],add=function(w,v,n){if(v!=null&&!isNaN(v))parts.push({w:w,v:Math.max(0,Math.min(1,v)),n:n});};
- var s=sleepOf(d),r=recovOf(d),g=S.goals;if(s){add(0.2,(s.dur-4)/(g.sleepH-4),'睡眠时长');if(s.q)add(0.1,(s.q-1)/4,'睡眠质量');}
- var rhrOf=function(x){var rr=recovOf(x);if(rr&&rr.rhr!=null)return rr.rhr;var b=S.body.find(function(y){return y.date===x;});return b?b.rhr:null;};
- var base=function(fn){var a=[];for(var i=1;i<=14;i++){var v=fn(addDays(d,-i));if(v!=null)a.push(v);}return a.length>=3?avg(a):null;};
- var rh=rhrOf(d),rb=base(rhrOf);if(rh!=null&&rb!=null)add(0.2,0.6+(rb-rh)/10,'静息心率');
- var hv=r&&r.hrv,hb=base(function(x){var q=recovOf(x);return q?q.hrv:null;});if(hv!=null&&hb)add(0.2,0.6+(hv-hb)/hb*2,'HRV');
- if(r){var sub=[r.energy?(r.energy-1)/4:null,r.mood?(r.mood-1)/4:null,r.soreness?(5-r.soreness)/4:null,r.stress?(5-r.stress)/4:null].filter(function(x){return x!=null;});if(sub.length)add(0.3,avg(sub),'主观');}
- if(parts.length<2)return null;var tw=parts.reduce(function(a,p){return a+p.w;},0);
- return{score:Math.round(parts.reduce(function(a,p){return a+p.w*p.v;},0)/tw*100),parts:parts};}
 function chRecovery(){var dates=S.recov.map(function(x){return x.date;}).concat(S.sleep.map(function(x){return x.date;})),from=since('rec',dates),days=daysBetween(from,sel);
  var rd=readiness(sel);$('#readyNow').innerHTML=rd?'<div class="score"><span class="big" style="color:'+(rd.score>=70?'var(--ok)':rd.score>=50?'var(--warn)':'var(--bad)')+'">'+rd.score+'</span><div><b>'+(sel===today()?'今日':sel)+'准备度</b><div class="mut">'+(rd.score>=70?'状态良好，可按计划训练':rd.score>=50?'一般，可适当降低强度':'偏低，建议减量或休息')+' · 依据：'+rd.parts.map(function(p){return p.n;}).join('、')+'</div></div></div>':'<div class="mut" style="margin-bottom:6px">准备度需要当天至少 2 项数据（睡眠、晨起心率、HRV、主观指标）。</div>';
  CH.line($('#chReady'),{h:150,series:[{name:'准备度',color:'var(--acc)',pts:days.map(function(d){var x=readiness(d);return{d:d,y:x?x.score:null};}),area:true}],yl:{min:0,max:100},refs:[{y:70,name:'良好',color:'var(--mut)'}],emptyMsg:'暂无准备度数据',emptyHint:'连续记录睡眠与晨起指标后自动计算'});
@@ -2143,48 +2490,7 @@ function chPain(){var from=since('pain',S.wristLog.map(function(x){return x.date
  var l7=S.wristLog.filter(function(x){return x.date<=sel&&x.date>addDays(sel,-7);});$('#wpAvg').textContent=l7.length?'近7天均 '+r1(avg(l7.map(function(x){return x.pain;})))+'/10':'';}
 
 
-/* ==========================================================
- * 肌群模型：动作 → 主/次要肌群，疲劳累计与恢复半衰期
- * ========================================================== */
-/** 肌群：[名称, 恢复半衰期(小时)]；下肢与下背恢复较慢 */
-var MUS={chest:['胸',36],back:['背',36],delts:['肩',30],biceps:['二头',24],triceps:['三头',24],forearms:['前臂',20],core:['核心',20],lowback:['下背',54],glutes:['臀',48],quads:['股四头',48],hams:['腘绳',48],calves:['小腿',30]};
-/** 关键词 → [主要肌群, 次要肌群]（按顺序匹配，越具体越靠前；计入：主要 1 组，次要 0.5 组） */
-var EX_MUS=[
- ['俯身飞鸟',['delts'],['back']],['反向飞鸟',['delts'],['back']],['面拉',['delts'],['back']],['侧平举',['delts'],[]],['前平举',['delts'],[]],
- ['推举',['delts'],['triceps']],['肩推',['delts'],['triceps']],
- ['卧推',['chest'],['triceps','delts']],['俯卧撑',['chest'],['triceps','delts','core']],['飞鸟',['chest'],['delts']],['夹胸',['chest'],[]],['胸推',['chest'],['triceps']],
- ['臂屈伸',['triceps'],['chest']],['下压',['triceps'],[]],['三头',['triceps'],[]],
- ['腿弯举',['hams'],[]],['弯举',['biceps'],['forearms']],
- ['引体',['back'],['biceps','forearms']],['下拉',['back'],['biceps']],['划船',['back'],['biceps','lowback']],['耸肩',['back'],[]],
- ['罗马尼亚',['hams','glutes'],['lowback']],['硬拉',['hams','glutes','lowback'],['back','forearms']],['背伸',['lowback'],['glutes']],['山羊挺身',['lowback'],['glutes','hams']],
- ['深蹲',['quads','glutes'],['core','lowback']],['腿举',['quads','glutes'],[]],['腿屈伸',['quads'],[]],['弓步',['quads','glutes'],['hams']],['箭步',['quads','glutes'],['hams']],['保加利亚',['quads','glutes'],['hams']],
- ['臀推',['glutes'],['hams']],['臀桥',['glutes'],['hams']],['提踵',['calves'],[]],
- ['平板',['core'],[]],['卷腹',['core'],[]],['举腿',['core'],[]],['死虫',['core'],[]],['腹',['core'],[]],['农夫',['forearms'],['back','core']],['握力',['forearms'],[]]];
-function musclesOf(name){name=name||'';for(var i=0;i<EX_MUS.length;i++)if(name.indexOf(EX_MUS[i][0])>=0)return{p:EX_MUS[i][1],s:EX_MUS[i][2]};return{p:[],s:[]};}
-function rirOf(w){return w.rir!=null?w.rir:(w.rpe!=null?Math.max(0,10-w.rpe):null);}
-var FATIGUE_RECOVERING=1.5,FATIGUE_HIGH=4,STALE_DAYS=7;
-function trainTs(d){var a=d.split('-');return new Date(+a[0],a[1]-1,+a[2],18).getTime();}
-function nowTs(){if(sel===today())return Date.now();var a=sel.split('-');return new Date(+a[0],a[1]-1,+a[2],23,59).getTime();}
-/** 计算每个肌群：剩余疲劳 f（有效组数×0.5^(经过小时/半衰期)）、近7天有效组数、上次训练日期、状态 */
-function muscleState(){var now=nowTs(),st={};Object.keys(MUS).forEach(function(k){st[k]={f:0,sets7:0,last:null};});
- S.workouts.forEach(function(w){if(w.date>sel)return;var r=rirOf(w);if(r!=null&&r>4)return;var m=musclesOf(w.exercise),n=w.sets||1,hrs=Math.max(0,(now-trainTs(w.date))/36e5);
-  [[m.p,1],[m.s,0.5]].forEach(function(pr){pr[0].forEach(function(k){var s=st[k];s.f+=n*pr[1]*Math.pow(0.5,hrs/MUS[k][1]);if(diffDays(w.date,sel)<7)s.sets7+=n*pr[1];if(!s.last||w.date>s.last)s.last=w.date;});});});
- Object.keys(st).forEach(function(k){var s=st[k];s.days=s.last?diffDays(s.last,sel):null;
-  s.status=!s.last?'never':s.f>=FATIGUE_HIGH?'fatigued':s.f>=FATIGUE_RECOVERING?'recovering':s.days>STALE_DAYS?'stale':'recovered';
-  s.eta=s.f>=FATIGUE_RECOVERING?Math.ceil(MUS[k][1]*Math.log(s.f/FATIGUE_RECOVERING)/Math.LN2):0;});
- return st;}
-var ST_LABEL={never:'未训练',fatigued:'恢复中（疲劳高）',recovering:'恢复中',recovered:'已恢复',stale:'太久没练'};
-var SPLITS=[['推','push',['chest','delts','triceps']],['拉','pull',['back','biceps','forearms']],['腿','legs',['quads','hams','glutes','calves']],['核心与下背','core',['core','lowback']]];
-/** 今日推荐：优先选择主要肌群均已恢复、且最久没练的部位；准备度低或无可练部位时建议休息/有氧 */
-function recommend(){var st=muscleState(),rd=readiness(sel),hasHist=S.workouts.length>0;
- if(rd&&rd.score<50)return{rest:true,title:'今天以休息或轻松有氧为主',why:'准备度 '+rd.score+'，恢复信号偏弱。'};
- var cands=SPLITS.map(function(sp){var ms=sp[2],ok=ms.slice(0,2).every(function(k){return['recovered','stale','never'].indexOf(st[k].status)>=0;}),days=Math.min.apply(null,ms.slice(0,2).map(function(k){return st[k].days==null?99:st[k].days;}));return{sp:sp,ok:ok,days:days};}).filter(function(c){return c.ok;});
- if(!hasHist)return{title:'全身训练（入门）',why:'还没有训练记录，从全身动作开始，每个动作留 2–3 次余力。',keys:[]};
- if(!cands.length)return{rest:true,title:'各部位仍在恢复，建议有氧或休息',why:'主要肌群剩余疲劳较高。'};
- cands.sort(function(a,b){return b.days-a.days;});var c=cands[0];
- var inj=S.injuries.some(function(x){return x.status!=='已恢复';})&&S.restricted.length?'；注意避开受限动作':'';
- return{title:c.sp[0]+'（'+c.sp[2].map(function(k){return MUS[k][0];}).join('、')+'）',why:c.sp[2].map(function(k){return MUS[k][0];}).slice(0,2).join('、')+'已恢复，'+(c.days>=99?'尚未练过':'距上次训练 '+c.days+' 天')+inj+'。',keys:c.sp[2],split:c.sp[1]};}
-
+/* 16-ui-session.js — 肌群热图、训练计划与按组训练 */
 /* ---------- 自绘简化人体肌群图（非第三方路径数据） ---------- */
 var mapMode='status',musSel=null;
 function mir(d){return d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g,function(m,x,y){return(120-x)+','+y;});}
@@ -2215,41 +2521,6 @@ function planHint(keys){var best=null,sc=0;S.plans.forEach(function(p){var n=0;p
  return best&&sc>=0.5?'<div class="actions"><button data-ss="start" data-plan="'+best.id+'">'+IC('play')+'开始「'+esc(best.name)+'」</button></div>':'';}
 document.addEventListener('click',function(e){var li=e.target.closest&&e.target.closest('li[data-ss]');if(li&&!e.target.closest('button')){sessAction(li.getAttribute('data-ss'),li);}});
 document.addEventListener('click',function(e){var m=e.target.closest&&e.target.closest('[data-mus]');if(m&&cur==='train'){musSel=m.getAttribute('data-mus');rMuscle();}});
-
-/* ==========================================================
- * 自动进阶：线性 / 双重进阶 / 保持；未做满不加重，连续未完成减载
- * ========================================================== */
-var RULE_LABEL={linear:'线性',double:'双重进阶',hold:'保持'};
-function exRule(ex){var r=(S.exRules||{})[ex]||{};return{rule:r.rule||'linear',lo:r.lo||null,hi:r.hi||null,inc:r.inc||null};}
-function defInc(ex,w){var p=musclesOf(ex).p,lower=p.some(function(k){return['quads','hams','glutes','lowback'].indexOf(k)>=0;});return lower?(w>=60?5:2.5):(w>=20?2.5:1);}
-/** 该动作在某日期之前的训练记录（按日分组，每组展开为单组） */
-function exHistory(ex,before){var by={};S.workouts.forEach(function(w){if(w.exercise===ex&&w.date<before)(by[w.date]=by[w.date]||[]).push(w);});
- return Object.keys(by).sort().map(function(d){var sets=[];by[d].forEach(function(w){for(var k=0;k<(w.sets||1);k++)sets.push(w);});return{d:d,sets:sets,w:Math.max.apply(null,sets.map(function(x){return x.weight||0;})),minR:Math.min.apply(null,sets.map(function(x){return x.reps||0;})),tot:sets.reduce(function(a,x){return a+(x.reps||0);},0)};});}
-/** 是否完成：有目标次数则每组≥目标；双重进阶看是否全部达到上限；否则以首组次数为基准 */
-function sessComplete(s,rule,need){return s.sets.every(function(x){var t=x.target&&x.target.reps?x.target.reps:need;return(x.reps||0)>=t;});}
-function roundW(v,st){return Math.round(v/st)*st;}
-/**
- * 下次目标：返回 {w, reps, sets, why, kind}；kind = up/reps/hold/deload
- * 规则优先级：恢复期前2周 → 伤处不适 → 连续2次未完成/停滞减载 → 各规则
- */
-function nextTarget(ex,setsN){var rule=exRule(ex),hist=exHistory(ex,sel),last=hist[hist.length-1],wk=recWeek(sel);if(!last)return null;
- var w=last.w,inc=rule.inc||defInc(ex,w),n=setsN||last.sets.length,base=last.sets[0].target&&last.sets[0].target.reps||(rule.rule==='double'?(rule.lo||8):last.sets[0].reps);
- var keepR=rule.rule==='double'?Math.max(rule.lo||1,last.minR):base;
- var out=function(w2,r2,why,kind){return{w:r1(w2),reps:r2,sets:n,why:why,kind:kind,rule:rule.rule};};
- if(wk&&wk<=2)return out(w,keepR,'恢复期第'+wk+'周，先保持 '+w+'kg，每组留 3–4 次余力。','hold');
- if(last.sets.some(function(x){return x.wrist;}))return out(w,keepR,'上次标记了'+flagLabel()+'，先保持重量，确认无痛再加。','hold');
- if(!w)return out(0,last.minR+1,'自重动作，下次每组争取多做 1 次。','reps');
- var need=rule.rule==='double'?(rule.lo||8):base,done=sessComplete(last,rule,need);
- var fails=0;for(var i=hist.length-1;i>=0&&hist[i].w>=w;i--){if(sessComplete(hist[i],rule,need))break;fails++;}
- var flat=0;for(var j=hist.length-1;j>0&&hist[j].w===w&&hist[j].tot<=hist[j-1].tot&&hist[j-1].w===w;j--)flat++;
- var top=rule.rule==='double'?last.minR>=(rule.hi||12):done;
- if(rule.rule!=='hold'&&(fails>=2||(flat>=2&&!top)))return out(roundW(w*0.9,inc>=2.5?2.5:0.5),rule.rule==='double'?(rule.lo||8):base,(fails>=2?'连续 '+fails+' 次没做满':'连续 '+(flat+1)+' 次没有进步')+'，减载 10% 再重新往上加。','deload');
- if(rule.rule==='hold')return out(w,keepR,'这个动作设为保持，维持重量和次数。','hold');
- if(rule.rule==='double'){var lo=rule.lo||8,hi=rule.hi||12;
-  if(last.minR>=hi)return out(w+inc,lo,'每组都做到了 '+hi+' 次上限，加 '+inc+'kg，次数回到 '+lo+'。','up');
-  var t=Math.min(hi,Math.max(lo,last.minR+1));return out(w,t,'还没全部做到 '+hi+' 次，先在 '+w+'kg 把最少的那组提到 '+t+' 次。','reps');}
- if(done){var rr=avg(last.sets.map(rirOf));return out(w+inc,base,'上次 '+last.sets.length+' 组都做满 '+base+' 次'+(rr!=null&&rr<=0.5?'（接近力竭，加重后注意动作）':'')+'，加 '+inc+'kg。','up');}
- return out(w,base,'上次有组没做满 '+base+' 次，不加重，先在原重量做满。','hold');}
 
 /* ==========================================================
  * 训练引导：计划 → 逐组完成（休息计时）→ 完成总结
@@ -2370,40 +2641,7 @@ function rSession(){var box=$('#sessBox');if(!box)return;var a=S.active,pb0=$('#
   '<div class="actions"><button class="ghost sm" data-ss="free">'+IC('play')+'自由训练</button><button class="ghost sm" data-ss="newplan">'+IC('plus')+'新建计划</button></div>'+
   '<div class="row" style="margin-top:8px"><span class="mut">从模板添加：</span>'+PLAN_TPL.map(function(t,i){return'<button class="chip" data-ss="tpl" data-v="'+i+'">'+t[0]+'</button>';}).join('')+'</div></details>';}
 
-/* ---------- 自动化：快速输入 / 一键操作 / 训练建议 ---------- */
-/** 当前时段默认餐次 */
-function mealByHour(){var h=new Date().getHours();return h<10?'早餐':h<14?'午餐':h<17?'加餐':h<21?'晚餐':'加餐';}
-function normName(n){return String(n).replace(/[（(].*?[）)]/g,'').replace(/\s/g,'').toLowerCase();}
-/** 在食物库中匹配名称：自定义优先；完全相等 > 文本包含最长关键字 > 关键字包含文本 */
-function matchFood(name){var t=normName(name);if(!t)return null;var best=null,score=0,cs=(S.customFoods||[]),list=cs.concat(FOOD_DB.foods||[]);
- list.forEach(function(f){var bonus=f.custom?5:0;[f.name].concat(f.aliases||[]).forEach(function(k){k=normName(k);if(!k)return;var sc=0;if(k===t)sc=1000+bonus*100;else if(t.indexOf(k)>=0&&k.length>=2)sc=100+k.length+bonus;else if(k.indexOf(t)>=0&&t.length>=2)sc=50+t.length+bonus;if(sc>score){score=sc;best=f;}});});return best;}
-var CN_NUM={'半':0.5,'一':1,'两':2,'二':2,'三':3,'四':4,'五':5,'六':6};
-var COUNT_UNITS='个|只|勺|碗|杯|片|根|盒|份|袋|瓶|块|把',KCAL_UNITS='kcal|千卡|大卡|卡';
-/** 解析一行文字为营养估算：如 "鸡胸肉200g 米饭1碗 鸡蛋2个"、"外卖 650"（只填热量）、自定义食物或组合名 */
-function parseQuick(text){var out={items:[],miss:[]},cs=(S.customFoods||[]).filter(function(f){return f.custom;}).sort(function(a,b){return b.name.length-a.name.length;});
- var U='(?:'+KCAL_UNITS+'|kg|g|克|ml|毫升|'+COUNT_UNITS+')';
- text=String(text||'');
- // 自定义名称（可能含 + 等分隔符）先整体替换为占位符，保证优先匹配
- cs.forEach(function(f,i){if(f.name&&text.indexOf(f.name)>=0)text=text.split(f.name).join(' \u0001'+i+'\u0001');});
- text=text.replace(new RegExp('([半一两二三四五六])('+COUNT_UNITS+')','g'),function(m,a,b){return CN_NUM[a]+b;})
-  .replace(new RegExp('([^\\s\\d,，、;；+])\\s+(\\d+(?:\\.\\d+)?\\s*'+U+'?)(?=$|[\\s,，、;；+])','gi'),'$1$2');
- text.split(/[，,、;；\n+]+|\s+/).forEach(function(tok){tok=tok.trim();if(!tok)return;
-  var name=tok,q=null,u='',m=tok.match(new RegExp('^(.*?)(\\d+(?:\\.\\d+)?)\\s*('+U+')?$','i'));
-  if(m&&m[1]){name=m[1];q=+m[2];u=(m[3]||'').toLowerCase();}else{m=tok.match(new RegExp('^(\\d+(?:\\.\\d+)?)\\s*('+U+')?(.+)$','i'));if(m){q=+m[1];u=(m[2]||'').toLowerCase();name=m[3];}}
-  var ph=name.match(/^\u0001(\d+)\u0001$/),label=ph?cs[+ph[1]].name:name;
-  if(new RegExp('^(?:'+KCAL_UNITS+')$','i').test(u)){out.items.push({name:label,kcal:q,p:0,c:0,f:0,src:'quick',kcalOnly:true});return;}
-  var fav=!ph&&S.favFoods.find(function(x){return normName(x.food)===normName(name);});
-  if(fav&&(!u||u==='份')){var k=q||1;out.items.push({name:fav.food+(k!==1?' ×'+k:''),kcal:fav.kcal*k,p:fav.p*k,c:fav.c*k,f:fav.f*k,src:'custom'});return;}
-  var f=ph?cs[+ph[1]]:matchFood(name);
-  if(!f){if(q!=null&&!u&&q>=50&&name){out.items.push({name:name,kcal:q,p:0,c:0,f:0,src:'quick',kcalOnly:true});return;}out.miss.push(tok.replace(/\u0001(\d+)\u0001/,function(x,i){return cs[+i].name;}));return;}
-  var units=unitsOf(f),g,amt=q,unit=u||'';
-  if(u==='g'||u==='克'||u==='ml'||u==='毫升')g=q;else if(u==='kg')g=q*1000;
-  else if(u){if(units[u])g=q*units[u];else{out.miss.push(label+q+u+'（未知单位）');return;}}
-  else if(q!=null){var fu=Object.keys(units)[0];if(q>=10||!fu){g=q;unit='g';}else{g=q*units[fu];unit=fu;}}
-  else{var fu2=Object.keys(units)[0];g=fu2?units[fu2]:100;amt=fu2?1:100;unit=fu2||'g';}
-  if(unit==='克')unit='g';
-  var it=fromFood(f,g,amt,unit);it.name=f.custom?(f.name+(unit==='份'&&amt!==1?' ×'+amt:unit!=='份'?' '+Math.round(g)+'g':'')):it.name+' '+Math.round(g)+'g';out.items.push(it);});
- return out;}
+/* 17-ui-quick.js — 快速输入与一键操作 */
 function qPreview(inp,box){var v=$(inp).value.trim();if(!v){if(inp==='#qText')$(box).textContent='';else $(box).textContent='';return;}var r=parseQuick(v),k=0,p=0;r.items.forEach(function(i){k+=i.kcal;p+=i.p;});
  $(box).innerHTML=(r.items.length?'估算 '+Math.round(k)+' kcal · 蛋白 '+r1(p)+'g（'+r.items.map(function(i){return esc(i.name)+(i.kcalOnly?' 仅热量':'');}).join('、')+'）':'')+(r.miss.length?' <span style="color:var(--warn)">未识别：'+esc(r.miss.join('、'))+'</span>':'');}
 function quickAdd(inp,box){var r=parseQuick($(inp).value);if(!r.items.length){toast(r.miss.length?'未识别：'+r.miss.join('、'):'请输入内容');return;}var meal=/^diet/.test(cur)?dMeal():mealByHour();
@@ -2432,40 +2670,14 @@ function autoFill(){var ex=$('#wEx').value.trim(),p=ex&&lastSet(ex);if(!p){$('#w
 $('#wEx').addEventListener('change',autoFill);
 $('#dRepeat').onclick=repeatDiet;$('#wRepeat').onclick=repeatTrain;$('#sAll').onclick=suppAll;$('#slReuse').onclick=reuseSleep;
 
-/* ---------- 批量导入 CSV ---------- */
-var CSV_ALIAS={'日期':'date','餐次':'meal','食物':'food','热量':'kcal','蛋白质':'p','蛋白':'p','碳水':'c','脂肪':'f','动作':'exercise','组数':'sets','次数':'reps','重量':'weight','备注':'note','体重':'weight','体脂':'bf','腰围':'waist','静息心率':'rhr','入睡':'bed','起床':'wake','质量':'q','指标':'name','数值':'value','单位':'unit','下限':'lo','上限':'hi','时长':'min','层数':'floors','心率':'hr','泳姿':'stroke','距离':'dist','用时':'time','swolf':'swolf'};
-/** 类型识别顺序即优先级；cols 为模板列 */
-var CSV_TYPES=[['workouts','力量训练',['date','exercise','sets','reps','weight','rpe','note'],['exercise','sets','reps']],['meals','饮食',['date','meal','food','kcal','p','c','f'],['food']],['labs','化验',['date','name','value','unit','lo','hi','note'],['name','value']],
- ['sleep','睡眠',['date','bed','wake','q','note'],['bed','wake']],['swims','游泳',['date','stroke','dist','time','swolf','note'],['stroke','dist']],['cardio','爬楼',['date','min','floors','hr'],['min']],['body','身体指标',['date','weight','bf','waist','rhr'],[]]];
-function parseCSV(txt){txt=txt.replace(/^\ufeff/,'');var rows=[],row=[],f='',q=false;for(var i=0;i<txt.length;i++){var ch=txt[i];
- if(q){if(ch==='"'){if(txt[i+1]==='"'){f+='"';i++;}else q=false;}else f+=ch;}
- else if(ch==='"')q=true;else if(ch===','){row.push(f);f='';}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&txt[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f='';}else f+=ch;}
- if(f||row.length){row.push(f);rows.push(row);}return rows.filter(function(r){return r.some(function(c){return c.trim();});});}
-function normDate(s){var m=String(s||'').trim().match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);return m?m[1]+'-'+pad(+m[2])+'-'+pad(+m[3]):null;}
-function normTime(s){var m=String(s||'').trim().match(/^(\d{1,2}):(\d{2})/);return m?pad(+m[1])+':'+m[2]:null;}
-function importCSV(txt){var rows=parseCSV(txt);if(rows.length<2)throw new Error('至少需要表头和一行数据');
- var hd=rows[0].map(function(h){h=h.trim();return CSV_ALIAS[h]||h.toLowerCase();});
- var type=CSV_TYPES.find(function(t){return hd.indexOf('date')>=0&&t[3].every(function(c){return hd.indexOf(c)>=0;})&&(t[3].length||['weight','bf','waist','rhr'].some(function(c){return hd.indexOf(c)>=0;}));});
- if(!type)throw new Error('无法识别类型，请检查表头（需含 date 列）');
- var data=rows.slice(1).map(function(r){var o={};hd.forEach(function(h,i){o[h]=(r[i]||'').trim();});return o;}),ok=0,bad=0;
- if(!confirm('识别为「'+type[1]+'」，共 '+data.length+' 行，确定导入？'))return null;
- data.forEach(function(o){var d=normDate(o.date);if(!d){bad++;return;}var n=function(k){return num(o[k]);};
-  if(type[0]==='meals'){var p=n('p')||0,c=n('c')||0,f=n('f')||0,k=n('kcal');if(k==null)k=p*4+c*4+f*9;S.meals.push({id:uid(),date:d,meal:o.meal||'加餐',food:o.food,kcal:k,p:p,c:c,f:f});}
-  else if(type[0]==='workouts'){if(!n('sets')||!n('reps')){bad++;return;}S.workouts.push({id:uid(),date:d,exercise:o.exercise,sets:n('sets'),reps:n('reps'),weight:n('weight')||0,rpe:n('rpe'),note:o.note||'',wrist:false});}
-  else if(type[0]==='labs'){if(n('value')==null){bad++;return;}S.labs.push({id:uid(),date:d,name:o.name,value:n('value'),unit:o.unit||'',lo:n('lo'),hi:n('hi'),note:o.note||''});}
-  else if(type[0]==='sleep'){var b=normTime(o.bed),w=normTime(o.wake);if(!b||!w){bad++;return;}S.sleep=S.sleep.filter(function(x){return x.date!==d;});S.sleep.push({id:uid(),date:d,bed:b,wake:w,dur:sleepDur(b,w),q:n('q'),note:o.note||''});}
-  else if(type[0]==='swims'){if(!n('dist')){bad++;return;}S.swims.push({id:uid(),date:d,stroke:o.stroke,dist:n('dist'),sec:parseT(o.time),swolf:n('swolf'),note:o.note||''});}
-  else if(type[0]==='cardio'){if(!n('min')){bad++;return;}S.cardio.push({id:uid(),date:d,min:n('min'),floors:n('floors'),hr:n('hr')});}
-  else if(type[0]==='body'){var ob={weight:n('weight'),bf:n('bf'),waist:n('waist'),rhr:n('rhr')};if(ob.weight==null&&ob.bf==null&&ob.waist==null&&ob.rhr==null){bad++;return;}S.body=S.body.filter(function(x){return x.date!==d;});ob.id=uid();ob.date=d;S.body.push(ob);}
-  ok++;});
- save();return type[1]+'：导入 '+ok+' 行'+(bad?'，跳过 '+bad+' 行无效':'');}
+/* 18-ui-settings.js — 设置与备份 */
 function download(name,content,mime){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:mime}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
 $('#csvTpl').innerHTML='<span class="mut">下载模板：</span>'+CSV_TYPES.map(function(t,i){return'<button class="chip" data-csvtpl="'+i+'">'+t[1]+'</button>';}).join('');
 $('#csvBtn').onclick=function(){$('#csvFile').click();};
 $('#csvFile').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var m=importCSV(rd.result);if(m){toast(m);render();}}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
 
 /* ---------- 设置：个人配置 / 示例配置 / 自定义食物库 ---------- */
-function rSettings(){var pf=S.profile;$('#pfName').value=pf.name||'';$('#pfH').value=pf.height||'';$('#pfFlag').value=pf.injuryFlagLabel||'';
+function rSettings(){rStore();var pf=S.profile;$('#pfName').value=pf.name||'';$('#pfH').value=pf.height||'';$('#pfFlag').value=pf.injuryFlagLabel||'';
  $('#exList2').innerHTML=EXAMPLE_PROFILES.length?EXAMPLE_PROFILES.map(function(e,i){return'<li><div><b>'+esc(e.title)+'</b><div class="mut">'+esc(e._comment||'')+'</div></div><button class="ghost sm" data-applyex="'+i+'">加载</button></li>';}).join(''):'<li class="mut">无内置示例</li>';
  $('#cfInfo').textContent='内置 '+(FOOD_DB.foods||[]).length+' 项 · 自定义 '+(S.customFoods||[]).length+' 项';
  var g=S.goals;$('#gSl').value=g.sleepH;$('#gTd').value=g.trainDays;$('#gSt').value=g.stairMin;$('#gWt').value=g.weight!=null?g.weight:'';}
@@ -2484,14 +2696,47 @@ $('#cfFile').onchange=function(){var f=this.files[0];if(!f)return;var rd=new Fil
  save();toast('导入 '+ok.length+' 项'+(arr.length-ok.length?'，跳过 '+(arr.length-ok.length)+' 项无效':''));render();}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
 $('#cfClear').onclick=function(){if(confirm('清空自定义食物？')){S.customFoods=[];save();render();}};
 $('#g2Save').onclick=function(){var a=num($('#gSl').value),b=num($('#gTd').value),c=num($('#gSt').value);if(a)S.goals.sleepH=a;if(b)S.goals.trainDays=b;if(c)S.goals.stairMin=c;S.goals.weight=num($('#gWt').value);save();toast('已保存');};
-$('#exp').onclick=function(){var out={};for(var k in S)out[k]=S[k];out.aiConfig=aiExport();var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='freebody-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);toast(AIC.incKey&&AIC.key?'已导出（含 API Key，请妥善保管）':'已导出');};
 $('#impBtn').onclick=function(){$('#imp').click();};
 $('#exFile').onchange=function(){var f=this.files[0],inp=this;if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d||typeof d!=='object'||Array.isArray(d)||d.meals)throw new Error('不是配置文件（完整备份请用「数据备份」导入）');if(!d.title)d.title=f.name;applyExample(d);}catch(err){toast('读取失败：'+err.message);}inp.value='';};rd.readAsText(f);};
 $('#exFileBtn').onclick=function(){$('#exFile').click();};
 $('#imp').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d||typeof d!=='object'||!Array.isArray(d.meals)||!d.goals)throw new Error('格式不符');
  if(!confirm('导入将覆盖当前全部数据，确定？'))return;if(d.aiConfig){aiImport(d.aiConfig);}delete d.aiConfig;localStorage.setItem(KEY,JSON.stringify(d));S=load();applyTheme();applyTitle();toast('导入成功');render();}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
-$('#wipe').onclick=function(){if(confirm('确定清空全部数据（含本机保存的 API Key）？建议先导出备份。')&&confirm('再次确认：不可恢复')){localStorage.removeItem(KEY);localStorage.removeItem(AIKEY);AIC=aiLoad();S=load();save();toast('已清空');render();}};
+$('#wipe').onclick=function(){if(confirm('确定清空全部数据（含本机保存的 API Key）？建议先导出备份。')&&confirm('再次确认：不可恢复')){localStorage.removeItem(KEY);localStorage.removeItem(AIKEY);localStorage.removeItem(METAKEY);META={};STORE.used=0;STORE.banner=null;rStoreBanner();AIC=aiLoad();S=load();save();toast('已清空');render();}};
 
+/* ---------- 存储安全（v2.6）：提示条、导出、持久存储、状态 ---------- */
+/** 导出完整备份（JSON）；记录 lastBackup，关闭备份提醒 */
+function doExport(){var out={};for(var k in S)out[k]=S[k];out.aiConfig=aiExport();download('freebody-'+today()+'.json',JSON.stringify(out,null,2),'application/json');
+ META.lastBackup=today();delete META.snooze;metaSave();if(STORE.banner==='backup')STORE.banner=null;rStoreBanner();rStore();
+ toast(AIC.incKey&&AIC.key?'已导出（含 API Key，请妥善保管）':'已导出');}
+$('#exp').onclick=doExport;
+var ST_MSG={quota:['bad','存储空间已满，最近的修改没有保存','请立即导出备份。数据仍在当前页面中，导出后再清理旧记录或换用其他浏览器。'],
+ 90:['bad','本机存储已用约 90%','空间快满了，写满后新的记录将无法保存。请先导出备份。'],
+ 70:['warn','本机存储已用约 70%','建议导出一次备份，并留意存储用量。'],
+ backup:['warn','超过 30 天没有备份','数据只存在本机，清除浏览器数据或换设备时会丢失。建议现在导出一份备份。']};
+function storeAlert(kind){if(STORE.banner==='quota'&&kind!=='quota')return;STORE.banner=String(kind);rStoreBanner();if(kind==='quota'||kind===90)toast(ST_MSG[kind][1]);}
+function backupTitle(){var ref=META.lastBackup||META.firstUse,n=ref?diffDays(ref,today()):BACKUP_DAYS;return META.lastBackup?'已经 '+n+' 天没有备份':'已记录 '+n+' 天，还没有备份过';}
+function rStoreBanner(){var b=$('#stBanner');if(!b)return;var k=STORE.banner,m=k&&ST_MSG[k];if(!m){b.innerHTML='';return;}if(k==='backup')m=[m[0],backupTitle(),m[2]];
+ b.innerHTML='<div class="alert '+m[0]+' st-banner" role="'+(m[0]==='bad'?'alert':'status')+'">'+IC(m[0]==='bad'?'alert':'info')+'<div class="st-b-tx"><b>'+m[1]+'</b><span>'+m[2]+'</span></div><div class="st-b-act"><button class="sm" data-st="export">'+IC('download')+'立即导出</button>'+(k==='quota'?'':'<button class="ghost sm" data-st="later">'+(k==='backup'?'7 天后提醒':'知道了')+'</button>')+'</div></div>';
+ if(window.FitIcons)FitIcons.hydrate();}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-st]');if(!b)return;var a=b.getAttribute('data-st');
+ if(a==='export')doExport();else if(a==='later'){if(STORE.banner==='backup'){META.snooze=addDays(today(),7);metaSave();}STORE.banner=null;rStoreBanner();}
+ else if(a==='persist')storePersist(true);});
+/** 申请持久存储：ask=false 为启动时自动申请（Firefox 会弹权限框，改为手动）；结果显示在数据备份卡片 */
+function storePersist(ask){var ns=navigator.storage;if(!ns||!ns.persist||!ns.persisted){STORE.persist='na';rStore();return;}
+ ns.persisted().then(function(p){if(p){STORE.persist='on';rStore();return;}if(!ask&&/Firefox\//.test(navigator.userAgent)){STORE.persist='off';rStore();return;}
+  return ns.persist().then(function(g){STORE.persist=g?'on':'off';rStore();if(ask)toast(g?'已开启持久存储':'浏览器未授予持久存储，请定期导出备份');});}).catch(function(){STORE.persist='na';rStore();});}
+function fmtKB(n){var b=n*2;return b>=1048576?r1(b/1048576)+' MB':Math.max(1,Math.round(b/1024))+' KB';}
+function rStore(){var box=$('#stStatus');if(!box)return;if(!STORE.used){STORE.used=lsUsage(JSON.stringify(S));STORE.pct=quotaPct(STORE.used);}
+ var pc=STORE.pct,lvl=pc>=90?'bad':pc>=70?'warn':'ok',d=today(),lb=META.lastBackup,ago=lb?diffDays(lb,d):null,due=backupDue(META,d,hasUserData(S));
+ var ps={on:['ok','已开启','浏览器不会在空间紧张时自动清除本应用的数据'],off:['warn','未开启','空间紧张或长期未使用时，浏览器可能清除数据'],na:['mut','浏览器不支持','请定期导出备份']}[STORE.persist]||['mut','检查中…',''];
+ var ios=document.documentElement.classList.contains('ios'),sa=document.documentElement.classList.contains('standalone');
+ var h='<div class="st-row"><span class="st-k">'+IC('database')+'存储用量</span><span class="st-v">'+fmtKB(STORE.used)+' · 约 '+pc+'%</span></div><div class="st-meter '+lvl+'" role="progressbar" aria-label="存储用量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pc+'"><i style="width:'+Math.max(2,pc)+'%"></i></div>'
+  +'<div class="st-row"><span class="st-k">'+IC('lock')+'持久存储</span><span class="st-v '+ps[0]+'">'+(STORE.persist==='off'?'<button class="ghost sm st-ask" data-st="persist">申请开启</button>':'')+ps[1]+'</span></div>'+(ps[2]?'<p class="st-note">'+ps[2]+'</p>':'')
+  +'<div class="st-row"><span class="st-k">'+IC('download')+'上次备份</span><span class="st-v '+(due?'warn':lb?'':'mut')+'">'+(lb?lb+'（'+(ago?ago+' 天前':'今天')+'）':'还没有导出过')+'</span></div>'
+  +(due?'<p class="st-note">已超过 30 天，建议现在导出。</p>':'');
+ if(ios)h+='<p class="st-note">'+(sa?'主屏幕应用与 Safari 的数据彼此独立。':'在 Safari 中长期不打开，系统可能清除本站数据；添加到主屏幕后更稳定，但主屏幕应用与 Safari 的数据彼此独立，迁移前请先导出再导入。')+'</p>';
+ box.innerHTML=h;if(window.FitIcons)FitIcons.hydrate();}
+/* 19-ui-ai.js — 拍照识别（v2.4） */
 /* ---------- 拍照识别（v2.4）：模型 API 配置 / 照片压缩 / 识别 / 确认后记录 ----------
  * 配置单独存于 localStorage「freeBody_ai_v1」，不进入主数据 S；导出时默认去掉 key。
  * 所有服务商均走 OpenAI 兼容的 POST {baseUrl}/chat/completions，图片以 data URL 内联发送。
@@ -2598,7 +2843,6 @@ function aiItem(o){o.lib=aiMatch(o.name);o.useLib=!!o.lib;return o;}
 function aiPer(it){return it.useLib&&it.lib?per100(it.lib):it.est;}
 function aiEaten(it){return Math.max(0,Math.round((it.g||0)*(1-(it.left||0))));}
 function aiNut(it){var p=aiPer(it),r=aiEaten(it)/100;return{kcal:Math.round((p.kcal||0)*r),p:r1((p.p||0)*r),c:r1((p.c||0)*r),f:r1((p.f||0)*r)};}
-function mealOfHour(h){return h<10?'早餐':h<14?'午餐':h<17?'加餐':h<21?'晚餐':'加餐';}
 function openAI(){if(AI.phase!=='busy'){AI.phase='pick';AI.err=null;}show('dietAI',true);}
 $('#faPhoto').onclick=openAI;
 $('#dPhoto').onclick=function(){curMeal=null;openAI();};
@@ -2681,125 +2925,7 @@ $('#aiBox').addEventListener('click',function(e){var b=e.target.closest('[data-a
  else if(a==='again'){AI.phase='pick';AI.items=[];rDietAI();}
  else if(a==='rec')aiRecord();});
 
-/* ===== v2.5 导入包：AI 教练生成数据 → 本机预览 → 确认后合并（只在本机处理，不经过服务器）。格式见 docs/data-format.md ===== */
-var IMP={phase:'paste',text:'',pack:null,rows:[],err:null,undo:null,res:null,viaLink:false};
-var IMP_MAX_LINK=60000,IMP_MAX_TEXT=2097152,IMP_MAX_N=2000;
-var IMP_TYPES={meal:['饮食','diet'],workout:['训练','train'],supplement:['补剂','pill'],sleep:['睡眠','moon'],body:['身体','body'],note:['心得','note']};
-var IMP_MEAL={breakfast:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐'};
-var IMP_ST={'new':['新增','ok'],update:['更新','acc'],merge:['合并','acc'],same:['已存在','mut'],bad:['无效','bad']};
-var IMP_ID=/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/,IMP_D=/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,IMP_T=/^([01]\d|2[0-3]):[0-5]\d$/;
-function impErr(m){var e=new Error(m);e.imp=true;return e;}
-/* 数字字段：缺省返回 undefined；类型或范围不对抛出说明 */
-function impN(e,k,lo,hi,int){var v=e[k];if(v==null)return undefined;if(typeof v!=='number'||!isFinite(v))throw impErr(k+' 应为数字');if(v<lo||v>hi)throw impErr(k+' 超出范围 '+lo+'–'+hi);if(int&&v!==Math.round(v))throw impErr(k+' 应为整数');return v;}
-function impS(e,k,max,req){var v=e[k];if(v==null||v===''){if(req)throw impErr('缺少 '+k);return undefined;}if(typeof v!=='string')throw impErr(k+' 应为文本');v=v.trim();if(!v&&req)throw impErr('缺少 '+k);if(v.length>max)throw impErr(k+' 超过 '+max+' 字');return v;}
-function impFind(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].imp===id||arr[i].id===id)return arr[i];return null;}
-function impSame(a,b,keys){for(var i=0;i<keys.length;i++){var k=keys[i],x=a[k],y=b[k];if(x==null&&y==null)continue;if(JSON.stringify(x)!==JSON.stringify(y))return false;}return true;}
-function impKcal(n){return Math.round(n)+' kcal';}
-/** 单条：校验 + 规范化为 FreeBody 记录 + 与本机数据比对，返回预览行 */
-function impRow(e,seen,src){var row={type:e&&e.type,id:e&&e.id,date:e&&e.date,status:'bad',title:'',detail:'',tags:[]};
- try{
-  if(!e||typeof e!=='object'||Array.isArray(e))throw impErr('条目应为对象');
-  if(!IMP_TYPES[e.type])throw impErr('不支持的类型 '+(e.type==null?'(缺少 type)':String(e.type)));
-  if(typeof e.id!=='string'||!IMP_ID.test(e.id))throw impErr('id 缺失或格式不对（字母数字开头，可含 . _ : -，最长 64）');
-  if(seen[e.type+'|'+e.id])throw impErr('包内重复的 id');seen[e.type+'|'+e.id]=1;
-  if(typeof e.date!=='string'||!IMP_D.test(e.date))throw impErr('date 应为 YYYY-MM-DD');
-  var t=e.type,id=e.id,d=e.date,old,rec;
-  if(t==='meal'){
-   var nm=impS(e,'name',80,true),ml=e.meal==null?null:(IMP_MEAL[String(e.meal).toLowerCase()]||e.meal),tm=impS(e,'time',5);
-   if(tm&&!IMP_T.test(tm))throw impErr('time 应为 HH:MM');
-   if(ml==null&&tm)ml=mealOfHour(+tm.slice(0,2));if(MEALS.indexOf(ml)<0)throw impErr('meal 应为 早餐 / 午餐 / 晚餐 / 加餐');
-   var g=impN(e,'g',0,5000),k=impN(e,'kcal',0,10000);if(k==null)throw impErr('缺少 kcal');
-   var p=impN(e,'p',0,1000),c=impN(e,'c',0,2000),f=impN(e,'f',0,1000),fib=impN(e,'fib',0,300),na=impN(e,'na',0,50000),lo=impN(e,'lo',0,10000),hi=impN(e,'hi',0,10000);
-   if(e.estimated!=null&&typeof e.estimated!=='boolean')throw impErr('estimated 应为 true / false');
-   var disp=nm+(g&&!/\d\s*(g|克|ml|毫升)$/i.test(nm)?' '+Math.round(g)+'g':'');
-   rec={id:id,imp:id,date:d,meal:ml,food:disp,name:disp,kcal:r1(k),p:r1(p||0),c:r1(c||0),f:r1(f||0),src:'import',via:'import',est:!!e.estimated};
-   if(fib!=null)rec.fib=r1(fib);if(na!=null)rec.na=Math.round(na);if(lo!=null&&hi!=null&&hi>=lo){rec.lo=lo;rec.hi=hi;}
-   if(g){rec.g=r1(g);rec.amount=r1(g);rec.unit='g';var q=100/g;rec.nutrimentsPer100g={kcal:r1(k*q),p:r1((p||0)*q),c:r1((c||0)*q),f:r1((f||0)*q)};}
-   var nt=impS(e,'note',200);if(nt)rec.note=nt;
-   row.title=ml+' · '+disp;row.detail=impKcal(k)+' · 蛋白 '+r1(p||0)+' · 碳水 '+r1(c||0)+' · 脂肪 '+r1(f||0)+' g';if(rec.est)row.tags.push('估算');
-   old=impFind(S.meals,id);row.recs=[rec];row.old=old;row.status=!old?'new':impSame(old,rec,['date','meal','name','kcal','p','c','f','g','est','fib','na','note'])?'same':'update';
-  }else if(t==='workout'){
-   var ex=impS(e,'exercise',60,true);if(!Array.isArray(e.sets)||!e.sets.length)throw impErr('sets 应为非空数组');if(e.sets.length>50)throw impErr('sets 最多 50 组');
-   if(e.flag!=null&&typeof e.flag!=='boolean')throw impErr('flag 应为 true / false');var wn=impS(e,'note',200)||'';
-   rec=e.sets.map(function(s,i){if(!s||typeof s!=='object')throw impErr('第 '+(i+1)+' 组格式不对');var r=impN(s,'reps',0,500,true);if(r==null)throw impErr('第 '+(i+1)+' 组缺少 reps');
-    var w=impN(s,'weight',0,1000)||0,ri=impN(s,'rir',0,10);return{id:id+'#'+(i+1),imp:id,date:d,exercise:ex,sets:1,reps:r,weight:w,rir:ri==null?null:ri,rpe:ri==null?null:10-ri,note:impS(s,'note',100)||wn,wrist:!!e.flag,via:'import'};});
-   var grp={};rec.forEach(function(x){var k2=x.reps+'×'+(x.weight?x.weight+'kg':'自重');grp[k2]=(grp[k2]||0)+1;});
-   var ks=Object.keys(grp);row.title=ex;row.detail=rec.length+' 组 · '+ks.map(function(k2){return k2.replace('×',' 次 × ')+(grp[k2]>1?' ×'+grp[k2]:'');}).join('，')+(rec[0].rir!=null?' · RIR '+rec.map(function(x){return x.rir==null?'-':x.rir;}).join('/'):'');if(e.flag)row.tags.push(S.profile.injuryFlagLabel||'伤处不适');
-   old=S.workouts.filter(function(w){return w.imp===id;});row.recs=rec;row.old=old;
-   row.status=!old.length?'new':old.length===rec.length&&rec.every(function(x,i){return impSame(old[i],x,['date','exercise','reps','weight','rir','wrist','note']);})?'same':'update';
-  }else if(t==='supplement'){
-   var sn=impS(e,'name',40,true),ds=impS(e,'dose',40),at=impS(e,'time',5);if(at&&!IMP_T.test(at))throw impErr('time 应为 HH:MM');
-   var sp=S.supps.find(function(x){return x.name.trim().toLowerCase()===sn.toLowerCase();}),lg=sp&&S.suppLog[d]&&S.suppLog[d][sp.id];
-   row.title=sn+(ds?' '+ds:'');row.detail=(at?'打卡 '+at:'打卡')+(sp?'':' · 将新增到补剂清单');row.recs=[{name:sn,dose:ds||'',at:at||'',imp:id,date:d}];
-   row.status=!lg?'new':(!at||lg.at===at)?'same':'update';
-  }else if(t==='sleep'){
-   var bd=impS(e,'bed',5,true),wk=impS(e,'wake',5,true);if(!IMP_T.test(bd)||!IMP_T.test(wk))throw impErr('bed / wake 应为 HH:MM');
-   var qq=impN(e,'q',1,5,true),sn2=impS(e,'note',200);
-   old=impFind(S.sleep,id)||S.sleep.find(function(x){return x.date===d;});
-   rec={date:d,bed:bd,wake:wk,dur:sleepDur(bd,wk)};rec.q=qq!=null?qq:old?old.q:null;rec.note=sn2!=null?sn2:old?old.note||'':'';
-   row.title='睡眠 '+bd+'–'+wk;row.detail=r1(rec.dur)+' 小时'+(rec.q?' · 质量 '+rec.q+'/5':'');row.recs=[rec];row.old=old;
-   row.status=!old?'new':impSame(old,rec,['date','bed','wake','q','note'])?'same':(old.imp===id||old.id===id)?'update':'merge';
-  }else if(t==='body'){
-   var bo={weight:impN(e,'weight',20,400),bf:impN(e,'bf',2,75),waist:impN(e,'waist',30,250),rhr:impN(e,'rhr',20,220,true)};
-   if(bo.weight==null&&bo.bf==null&&bo.waist==null&&bo.rhr==null)throw impErr('weight / bf / waist / rhr 至少填一项');
-   old=impFind(S.body,id)||S.body.find(function(x){return x.date===d;});rec={date:d};['weight','bf','waist','rhr'].forEach(function(k2){rec[k2]=bo[k2]!=null?bo[k2]:old&&old[k2]!=null?old[k2]:null;});
-   row.title='身体指标';row.detail=[['weight','体重 ',' kg'],['bf','体脂 ','%'],['waist','腰围 ',' cm'],['rhr','静息心率 ',' bpm']].filter(function(x){return bo[x[0]]!=null;}).map(function(x){return x[1]+bo[x[0]]+x[2];}).join(' · ');row.recs=[rec];row.old=old;
-   row.status=!old?'new':impSame(old,rec,['weight','bf','waist','rhr'])?'same':(old.imp===id||old.id===id)?'update':'merge';
-  }else if(t==='note'){
-   var tx=impS(e,'text',2000,true),ti=impS(e,'title',60),tg=e.tags==null?[]:e.tags;
-   if(!Array.isArray(tg)||tg.length>10||tg.some(function(x){return typeof x!=='string'||!x.trim()||x.length>20;}))throw impErr('tags 应为最多 10 个、每个不超过 20 字的文本');
-   rec={id:id,imp:id,date:d,title:ti||'',text:tx,tags:tg.map(function(x){return x.trim();}),from:src||''};
-   row.title=ti||'心得';row.detail=tx.length>60?tx.slice(0,60)+'…':tx;old=impFind(S.notes,id);row.recs=[rec];row.old=old;
-   row.status=!old?'new':impSame(old,rec,['date','title','text','tags'])?'same':'update';
-  }
- }catch(x){if(!x.imp)throw x;row.status='bad';row.reason=x.message;if(!row.title)row.title=IMP_TYPES[row.type]?IMP_TYPES[row.type][0]:'未知条目';}
- return row;}
-/** 解析整包（对象）；包级错误抛出 */
-function impPlan(pk){
- if(Array.isArray(pk))pk={freebody:'import',version:1,entries:pk};
- if(!pk||typeof pk!=='object')throw impErr('内容不是 FreeBody 导入包');
- if(pk.freebody!=='import'){if(pk.v===1&&(pk.meals||pk.workouts))throw impErr('这是完整备份文件，请用「导入 JSON」恢复备份。');throw impErr('缺少 "freebody": "import"，不是 FreeBody 导入包');}
- if(pk.version!==1)throw impErr(typeof pk.version==='number'&&pk.version>1?'导入包版本 '+pk.version+' 较新，请先更新 FreeBody':'version 应为 1');
- if(!Array.isArray(pk.entries)||!pk.entries.length)throw impErr('entries 为空');
- if(pk.entries.length>IMP_MAX_N)throw impErr('一次最多导入 '+IMP_MAX_N+' 条，请拆分');
- var seen={},src=typeof pk.source==='string'?pk.source.slice(0,60):'';
- return pk.entries.map(function(e){return impRow(e,seen,src);});}
-function impStrip(t){t=String(t||'').trim();var m=/^```[a-z]*\s*([\s\S]*?)\s*```$/i.exec(t);if(m)t=m[1].trim();return t;}
-function impB64(s){s=s.replace(/-/g,'+').replace(/_/g,'/').replace(/\s/g,'');if(/[^A-Za-z0-9+/=]/.test(s))throw impErr('链接中含有无效字符');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
-var IMP_CUT='链接内容不完整，可能在转发时被截断。请让 AI 改为输出 JSON，然后用「粘贴导入」。';
-/** 链接载荷 → JSON 文本（Promise）。z. 前缀 = deflate-raw 压缩；否则为未压缩 UTF-8 JSON 的 base64url */
-function impDecode(s){return new Promise(function(res,rej){
- try{s=decodeURIComponent(s);}catch(e){}
- if(s.length>IMP_MAX_LINK)return rej(impErr('链接过长（'+s.length+' 字符），请让 AI 输出 JSON，改用「粘贴导入」。'));
- var z=s.slice(0,2)==='z.',u;try{u=impB64(z?s.slice(2):s);}catch(e){return rej(impErr(IMP_CUT));}
- var txt=function(b){try{res(new TextDecoder('utf-8',{fatal:true}).decode(b));}catch(e){rej(impErr(IMP_CUT));}};
- if(!z)return txt(u);
- if(typeof DecompressionStream==='undefined')return rej(impErr('当前浏览器不支持压缩链接，请让 AI 输出 JSON，改用「粘贴导入」。'));
- try{new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(ab){txt(new Uint8Array(ab));},function(){rej(impErr(IMP_CUT));});}catch(e){rej(impErr(IMP_CUT));}});}
-function impLinkPart(t){var m=/#import=([^\s]+)/.exec(t);return m?m[1]:null;}
-/** 文本 / 链接 → 预览 */
-function impLoad(t,viaLink){IMP.err=null;IMP.viaLink=!!viaLink;
- var lp=viaLink?t:impLinkPart(t);
- var go=function(json){var pk;if(json.length>IMP_MAX_TEXT){IMP.err='内容过大（超过 2 MB），请拆分后再导入。';return impShow();}
-  try{pk=JSON.parse(impStrip(json));}catch(e){IMP.err=(lp?IMP_CUT:'不是有效的 JSON：'+e.message);return impShow();}
-  try{IMP.rows=impPlan(pk);IMP.pack=pk;IMP.phase='preview';}catch(e){if(!e.imp)throw e;IMP.err=e.message;}impShow();};
- if(lp)impDecode(lp).then(go,function(e){IMP.err=e.message;impShow();});else go(t);}
-function impShow(){if(IMP.err&&IMP.viaLink)IMP.phase='paste';if(cur!=='impPack')show('impPack',true);else rImp();}
-function impCount(){var c={'new':0,update:0,merge:0,same:0,bad:0};IMP.rows.forEach(function(r){c[r.status]++;});return c;}
-/** 写入：逐条按预览时的判断合并；写前保存快照，可撤销 */
-function impApply(){var rows=IMP.rows.filter(function(r){return r.status==='new'||r.status==='update'||r.status==='merge';});if(!rows.length)return;
- IMP.undo=JSON.stringify(S);
- rows.forEach(function(r){var rec=r.recs[0],i;
-  if(r.type==='meal'){i=S.meals.indexOf(r.old);if(i>=0)S.meals[i]=rec;else S.meals.push(rec);}
-  else if(r.type==='workout'){S.workouts=S.workouts.filter(function(w){return w.imp!==r.id;});r.recs.forEach(function(x){S.workouts.push(x);});}
-  else if(r.type==='supplement'){var sp=S.supps.find(function(x){return x.name.trim().toLowerCase()===rec.name.toLowerCase();});if(!sp){sp={id:uid(),name:rec.name,dose:rec.dose,time:''};S.supps.push(sp);}
-   var L=S.suppLog[rec.date]||(S.suppLog[rec.date]={}),n=new Date();L[sp.id]={at:rec.at||(L[sp.id]&&L[sp.id].at)||pad(n.getHours())+':'+pad(n.getMinutes()),imp:r.id};}
-  else if(r.type==='sleep'||r.type==='body'){var arr=S[r.type];if(r.old){for(var k in rec)r.old[k]=rec[k];r.old.imp=r.old.imp||r.id;}else{rec.id=r.id;rec.imp=r.id;arr.push(rec);}}
-  else if(r.type==='note'){i=S.notes.indexOf(r.old);if(i>=0)S.notes[i]=rec;else S.notes.push(rec);}});
- save();var c=impCount();IMP.res={n:rows.length,c:c,dates:rows.map(function(r){return r.date;}).sort()};IMP.phase='done';impClearHash();toast('已导入 '+rows.length+' 条');rImp();}
-function impClearHash(){if(/^#import=/.test(location.hash))try{history.replaceState(null,'',location.pathname+location.search);}catch(e){location.hash='';}}
-function impReset(){IMP.phase='paste';IMP.rows=[];IMP.pack=null;IMP.err=null;IMP.res=null;IMP.viaLink=false;}
-function impWd(d){var x=new Date(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10));return(+d.slice(5,7))+'月'+(+d.slice(8,10))+'日 '+DT_WD[x.getDay()]+(d===today()?' · 今天':'');}
+/* 20-ui-import.js — 导入预览页与心得 */
 function rImp(){var h='',b=$('#impBox');if(!b)return;SEC_LABEL.impPack=IMP.phase==='preview'?'导入预览':IMP.phase==='done'?'导入完成':'粘贴导入';var snt=document.querySelector('#subnav .sn-t');if(snt&&cur==='impPack')snt.textContent=SEC_LABEL.impPack;
  if(IMP.phase==='paste'){
   h+='<div class="card"><h2>粘贴导入</h2><p class="mut">粘贴 AI 教练生成的 FreeBody 导入包（JSON），或包含 <code>#import=</code> 的导入链接。内容只在本机解析，不经过任何服务器；确认前不会写入。</p>'+
@@ -2839,6 +2965,7 @@ function rNotes(){var L=S.notes.slice().sort(function(a,b){return a.date<b.date?
 $('#ntSave').onclick=function(){var t=$('#ntText').value.trim();if(!t){toast('请先写点内容');return;}S.notes.push({id:uid(),date:sel,title:'',text:t.slice(0,2000),tags:[]});$('#ntText').value='';save();toast('已保存');render();};
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-delnote]');if(!b)return;if(!confirm('删除这条心得？'))return;var a=b.getAttribute('data-delnote');S.notes=S.notes.filter(function(x){return x.id!==a;});save();render();});
 
+/* 90-boot.js — 全局事件、启动、可访问性、日期输入、快捷键、PWA、调试钩子 */
 /* 通用点击：删除/模板 */
 document.addEventListener('click',function(e){var t=e.target.closest('button,input[type=checkbox]');if(!t)return;var a;
  if((a=t.getAttribute('data-delmeal'))){S.meals=S.meals.filter(function(x){return x.id!==a;});}
@@ -2884,6 +3011,10 @@ if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener
 if(window.FitIcons)FitIcons.hydrate();
 if(S.active)setTimeout(tickRest,0);
 applyTheme();applyTitle();show('overview');
+/* 存储安全（v2.6）：启动时申请持久存储、检查备份提醒与用量 */
+(function(){STORE.used=lsUsage(JSON.stringify(S));STORE.pct=quotaPct(STORE.used);if(!META.firstUse&&hasUserData(S)){META.firstUse=firstDataDate(S)||today();metaSave();}
+ var w=META.warned||(META.warned={}),lv=quotaLevel(STORE.pct,w);if(lv){metaSave();storeAlert(lv);}else if(backupDue(META,today(),hasUserData(S)))storeAlert('backup');
+ storePersist(false);})();
 /* ---------- 多端：主题色 / 键盘 / 可访问性 / 尺寸变化 / PWA ---------- */
 /** 浏览器 UI 颜色跟随当前主题（手动切换时覆盖媒体查询） */
 function syncThemeColor(){var ms=document.querySelectorAll('meta[name=theme-color]'),c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#f6f5f1';Array.prototype.forEach.call(ms,function(m){if((S.theme||'auto')==='auto')m.setAttribute('content',m.getAttribute('media')&&/dark/.test(m.getAttribute('media'))?'#0b0c0f':'#f5f5f7');else m.setAttribute('content',c);});}
@@ -2947,7 +3078,7 @@ document.addEventListener('keydown',function(e){var t=e.target;
 (function(){var tm,w=window.innerWidth;window.addEventListener('resize',function(){clearTimeout(tm);tm=setTimeout(function(){if(Math.abs(window.innerWidth-w)>40){w=window.innerWidth;render();}},200);});})();
 /** PWA：仅在 http(s) 下启用 manifest 与 service worker；file:// 直接打开时静默跳过（单文件用法不受影响） */
 (function(){var web=/^https?:$/.test(location.protocol);if(!web)return;
- var l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);
+ if(window.__fbPwaMeta!==false){var l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);}
  if(!('serviceWorker' in navigator))return;
  var btn=$('#swUpd'),reloading=false;
  function offer(w){if(!w)return;btn.hidden=false;btn.onclick=function(){btn.textContent='正在更新…';w.postMessage('skipWaiting');};}

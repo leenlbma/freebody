@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.5.2-2148b8" alt="version 2.5.2">
+<img src="https://img.shields.io/badge/version-2.6.0-2148b8" alt="version 2.6.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -105,18 +105,21 @@ Every chart is dependency-free inline SVG. Tap any point to read its value, and 
 
 **Add it to your home screen.** FreeBody is a progressive web app (PWA). Open it once over https, from the link above or your own server, and you can install it like a native app and use it offline. Your data stays in the browser's localStorage either way.
 
-- **iPhone / iPad (Safari):** open the site, tap Share, choose Add to Home Screen, then Add. It then launches full screen without the address bar. On iOS the home-screen app and Safari keep separate storage. To move your data, export JSON under 我的 › 数据备份 (Me › Backup) and import it on the other side.
+- **iPhone / iPad (Safari):** open the site, tap Share, choose Add to Home Screen, then Add. It then launches in its own window without the address bar.
+  - **Note: once added to the home screen, its data is stored separately from Safari.** The home-screen app starts empty and cannot see what you recorded in Safari. If you have already logged data in Safari, first export it there under 我的 › 数据备份 (Me › Backup) with 导出 JSON (Export JSON), then use 导入 JSON (Import JSON) in the same place in the home-screen app. After that, keep recording in one place.
+  - If the home-screen app shows an empty strip at the bottom and the navigation bar does not sit on the bottom edge, delete the icon and add it again. v2.6.0 fixes this layout issue on iOS 26, but an old icon may keep the old configuration.
 - **Android (Chrome / Edge):** open the site, then choose Install app or Add to Home screen from the menu. Some browsers also offer it in a banner.
 - **Desktop (Chrome / Edge):** use the install icon at the right of the address bar, or the menu entry for installing the page as an app. It then runs in its own window and can be pinned to the taskbar or Dock.
 
 **Updates.** When a new version is published, a "有新版本，点此刷新" (new version, tap to refresh) bar appears at the bottom. Tap it to switch, or ignore it to keep the current version.
 
-**Build locally.** You need Node.js 14 or later; there are no dependencies.
+**Build locally.** You need Node.js 18 or later; there are no dependencies.
 
 ```bash
 git clone https://github.com/leenlbma/freebody.git && cd freebody
 npm run build    # writes index.html and sw.js at the repository root
 npm run check    # syntax, emoji, placeholders, food library and import-pack schema
+npm test         # unit tests for the core calculations (node:test)
 ```
 
 You can also download `index.html` and open it directly. Over `file://` there is no offline cache and no update prompt, but everything else works.
@@ -158,8 +161,10 @@ The repository includes `.github/workflows/pages.yml`. Every push to `main` buil
 - **Data stays on your device.** Every record lives in your browser's localStorage under the key `freeBody_v1`, and nothing is uploaded. Data from the old `fitTracker_v1` key is migrated automatically, and old backups import as they are.
 - **Your API key stays on your device.** The photo-recognition key is stored locally and separately, under `freeBody_ai_v1`. Backups leave it out **by default**; you can opt in, but we don't recommend it.
 - **Imports are processed locally.** Both paste import and link import (`#import=`) are parsed in the browser. Browsers never send anything after `#` to a server, and nothing is written until you confirm.
-- **The only network request is one you start yourself:** photo recognition or a connection test. These send a compressed photo to the provider you chose, under that provider's privacy policy. FreeBody does not keep the photo. Without a key, the app makes no network requests at all.
-- **Back up regularly.** Clearing browser data or switching devices loses your records, so export JSON from 我的 › 数据备份 (Me › Backup) now and then. Backups contain personal health information: keep them safe and never commit them to a repository.
+- **Photo recognition goes online only after you enter a model key.** Without a key, FreeBody makes no network requests: taking or choosing a photo stays on the device, and the recognition screen points you to manual logging. With a key, a request is sent only when you tap recognise or test the connection. The compressed photo (or the test request) then goes straight from your browser to the provider you chose, never through a FreeBody server, under that provider's privacy policy. FreeBody does not keep the photo.
+- Apart from that, loading the page and updating the offline cache (service worker) only contact the address FreeBody is served from, and carry none of your data.
+- **Storage safety.** Clearing browser data or switching devices loses your records. At startup FreeBody asks for persistent storage (`navigator.storage.persist()`). It warns once when local storage reaches about 70% and once at 90%. If a save fails because storage is full, it tells you straight away and offers an export. It also reminds you 30 days after your last backup (you can snooze for 7 days). All of this is shown under 我的 › 数据备份 (Me › Backup). Reminder state and the last backup date are kept in `freeBody_meta_v1`, which holds none of your records.
+- **Back up regularly.** Backups contain personal health information: keep them safe and never commit them to a repository.
 
 ## Photo recognition setup
 
@@ -242,7 +247,9 @@ freebody/
 │   ├── styles.css             # styles; light and dark themes via CSS variables
 │   ├── icons.js               # inline SVG line icons
 │   ├── charts.js              # dependency-free SVG charts
-│   ├── app.js                 # application logic, sectioned by feature
+│   ├── app/                   # application modules, concatenated in file-name order into one IIFE at build time
+│   │   ├── 00-core.js … 04-import.js   # state, storage, utilities, core calculations, import merge (no DOM; unit-tested)
+│   │   └── 10-ui-*.js … 90-boot.js     # page UI and startup
 │   └── sw.template.js         # service worker template
 ├── data/foods.json            # food library (322 entries, each with a ref)
 ├── examples/                  # generic sample profile and sample import packs (import/); no real data
@@ -250,6 +257,7 @@ freebody/
 ├── skills/freebody-coach/     # generic Agent Skill for producing packs and links (with PROMPT.md, make_link.py)
 ├── scripts/build.js           # inlining build + sw.js generation
 ├── scripts/check.js           # syntax, emoji, food library and import-pack schema checks
+├── tests/                     # node:test unit tests (calculations, progression, import merge, storage warnings)
 ├── scripts/gen-foods.js       # food library generator (ingredient values + recipes → foods.json)
 ├── docs/                      # data format, data model, food library, CSV import, screenshots
 ├── LICENSE                    # MIT

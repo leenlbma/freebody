@@ -6,10 +6,19 @@
 <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101113" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FreeBody">
+<script>
+/* 主屏幕模式（v2.6）：iOS 26 起，页面声明 manifest 或 black-translucent 状态栏时，主屏幕应用走旧的布局路径，
+   窗口下方会空出一条与状态栏等高、无法绘制的黑条（页面内无法探测或修复）。因此 iOS 26+ 不声明这些项，
+   由系统默认以 Web App 打开、状态栏不透明；旧版 iOS 与其他平台保持原有的沉浸式与可安装声明。 */
+(function(){var d=document,h=d.documentElement,ua=navigator.userAgent,
+ ios=/iP(hone|ad|od)/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1),
+ cs=window.CSS&&CSS.supports,ios26=ios&&!!(cs&&(CSS.supports('animation-timeline','scroll()')||CSS.supports('anchor-name','--a')));
+ window.__fbPwaMeta=!ios26;if(ios)h.classList.add('ios');
+ if(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))h.classList.add('standalone');
+ if(ios26)return;var m=[['mobile-web-app-capable','yes']];
+ if(ios)m.push(['apple-mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','black-translucent'],['apple-mobile-web-app-title','FreeBody']);
+ m.forEach(function(x){var e=d.createElement('meta');e.name=x[0];e.content=x[1];d.head.appendChild(e);});})();
+</script>
 <meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>FreeBody</title>
@@ -35,6 +44,7 @@
 </header>
 
 <main>
+<div id="stBanner" aria-live="polite"></div>
 <div class="subnav" id="subnav"></div>
 <!-- 总览 -->
 <section id="overview" data-lay="fixed" class="on">
@@ -464,7 +474,8 @@
  </details>
  <div class="card"><h2>数据备份</h2>
   <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
-  <div class="actions"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
+  <div class="st-status" id="stStatus"></div>
+  <div class="actions bk-act"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card mut" style="font-size:12px">FreeBody · 数据只存本机 · 不构成医疗建议</div>

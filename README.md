@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.5.2-2148b8" alt="version 2.5.2">
+<img src="https://img.shields.io/badge/version-2.6.0-2148b8" alt="version 2.6.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -87,18 +87,21 @@ v2.4 起可选拍照识别：拍一张，或吃前、吃后各拍一张，模型
 
 FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pages 链接或你自己的服务器）打开一次后，即可离线使用，并可像 App 一样安装。数据仍只保存在本机浏览器的 localStorage 中，安装与否不影响数据。
 
-- **iPhone / iPad（Safari）**：打开网址 → 点底部「分享」按钮 → 选择「添加到主屏幕」→「添加」。之后从主屏幕图标启动为全屏、无地址栏。注意 iOS 上主屏幕应用与 Safari 的存储彼此独立，迁移数据请先在「我的 → 数据」导出 JSON 再导入。
+- **iPhone / iPad（Safari）**：打开网址 → 点底部「分享」按钮 → 选择「添加到主屏幕」→「添加」。之后从主屏幕图标以独立窗口启动、无地址栏。
+  - **注意：添加到主屏幕后，数据与 Safari 分开存储。**主屏幕应用打开时是空的，看不到你在 Safari 里记过的数据。如果已经在 Safari 里记录过，请先在 Safari 中打开「我的 › 数据备份」→「导出 JSON」，再到主屏幕应用的同一位置「导入 JSON」。之后固定在一处记录即可。
+  - 如果主屏幕应用底部出现空白条、导航没有贴住屏幕底边，请删除主屏幕图标后重新添加（v2.6.0 修复了 iOS 26 上的布局问题，旧图标可能仍沿用旧配置）。
 - **Android（Chrome / Edge）**：打开网址 → 右上角菜单 →「安装应用」或「添加到主屏幕」。部分浏览器会在底部自动弹出安装提示。
 - **电脑（Chrome / Edge）**：打开网址 → 地址栏右侧的「安装」图标（或菜单 →「投放、保存和分享 → 将页面作为应用安装」）。安装后在独立窗口运行，可固定到任务栏 / 程序坞。
 
 **更新**：发布新版本后，再次打开时页面底部会出现「有新版本，点此刷新」，点一下即切换到新版本；不点则继续使用当前版本。
 
-**本地构建**　需要 Node.js ≥ 14，无第三方依赖。
+**本地构建**　需要 Node.js ≥ 18，无第三方依赖。
 
 ```bash
 git clone https://github.com/leenlbma/freebody.git && cd freebody
 npm run build    # 生成根目录 index.html 与 sw.js
 npm run check    # 语法、emoji、占位符、食物库、导入包 schema 校验
+npm test         # 核心计算单元测试（node:test）
 ```
 
 也可以只下载 `index.html` 直接用浏览器打开（`file://` 下没有离线缓存与更新提示，其余功能照常）。
@@ -124,11 +127,12 @@ npm run check    # 语法、emoji、占位符、食物库、导入包 schema 校
 2. Settings → Pages → Build and deployment → Source 选择 **GitHub Actions**（或 `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow`）。
 3. 在 Actions 里运行一次「Deploy to GitHub Pages」（或推送任意提交），完成后访问 `https://<owner>.github.io/<repo>/`。
 
-**从源码构建**（需 Node.js ≥ 14，无第三方依赖）：
+**从源码构建**（需 Node.js ≥ 18，无第三方依赖）：
 
 ```bash
 npm run build    # 或 node scripts/build.js  → 生成根目录 index.html
 npm run check    # 或 node scripts/check.js  → 语法自检
+npm test         # 或 node --test tests/     → 单元测试
 ```
 
 </details>
@@ -138,8 +142,10 @@ npm run check    # 或 node scripts/check.js  → 语法自检
 - **数据只存本地**：所有记录只保存在本机浏览器的 localStorage（键名 `freeBody_v1`），不上传任何服务器。旧版 `fitTracker_v1` 数据会自动迁移，旧备份可直接导入。
 - **Key 只存本地**：拍照识别的 API Key 单独保存在本机（`freeBody_ai_v1`），导出备份时**默认不包含 Key**（可在设置中勾选包含，不推荐）。
 - **导入只在本机处理**：粘贴导入与链接导入（`#import=`）都在浏览器中解析，`#` 之后的内容不会发送给任何服务器，确认前不写入。
-- **唯一的网络请求**是你主动发起的拍照识别或测试连接：压缩后的照片会发送给你所选的服务商，并受其隐私政策约束。FreeBody 不保存照片。不配置 Key 时应用不发起任何网络请求。
-- 清除浏览器数据或换设备会丢失记录，请定期在「我的 › 数据备份」导出 JSON。备份含个人健康信息，请妥善保管，不要提交到仓库。
+- **拍照识别只有在你填写模型 Key 之后才会联网**。没有填写 Key 时，FreeBody 不发起任何网络请求：拍照、选图都只在本机处理，识别入口会引导你手动记录。填写 Key 后，只有你主动点「识别」或「测试连接」时，压缩后的照片（或测试请求）才会直接从浏览器发送到你所选的服务商，不经过 FreeBody 的任何服务器，并受该服务商的隐私政策约束。FreeBody 不保存照片。
+- 除此之外，打开网页、离线缓存更新（Service Worker）只会访问 FreeBody 自身所在的网址，不包含你的任何数据。
+- **存储安全**：清除浏览器数据或换设备会丢失记录。FreeBody 会在启动时申请持久存储（`navigator.storage.persist()`），本机存储用到约 70% 和 90% 时各提醒一次，写满导致保存失败时立即提示并提供导出；距上次备份满 30 天会提醒（可推迟 7 天）。这些状态都显示在「我的 › 数据备份」。提醒状态与上次备份日期保存在 `freeBody_meta_v1`，不含记录内容。
+- 备份含个人健康信息，请妥善保管，不要提交到仓库。
 
 ## AI 识别配置说明
 
@@ -216,7 +222,9 @@ freebody/
 │   ├── styles.css             # 样式（CSS 变量实现深浅色主题）
 │   ├── icons.js               # 内联 SVG 线条图标
 │   ├── charts.js              # 零依赖 SVG 图表库
-│   ├── app.js                 # 应用逻辑（按板块分节注释）
+│   ├── app/                   # 应用逻辑模块，构建时按文件名顺序合并进一个 IIFE
+│   │   ├── 00-core.js … 04-import.js   # 状态、存储、工具函数、核心计算、导入合并（不依赖 DOM，可单测）
+│   │   └── 10-ui-*.js … 90-boot.js     # 各页面界面与启动
 │   └── sw.template.js         # Service Worker 模板
 ├── data/foods.json            # 食物营养库（322 项，每条带 ref 来源）
 ├── examples/                  # 通用示例配置（profile-sample.json）与导入包示例（import/），不含真实数据
@@ -224,6 +232,7 @@ freebody/
 ├── skills/freebody-coach/     # 通用 Agent Skill：教 AI 生成导入包与链接（含 PROMPT.md、make_link.py）
 ├── scripts/build.js           # 内联构建 + 生成 sw.js
 ├── scripts/check.js           # 语法 / emoji / 食物库 / 导入包 schema 校验
+├── tests/                     # node:test 单元测试（核心计算、进阶规则、导入合并、存储预警）
 ├── scripts/gen-foods.js       # 食物库生成（原料值 + 自拟配方 → foods.json）
 ├── docs/                      # 数据格式、数据结构、食物库扩展、CSV 导入、截图
 ├── LICENSE                    # MIT

@@ -41,7 +41,7 @@ OpenNutriTracker（GPL-3.0）
 人体肌群图
 ----------------------------------------------------------------------
 
-src/app.js 中的正/背面人体肌群热图（BODY_SIL / FRONT / BACK）为本项目
+src/app/16-ui-session.js 中的正/背面人体肌群热图（BODY_SIL / FRONT / BACK）为本项目
 自行绘制的简化 SVG，以 MIT 许可证随本项目发布；
 未使用 MuscleMap（melihcolpan/MuscleMap，MIT）或其衍生文件中的路径数据。
 

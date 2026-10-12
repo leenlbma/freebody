@@ -44,18 +44,34 @@ const examples = fs.existsSync(exDir)
       .map((n) => JSON.parse(fs.readFileSync(path.join(exDir, n), 'utf8')))
   : [];
 
-// 3) 内联：样式、数据、图标、图表库、应用脚本依次注入模板（JSON 中的 "</" 转义，避免提前闭合 <script>）
+// 3) 应用脚本：src/app/*.js 按文件名顺序拼接，包在同一个 IIFE 中（模块共享作用域，顺序即执行顺序）
+const appDir = path.join(root, 'src', 'app');
+const appFiles = fs.readdirSync(appDir).filter((n) => /^\d{2}-[\w-]+\.js$/.test(n)).sort();
+if (!appFiles.length) throw new Error('src/app/ 下没有模块');
+const app = [
+  '/*!',
+  ' * FreeBody — 应用脚本（由 scripts/build.js 从 src/app/*.js 合并）',
+  ' * 单页离线健身记录：饮食 / 训练 / 补剂 / 睡眠 / 身体指标 / 激素与恢复 / 伤病与限制',
+  ' * 数据仅存于浏览器 localStorage（键：freeBody_v1，自动从旧键 fitTracker_v1 迁移），可导出/导入 JSON。',
+  ' * 模块：' + appFiles.join('、'),
+  ' * 本项目不提供医疗建议。MIT License.',
+  ' */',
+  '(function(){',
+  "'use strict';",
+].join('\n') + '\n' + appFiles.map((n) => fs.readFileSync(path.join(appDir, n), 'utf8')).join('') + '})();\n';
+
+// 4) 内联：样式、数据、图标、图表库、应用脚本依次注入模板（JSON 中的 "</" 转义，避免提前闭合 <script>）
 const data = 'window.FIT_DATA = ' + JSON.stringify({ foods, examples }).replace(/<\//g, '<\\/') + ';';
 const html = read('src/index.template.html')
   .replace('/*__STYLES__*/', () => read('src/styles.css'))
   .replace('/*__DATA__*/', () => data)
   .replace('/*__ICONS__*/', () => read('src/icons.js'))
   .replace('/*__CHARTS__*/', () => read('src/charts.js'))
-  .replace('/*__APP__*/', () => read('src/app.js'));
+  .replace('/*__APP__*/', () => app);
 
 const banner = `<!-- 由 scripts/build.js 生成，请勿直接编辑；修改 src/、data/、examples/ 后重新构建 -->\n`;
 fs.writeFileSync(path.join(root, 'index.html'), html.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + banner));
-// 4) PWA：生成 sw.js（版本号 = package 版本 + 产物内容哈希，内容变化即触发更新）
+// 5) PWA：生成 sw.js（版本号 = package 版本 + 产物内容哈希，内容变化即触发更新）
 const crypto = require('crypto');
 const pkg = JSON.parse(read('package.json'));
 const manifest = read('manifest.webmanifest');

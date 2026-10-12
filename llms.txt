@@ -25,9 +25,11 @@ FreeBody is an offline, single-file fitness tracker (training, diet, recovery, p
 
 ## 构建
 
-- 环境：Node.js ≥ 14，零第三方依赖
+- 环境：Node.js ≥ 18，零第三方依赖
 - `npm run build` → 生成单文件 index.html（内联全部资源、食物库与示例配置）
 - `npm run check` → 自检：确认产物为最新构建、内联脚本可解析、无 emoji、无占位符残留，食物库与导入包示例符合 schema
+- `npm test` → node:test 单元测试（tests/）：dayTot、过度训练信号、准备度、进阶规则、1RM、BMR、疲劳半衰期、导入合并去重、存储预警与备份提醒
+- 源码：src/app/ 按模块拆分（store / calc / import / 各页 ui），构建时合并为单文件
 
 ## 许可
 

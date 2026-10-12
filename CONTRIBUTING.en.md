@@ -12,6 +12,7 @@ Thanks for helping out. FreeBody sticks to three principles: **no dependencies, 
    ```bash
    node scripts/build.js
    node scripts/check.js
+   npm test
    ```
 4. Open `index.html` at phone width (390 px, for example) and check it in both the light and dark themes.
 5. Open a pull request with a short entry under "未发布" (Unreleased) in `CHANGELOG.md`. Include both the source changes and the rebuilt `index.html`.
@@ -19,7 +20,8 @@ Thanks for helping out. FreeBody sticks to three principles: **no dependencies, 
 ## Code conventions
 
 - **Language level:** plain JavaScript, ES5 style, so older mobile browsers keep working. No frameworks, no CDNs, no network requests.
-- **Adding a section:** `src/app.js` is split into commented sections (`/* ---------- section ---------- */`). Follow the same steps for a new one:
+- **Module layout:** application logic lives in `src/app/`. The build concatenates the files in file-name order into one IIFE (a shared scope, no module loader). `00-core` (state and constants), `01-store` (storage, quota warnings, backup reminders), `02-util`, `03-calc` (core calculations) and `04-import` (import parsing and merge) never touch the DOM and are covered by the unit tests in `tests/`. Files from `10-ui-*` onwards are page UI, and `90-boot` is startup. Name new files `NN-name.js` with a one-line description at the top, and add tests when you change calculation or import logic.
+- **Adding a section:** each module is split into commented sections (`/* ---------- section ---------- */`). Follow the same steps for a new one:
   1. add its defaults to `defaults()`;
   2. write a `rXxx()` render function;
   3. register it in `render()`;

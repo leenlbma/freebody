@@ -1,7 +1,7 @@
 /* FreeBody service worker（由 scripts/build.js 生成 sw.js，请勿直接编辑 sw.js）
  * 策略：缓存优先；安装时预缓存应用外壳；新版本安装后等待页面确认（"有新版本，点此刷新"）再接管。 */
 'use strict';
-var VERSION = '2.5.2-01a72923bd';
+var VERSION = '2.6.0-0cfdbaf534';
 var CACHE = 'freebody-' + VERSION;
 var ASSETS = ["./","./index.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-192.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png"];
 self.addEventListener('install', function (e) {
