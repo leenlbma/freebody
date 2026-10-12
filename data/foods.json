@@ -1,0 +1,441 @@
+{
+  "version": 3,
+  "per": "100g",
+  "note": "常见食物每100g可食部的近似营养值：kcal、蛋白质 p、碳水 c、脂肪 f（g），可选 膳食纤维 fib（g）、钠 na（mg），缺省表示未提供。数值为本项目自整理的近似值，参考 USDA FoodData Central（公有领域 / CC0），仅供估算，实际以包装营养成分表为准。servings 为常用份量换算（如 1碗米饭≈200g），用于快速输入；source 标注数据来源。",
+  "foods": [
+    {
+      "id": "rice-cooked",
+      "name": "米饭（熟）",
+      "category": "主食",
+      "kcal": 116,
+      "p": 2.6,
+      "c": 25.9,
+      "f": 0.3,
+      "fib": 0.4,
+      "na": 1,
+      "aliases": [
+        "饭",
+        "白饭",
+        "米饭"
+      ],
+      "servings": [
+        {
+          "unit": "碗",
+          "g": 200,
+          "label": "1碗米饭≈200g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "noodles-cooked",
+      "name": "面条（熟）",
+      "category": "主食",
+      "kcal": 138,
+      "p": 4.5,
+      "c": 25.0,
+      "f": 2.1,
+      "fib": 1.2,
+      "aliases": [
+        "面",
+        "面条"
+      ],
+      "servings": [
+        {
+          "unit": "碗",
+          "g": 250,
+          "label": "1碗面条≈250g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "oats-dry",
+      "name": "燕麦片（干）",
+      "category": "主食",
+      "kcal": 379,
+      "p": 13.2,
+      "c": 67.7,
+      "f": 6.5,
+      "fib": 10.1,
+      "na": 6,
+      "aliases": [
+        "燕麦"
+      ],
+      "servings": [
+        {
+          "unit": "勺",
+          "g": 10,
+          "label": "1勺燕麦片≈10g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "wholewheat-bread",
+      "name": "全麦面包",
+      "category": "主食",
+      "kcal": 247,
+      "p": 13.0,
+      "c": 41.0,
+      "f": 3.4,
+      "fib": 6.8,
+      "na": 450,
+      "aliases": [
+        "面包",
+        "吐司"
+      ],
+      "servings": [
+        {
+          "unit": "片",
+          "g": 35,
+          "label": "1片全麦面包≈35g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "sweet-potato-cooked",
+      "name": "红薯（熟）",
+      "category": "主食",
+      "kcal": 90,
+      "p": 2.0,
+      "c": 20.7,
+      "f": 0.2,
+      "fib": 3.3,
+      "na": 36,
+      "aliases": [
+        "红薯",
+        "地瓜"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 200,
+          "label": "1个红薯≈200g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "potato-cooked",
+      "name": "土豆（熟）",
+      "category": "主食",
+      "kcal": 87,
+      "p": 1.9,
+      "c": 20.1,
+      "f": 0.1,
+      "fib": 1.8,
+      "na": 5,
+      "aliases": [
+        "土豆"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 150,
+          "label": "1个土豆≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "chicken-breast-cooked",
+      "name": "鸡胸肉（熟，去皮）",
+      "category": "蛋白质",
+      "kcal": 165,
+      "p": 31.0,
+      "c": 0,
+      "f": 3.6,
+      "fib": 0,
+      "na": 74,
+      "aliases": [
+        "鸡胸",
+        "鸡胸肉"
+      ],
+      "servings": [
+        {
+          "unit": "块",
+          "g": 120,
+          "label": "1块鸡胸肉≈120g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "egg-whole",
+      "name": "鸡蛋（全蛋）",
+      "category": "蛋白质",
+      "kcal": 143,
+      "p": 12.6,
+      "c": 0.7,
+      "f": 9.5,
+      "fib": 0,
+      "na": 142,
+      "aliases": [
+        "鸡蛋",
+        "蛋"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 50,
+          "label": "1个鸡蛋≈50g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "beef-lean-raw",
+      "name": "瘦牛肉（生）",
+      "category": "蛋白质",
+      "kcal": 130,
+      "p": 21.0,
+      "c": 0,
+      "f": 5.0,
+      "fib": 0,
+      "na": 66,
+      "aliases": [
+        "牛肉"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "salmon-raw",
+      "name": "三文鱼（生）",
+      "category": "蛋白质",
+      "kcal": 208,
+      "p": 20.0,
+      "c": 0,
+      "f": 13.0,
+      "fib": 0,
+      "na": 59,
+      "aliases": [
+        "三文鱼"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "cod-raw",
+      "name": "鳕鱼（生）",
+      "category": "蛋白质",
+      "kcal": 82,
+      "p": 18.0,
+      "c": 0,
+      "f": 0.7,
+      "fib": 0,
+      "na": 54,
+      "aliases": [
+        "鳕鱼"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "tofu",
+      "name": "豆腐（老豆腐）",
+      "category": "蛋白质",
+      "kcal": 76,
+      "p": 8.1,
+      "c": 1.9,
+      "f": 4.8,
+      "fib": 2.3,
+      "na": 12,
+      "aliases": [
+        "豆腐"
+      ],
+      "servings": [
+        {
+          "unit": "块",
+          "g": 150,
+          "label": "1块豆腐≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "whey-powder",
+      "name": "乳清蛋白粉（因品牌差异大）",
+      "category": "蛋白质",
+      "kcal": 400,
+      "p": 78.0,
+      "c": 8.0,
+      "f": 6.0,
+      "aliases": [
+        "蛋白粉",
+        "乳清",
+        "乳清蛋白"
+      ],
+      "servings": [
+        {
+          "unit": "勺",
+          "g": 30,
+          "label": "1勺乳清蛋白粉≈30g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "milk-whole",
+      "name": "牛奶（全脂）",
+      "category": "乳制品",
+      "kcal": 61,
+      "p": 3.2,
+      "c": 4.8,
+      "f": 3.3,
+      "fib": 0,
+      "na": 43,
+      "aliases": [
+        "牛奶"
+      ],
+      "servings": [
+        {
+          "unit": "杯",
+          "g": 250,
+          "label": "1杯牛奶≈250g"
+        },
+        {
+          "unit": "盒",
+          "g": 250,
+          "label": "1盒牛奶≈250g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "greek-yogurt-plain",
+      "name": "希腊酸奶（无糖脱脂）",
+      "category": "乳制品",
+      "kcal": 59,
+      "p": 10.0,
+      "c": 3.6,
+      "f": 0.4,
+      "fib": 0,
+      "na": 36,
+      "aliases": [
+        "希腊酸奶",
+        "酸奶"
+      ],
+      "servings": [
+        {
+          "unit": "杯",
+          "g": 150,
+          "label": "1杯希腊酸奶≈150g"
+        },
+        {
+          "unit": "盒",
+          "g": 150,
+          "label": "1盒希腊酸奶≈150g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "broccoli",
+      "name": "西兰花",
+      "category": "蔬果",
+      "kcal": 34,
+      "p": 2.8,
+      "c": 6.6,
+      "f": 0.4,
+      "fib": 2.6,
+      "na": 33,
+      "aliases": [
+        "西兰花",
+        "西蓝花"
+      ],
+      "servings": [],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "apple",
+      "name": "苹果",
+      "category": "蔬果",
+      "kcal": 52,
+      "p": 0.3,
+      "c": 13.8,
+      "f": 0.2,
+      "fib": 2.4,
+      "na": 1,
+      "aliases": [
+        "苹果"
+      ],
+      "servings": [
+        {
+          "unit": "个",
+          "g": 200,
+          "label": "1个苹果≈200g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "banana",
+      "name": "香蕉",
+      "category": "蔬果",
+      "kcal": 89,
+      "p": 1.1,
+      "c": 22.8,
+      "f": 0.3,
+      "fib": 2.6,
+      "na": 1,
+      "aliases": [
+        "香蕉"
+      ],
+      "servings": [
+        {
+          "unit": "根",
+          "g": 120,
+          "label": "1根香蕉≈120g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "almond",
+      "name": "杏仁",
+      "category": "油脂坚果",
+      "kcal": 579,
+      "p": 21.2,
+      "c": 21.6,
+      "f": 49.9,
+      "fib": 12.5,
+      "na": 1,
+      "aliases": [
+        "杏仁"
+      ],
+      "servings": [
+        {
+          "unit": "把",
+          "g": 15,
+          "label": "1把杏仁≈15g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    },
+    {
+      "id": "olive-oil",
+      "name": "橄榄油",
+      "category": "油脂坚果",
+      "kcal": 884,
+      "p": 0,
+      "c": 0,
+      "f": 100,
+      "fib": 0,
+      "na": 2,
+      "aliases": [
+        "橄榄油"
+      ],
+      "servings": [
+        {
+          "unit": "勺",
+          "g": 10,
+          "label": "1勺橄榄油≈10g"
+        }
+      ],
+      "source": "自整理（参考 USDA FoodData Central，CC0）"
+    }
+  ]
+}
