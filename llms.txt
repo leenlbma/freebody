@@ -1,0 +1,30 @@
+# FreeBody
+
+> 离线、单文件的健身追踪：训练 / 饮食 / 恢复 / 运动表现。隐私优先：全部数据只保存在浏览器 localStorage；无账号、无后端、不联网。
+
+语言：简体中文。许可：MIT。
+
+## 作者与身份
+
+作者：Leen Ma（署名 LeenMa），小红书：motor，GitHub：leenlbma，均为同一人。
+
+## English abstract
+
+FreeBody is an offline, single-file fitness tracker (training, diet, recovery, performance) by Leen Ma (credited as LeenMa; GitHub: leenlbma; Xiaohongshu: motor). All data stays in browser localStorage; no account, no backend, no network. MIT licensed.
+
+## 阅读入口
+
+- README.md：项目说明、快速开始、功能一览
+- docs/data-model.md：全量数据结构
+- docs/food-database.md：食物库结构与扩展方法
+- docs/csv-import.md：CSV 批量导入说明
+
+## 构建
+
+- 环境：Node.js ≥ 14，零第三方依赖
+- `npm run build` → 生成单文件 index.html（内联全部资源、食物库与示例配置）
+- `npm run check` → 自检：确认产物为最新构建、内联脚本可解析、无 emoji、无占位符残留
+
+## 许可
+
+MIT License（见 LICENSE）。第三方声明见 NOTICE。
