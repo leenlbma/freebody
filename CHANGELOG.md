@@ -4,6 +4,24 @@
 
 ## [未发布]
 
+## [2.3.0] - 2026-10-12
+
+多端适配：可安装、可离线、平板与桌面布局。数据结构不变。
+
+### 新增
+- PWA：`manifest.webmanifest`（FreeBody、中文、standalone、主题 / 背景色）与斜切 B 图标 192 / 512 PNG（含 maskable 版本，`scripts/make-icons.py` 由 SVG 生成）。
+- Service Worker（`sw.js`，由构建生成）：预缓存应用文件，缓存优先、离线可用；版本号 = 包版本 + 内容哈希，每次构建自动更新；有新版本时显示「有新版本，点此刷新」，点按后切换。仅在 http(s) 下注册，`file://` 直接打开时静默跳过，单文件用法不变。
+- iOS 支持：apple-touch-icon、`apple-mobile-web-app-capable`、半透明状态栏、标题，以及按浅 / 深色区分的 `theme-color`。
+- 键盘：卡片与列表项可 Tab 聚焦并用 Enter / 空格 激活，统一 `:focus-visible` 焦点样式；可选快捷键 `1`–`4`、`←` `→`、`T`、`/`、`Esc`。
+- GitHub Actions 部署到 GitHub Pages 的 workflow（`.github/workflows/pages.yml`，仅公开仓库或设置 `ENABLE_PAGES=true` 时运行）。
+- README：「安装到手机 / 电脑」「多端布局与快捷键」「部署到 GitHub Pages」。
+
+### 变更
+- 响应式布局：手机（< 600px）保持原样；平板（600–1024px）两栏卡片；横屏手机左侧图标导航；桌面（> 1024px）左侧导航栏、内容居中限宽，设置 / 伤病 / 化验等页三栏，超宽屏训练与数据页三栏。
+- 安全区左右内边距、禁止自动放大文字、大字体下标题行自动换行；鼠标悬停反馈。
+- 视口宽度变化较大（旋转、调整窗口）时自动重绘图表。
+- 构建自检增加 sw.js 与 manifest 图标检查。
+
 ## [2.2.1] - 2026-10-12
 
 ### 变更

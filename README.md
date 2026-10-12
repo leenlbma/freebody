@@ -2,7 +2,7 @@
 
 <p align="center"><b>FreeBody</b> — 身体会变，心永远自由。<br><i>Train the body, keep the heart forever free.</i></p>
 
-一个**单文件、离线可用、零外部依赖**的个人训练与健康记录工具，面向手机浏览器。适合增肌减脂、停训后回归、带伤训练等场景。
+一个**单文件、离线可用、零外部依赖**的个人训练与健康记录工具，面向手机浏览器，也适配平板与桌面，可作为 PWA 安装。适合增肌减脂、停训后回归、带伤训练等场景。
 
 > **注意**：本项目仅用于个人记录与趋势参考，**不构成任何医疗、营养或康复建议**。化验指标、伤病与补剂相关问题请咨询医生或专业人士。
 
@@ -71,7 +71,35 @@
 
 ## 使用方式
 
-**直接使用**：下载 `index.html`，用手机或电脑浏览器打开即可（可"添加到主屏幕"）。无需联网、无需安装。
+**在线使用**：<https://leenlbma.github.io/freebody/>（GitHub Pages，首次打开后可离线使用，可安装到桌面 / 主屏幕，见下文）。
+
+**直接使用**：下载 `index.html`，用手机或电脑浏览器打开即可。无需联网、无需安装。以 `file://` 本地打开时 Service Worker 不可用，应用照常运行（只是不会出现"安装"与更新提示）。
+
+### 安装到手机 / 电脑
+
+FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pages 链接或你自己的服务器）打开一次后，即可离线使用，并可像 App 一样安装。数据仍只保存在本机浏览器的 localStorage 中，安装与否不影响数据。
+
+- **iPhone / iPad（Safari）**：打开网址 → 点底部「分享」按钮 → 选择「添加到主屏幕」→「添加」。之后从主屏幕图标启动为全屏、无地址栏。注意 iOS 上主屏幕应用与 Safari 的存储彼此独立，迁移数据请先在「我的 → 数据」导出 JSON 再导入。
+- **Android（Chrome / Edge）**：打开网址 → 右上角菜单 →「安装应用」或「添加到主屏幕」。部分浏览器会在底部自动弹出安装提示。
+- **电脑（Chrome / Edge）**：打开网址 → 地址栏右侧的「安装」图标（或菜单 →「投放、保存和分享 → 将页面作为应用安装」）。安装后在独立窗口运行，可固定到任务栏 / 程序坞。
+
+**更新**：发布新版本后，再次打开时页面底部会出现「有新版本，点此刷新」，点一下即切换到新版本；不点则继续使用当前版本。
+
+### 多端布局与快捷键
+
+- 手机（< 600px）：底部导航，单列卡片。
+- 平板（600–1024px）：两栏卡片；横屏手机改为左侧图标导航。
+- 桌面（> 1024px）：左侧导航栏，内容居中限宽，卡片与图表多列排布。
+- 支持系统大字体、安全区（刘海 / 底部横条）、键盘焦点样式。
+- 快捷键（输入框外）：`1`–`4` 切换 今天 / 训练 / 数据 / 我的，`←` `→` 前一天 / 后一天，`T` 回到今天，`/` 搜索食物，`Esc` 返回上一级；`Enter` / 空格 可激活聚焦的卡片。
+
+### 部署到 GitHub Pages
+
+仓库已包含 `.github/workflows/pages.yml`：推送到 `main` 时构建并发布 `index.html`、`sw.js`、`manifest.webmanifest`、`icons/`。fork 后启用方法：
+
+1. 仓库需为公开（私有仓库需付费计划，并设置仓库变量 `ENABLE_PAGES=true`）。
+2. Settings → Pages → Build and deployment → Source 选择 **GitHub Actions**（或 `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow`）。
+3. 在 Actions 里运行一次「Deploy to GitHub Pages」（或推送任意提交），完成后访问 `https://<owner>.github.io/<repo>/`。
 
 **从源码构建**（需 Node.js ≥ 14，无第三方依赖）：
 
@@ -85,6 +113,9 @@ npm run check    # 或 node scripts/check.js  → 语法自检
 ```
 freebody/
 ├── index.html                 # 构建产物：可直接打开的单文件应用
+├── sw.js                      # 构建产物：Service Worker（版本号随构建内容变化）
+├── manifest.webmanifest       # PWA 清单
+├── icons/                     # PWA / apple-touch 图标 PNG（scripts/make-icons.py 生成）
 ├── assets/
 │   ├── logo.svg               # 主字标（斜切 B），logo-reverse.svg 为反白版
 │   ├── favicon.svg            # 斜切 B 图标（index.html 内已内联同款 favicon）
@@ -95,10 +126,11 @@ freebody/
 │   ├── styles.css             # 样式（CSS 变量实现深浅色主题）
 │   ├── icons.js               # 内联 SVG 线条图标
 │   ├── charts.js              # 零依赖 SVG 图表库
-│   └── app.js                 # 应用逻辑（按板块分节注释）
+│   ├── app.js                 # 应用逻辑（按板块分节注释）
+│   └── sw.template.js         # Service Worker 模板
 ├── data/foods.json            # 食物营养库（欢迎贡献）
 ├── examples/                  # 可选通用示例配置（profile-sample.json，不含任何记录数据）
-├── scripts/build.js           # 内联构建
+├── scripts/build.js           # 内联构建 + 生成 sw.js
 ├── scripts/check.js           # 语法自检
 ├── docs/                      # 数据结构、食物库扩展、CSV 导入、截图
 ├── LICENSE                    # MIT

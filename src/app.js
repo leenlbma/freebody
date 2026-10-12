@@ -1081,6 +1081,42 @@ if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener
 if(window.FitIcons)FitIcons.hydrate();
 if(S.active)setTimeout(tickRest,0);
 applyTheme();applyTitle();show('overview');
+/* ---------- 多端：主题色 / 键盘 / 可访问性 / 尺寸变化 / PWA ---------- */
+/** 浏览器 UI 颜色跟随当前主题（手动切换时覆盖媒体查询） */
+function syncThemeColor(){var ms=document.querySelectorAll('meta[name=theme-color]'),c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#f5f5f7';Array.prototype.forEach.call(ms,function(m){if((S.theme||'auto')==='auto')m.setAttribute('content',m.getAttribute('media')&&/dark/.test(m.getAttribute('media'))?'#0b0c0f':'#f5f5f7');else m.setAttribute('content',c);});}
+syncThemeColor();(function(){var _a=applyTheme;applyTheme=function(){_a();syncThemeColor();};})();
+/** 非按钮的可点元素可用键盘聚焦，Enter / 空格触发 */
+var TAP_SEL='[data-go]:not(button),[data-sub]:not(button),[data-entry],[data-fopen],[data-calday]:not(button)';
+function a11y(){Array.prototype.forEach.call(document.querySelectorAll(TAP_SEL),function(el){if(!el.hasAttribute('tabindex')){el.setAttribute('tabindex','0');el.setAttribute('role','button');}});}
+(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();};})();a11y();
+function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
+/** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */
+document.addEventListener('keydown',function(e){var t=e.target;
+ if((e.key==='Enter'||e.key===' ')&&t&&t.matches&&t.matches(TAP_SEL)){e.preventDefault();t.click();return;}
+ if(e.key==='Escape'){if(typing(t))t.blur();var bk0=document.querySelector('#subnav .back');if(bk0)bk0.click();return;}
+ if(e.ctrlKey||e.metaKey||e.altKey||typing(t))return;
+ var k=e.key;
+ if(/^[1-4]$/.test(k)){show(GROUPS[+k-1][0]);e.preventDefault();}
+ else if(k==='ArrowLeft'){$('#dPrev').click();e.preventDefault();}
+ else if(k==='ArrowRight'){$('#dNext').click();e.preventDefault();}
+ else if(k==='t'||k==='T'){$('#dToday').click();}
+ else if(k==='/'){e.preventDefault();if(cur!=='dietAdd')openAdd(dMeal(),'search');else{faTab='search';rDietAdd();}$('#faSearch').focus();}
+});
+/** 尺寸 / 方向变化后重绘（图表按容器宽度绘制） */
+(function(){var tm,w=window.innerWidth;window.addEventListener('resize',function(){clearTimeout(tm);tm=setTimeout(function(){if(Math.abs(window.innerWidth-w)>40){w=window.innerWidth;render();}},200);});})();
+/** PWA：仅在 http(s) 下启用 manifest 与 service worker；file:// 直接打开时静默跳过（单文件用法不受影响） */
+(function(){var web=/^https?:$/.test(location.protocol);if(!web)return;
+ var l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);
+ if(!('serviceWorker' in navigator))return;
+ var btn=$('#swUpd'),reloading=false;
+ function offer(w){if(!w)return;btn.hidden=false;btn.onclick=function(){btn.textContent='正在更新…';w.postMessage('skipWaiting');};}
+ navigator.serviceWorker.addEventListener('controllerchange',function(){if(reloading)return;reloading=true;location.reload();});
+ window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(reg){
+  if(reg.waiting&&navigator.serviceWorker.controller)offer(reg.waiting);
+  reg.addEventListener('updatefound',function(){var nw=reg.installing;if(!nw)return;nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller)offer(nw);});});
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')reg.update().catch(function(){});});
+ }).catch(function(){});});
+})();
 // 调试/测试钩子（不影响正常使用）
 window.__freeBody={get state(){return S;},show:show,otSignals:otSignals,_importCSV:importCSV,_parseQuick:parseQuick,_weightETA:weightETA,_calcTarget:calcTarget,_tgtCfg:tgtCfg,_nextTarget:nextTarget,_muscleState:muscleState,_recommend:recommend};
 })();

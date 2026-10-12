@@ -55,4 +55,15 @@ const html = read('src/index.template.html')
 
 const banner = `<!-- 由 scripts/build.js 生成，请勿直接编辑；修改 src/、data/、examples/ 后重新构建 -->\n`;
 fs.writeFileSync(path.join(root, 'index.html'), html.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + banner));
+// 4) PWA：生成 sw.js（版本号 = package 版本 + 产物内容哈希，内容变化即触发更新）
+const crypto = require('crypto');
+const pkg = JSON.parse(read('package.json'));
+const manifest = read('manifest.webmanifest');
+const mf = JSON.parse(manifest);
+const assets = ['./', './index.html', './manifest.webmanifest'].concat(mf.icons.map((i) => './' + i.src), ['./icons/apple-touch-icon.png']);
+for (const a of assets.slice(3)) if (!fs.existsSync(path.join(root, a))) throw new Error('缺少 PWA 图标 ' + a + '（运行 scripts/make-icons.py）');
+const hash = crypto.createHash('sha256').update(html).update(manifest).digest('hex').slice(0, 10);
+const swVersion = pkg.version + '-' + hash;
+fs.writeFileSync(path.join(root, 'sw.js'), read('src/sw.template.js').replace('__VERSION__', swVersion).replace('__ASSETS__', JSON.stringify(assets)));
+console.log(`[ok] sw.js 已生成（版本 ${swVersion}，预缓存 ${assets.length} 项）`);
 console.log(`[ok] index.html 已生成（食物 ${foods.foods.length} 项，示例配置 ${examples.length} 个，${(Buffer.byteLength(html) / 1024).toFixed(1)} KB）`);

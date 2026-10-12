@@ -288,3 +288,47 @@ button.plus .ic{width:20px;height:20px}button.plus.sm{width:34px;height:34px}
 button.danger{color:var(--bad)}
 [hidden]{display:none!important}
 .rg-fg.zero{stroke-opacity:0}
+/* ===== v2.3.0 多端适配：手机（<600）保持原样；平板 600–1024 两栏；桌面 >1024 左侧导航 + 居中多列 ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button:focus:not(:focus-visible),[tabindex]:focus:not(:focus-visible){outline:none}
+.card:focus-visible,.frow:focus-visible,.entries li:focus-visible{outline-offset:-2px;border-radius:12px}
+.sw-upd{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:12;border-radius:99px;padding:10px 18px;min-height:44px;box-shadow:0 6px 24px rgba(0,0,0,.25);white-space:nowrap}
+@media(hover:hover){.tap:hover,.frow:hover,.entries li:hover{background:color-mix(in srgb,var(--fg) 4%,var(--card))}.frow:hover{background:transparent}.frow:hover b{color:var(--acc)}}
+/* 两栏：卡片按列流式排布；警示条、会话、日期栏等跨栏 */
+@media(min-width:600px){
+ main{max-width:1040px;padding:14px 18px 24px}
+ #diet.on,#train.on,#tstats.on,#cardio.on,#perf.on,#supp.on,#sleep.on,#body.on,#hormone.on,#injury.on,#settings.on,#dietFood.on,#dataBox,#faQuick:not([hidden]),#overview.on{columns:2;column-gap:14px}
+ section.on>*,#dataBox>*,#faQuick>*{break-inside:avoid}
+ #overview>#ovAlerts,#overview>.checks,#diet>.row,#train>#sessBox,#train>#recBanner,#hormone>.disc,#hormone>#otAlert,#injury>.disc,#injury>#injAlert,#dietFood>#dfDay{column-span:all}
+ #dietAdd.on{max-width:720px;margin:0 auto}
+ #mealCards>.card:last-child{margin-bottom:10px}
+ .bm svg{max-width:300px}
+ #toast{bottom:96px}
+}
+/* 横屏手机：底部导航改为左侧图标栏，节省纵向空间 */
+@media(orientation:landscape) and (max-height:520px) and (max-width:1024px){
+ body{padding-bottom:16px;padding-left:calc(64px + env(safe-area-inset-left))}
+ nav{top:0;bottom:0;right:auto;width:calc(64px + env(safe-area-inset-left));flex-direction:column;justify-content:center;border-top:0;border-right:1px solid var(--bd);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom) env(safe-area-inset-left)}
+ nav button{flex:0 0 auto;padding:10px 2px}
+ header{padding-top:calc(6px + env(safe-area-inset-top))}
+ .sw-upd{bottom:16px}#toast{bottom:20px}
+}
+/* 桌面：左侧导航 + 内容居中 */
+@media(min-width:1025px){
+ body{padding-bottom:24px;padding-left:220px}
+ nav{top:0;bottom:0;right:auto;width:220px;flex-direction:column;justify-content:flex-start;gap:2px;padding:76px 12px 12px;border-top:0;border-right:1px solid var(--bd)}
+ nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;padding:10px 14px;font-size:15px;border-radius:10px;min-height:44px}
+ nav button.on{background:color-mix(in srgb,var(--acc) 12%,transparent)}
+ nav button:hover:not(.on){background:var(--in);color:var(--fg)}
+ header{position:sticky}
+ header>.hrow{max-width:1180px;margin-left:auto;margin-right:auto}
+ main{max-width:1180px;padding:18px 24px 32px}
+ #injury.on,#settings.on,#hormone.on,#dataBox{columns:3}
+ #dietAdd.on{max-width:760px}
+ .sw-upd{bottom:24px;margin-left:110px}#toast{bottom:28px;margin-left:110px}
+}
+@media(min-width:1440px){#train.on,#body.on,#tstats.on{columns:3}#train>#musWrap{break-inside:avoid}}
+/* 大字体：允许换行，避免溢出 */
+.hrow{flex-wrap:wrap}.meal-h>div,.frow>div{min-width:0;overflow-wrap:anywhere}
