@@ -598,4 +598,39 @@ header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
 .dnav>.dtf-bar{flex:none;width:auto;min-width:136px;padding:0 6px;background:transparent;border-color:transparent;border-radius:10px;justify-content:center;font-weight:600}
 .dtf-bar .dtf-v{flex:none;text-align:center}
 #dToday{flex:none;height:var(--bh)!important;min-height:var(--bh)!important;padding:0 14px}
-@media(max-width:599px){header{padding-left:16px;padding-right:16px}main{padding-left:16px;padding-right:16px}}
+@media(max-width:599px){header{padding-left:16px;padding-right:16px}main{padding-left:16px;padding-right:16px}}/* ===== v2.5 导入包预览 / 心得 ===== */
+#impPack.on,#notes.on{display:block;max-width:720px}
+#impPack .card,#notes .card{margin-bottom:12px}
+#ipText{min-height:168px;height:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical;word-break:break-all}
+.imp-err{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0}.imp-err .ic{flex:none;width:18px;height:18px;margin-top:1px;color:var(--bad)}
+.imp-foot{font-size:12px;margin:10px 0 0}
+.imp-src{display:flex;gap:6px;align-items:center;font-size:13px;margin:-2px 0 12px}.imp-src .ic{width:16px;height:16px;flex:none}
+.imp-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.imp-st{background:var(--in);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.imp-st b{font-size:22px;line-height:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.imp-st span{font-size:12px;color:var(--mut)}
+.imp-st.st-new b{color:var(--acc)}.imp-st.st-bad b{color:var(--bad)}.imp-st.zero b{color:var(--mut)}
+.imp-note{font-size:12px;margin:10px 0 0}.bad-t{color:var(--bad);font-size:12px}
+.imp-day h3{font-size:13px;color:var(--mut);font-weight:600;margin:0 0 4px}
+.imp-list{list-style:none;margin:0;padding:0}
+.imp-it{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--bd);min-height:44px}
+.imp-it:first-child{border-top:0}
+.imp-ic{flex:none;width:36px;height:36px;border-radius:10px;background:var(--in);color:var(--acc);display:inline-flex;align-items:center;justify-content:center}.imp-ic .ic{width:18px;height:18px}
+.imp-it.is-bad .imp-ic{color:var(--bad)}
+.imp-tx{flex:1;min-width:0}.imp-tx b{display:block;font-size:15px;line-height:20px;font-weight:600;overflow-wrap:anywhere}.imp-tx .mut{font-size:13px;line-height:18px;margin-top:2px;overflow-wrap:anywhere}
+.imp-tg{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;padding-top:1px}
+.tag.st-new{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.tag.st-update,.tag.st-merge{color:var(--acc);border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
+.tag.st-bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}
+.imp-bar{position:sticky;bottom:calc(env(safe-area-inset-bottom) + 72px);z-index:4;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:8px;padding:12px;margin:4px 0 12px;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh)}
+.imp-bar button{width:100%}
+@media(min-width:1025px),(orientation:landscape) and (max-height:520px){.imp-bar{bottom:16px}}
+.imp-done{text-align:center;padding-top:28px;padding-bottom:24px}.imp-done .actions{justify-content:center}
+.imp-ok{width:56px;height:56px;margin:0 auto 12px;border-radius:50%;background:color-mix(in srgb,var(--ok) 14%,var(--card));color:var(--ok);display:flex;align-items:center;justify-content:center}.imp-ok .ic{width:28px;height:28px}
+#ntText{min-height:96px;height:auto;resize:vertical}
+.nt-list{list-style:none;margin:0;padding:0}
+.nt-it{padding:12px 0;border-top:1px solid var(--bd)}.nt-it:first-child{border-top:0;padding-top:0}
+.nt-h{display:flex;align-items:center;gap:8px}.nt-h b{flex:1;min-width:0}.nt-h .mut{font-size:12px}
+.nt-it p{margin:6px 0 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.nt-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nt-del{flex:none}

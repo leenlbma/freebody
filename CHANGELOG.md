@@ -4,6 +4,28 @@
 
 ## [未发布]
 
+## [2.5.0] - 2026-10-12
+
+定位调整为「AI 健身教练的仪表盘」：用户与自己的 AI 聊训练和饮食，AI 生成数据，FreeBody 负责本地存储与可视化。
+
+### 新增
+- **公开数据格式**：
+  - `docs/data-format.md`（英文 `docs/data-format.en.md`）：增量导入包 `{"freebody":"import","version":1,"entries":[...]}` 的完整说明。
+  - 覆盖饮食（餐次、食物、克重、kcal、P/C/F、是否估算及范围）、训练（动作、组、次数、重量、RIR）、补剂、睡眠、体重与身体指标、心得。
+  - 每条带 `id`，重复导入按 id 去重；睡眠、身体指标同一天合并。
+  - `schema/freebody.schema.json`（JSON Schema 2020-12）与示例 `examples/import/`。
+- **粘贴导入**（我的 › 数据备份）：粘贴 JSON 或导入链接，先预览「新增 / 更新 / 合并 / 已存在 / 无效」，确认后才写入；导入后可一键撤销。
+- **链接导入**：打开 `#import=<base64url>`（`z.` 前缀表示 deflate-raw 压缩）弹出同样的预览确认；确认或取消后清除 hash。链接过长或被截断时提示改用粘贴。数据只在本地解析，不经过任何服务器。
+- **心得**页（数据 › 心得）：记录训练与饮食心得，导入包中的 note 条目写入这里。
+- 导入的饮食记录来源显示为「AI 导入」，估算值带「估算」标记。
+- **FreeBody Coach skill**：`skills/freebody-coach/SKILL.md`（英文 `SKILL.en.md`），通用 Agent Skill 格式，不绑定平台。教 AI 照片 / 文字饮食估算（含吃前吃后对比）、训练记录、按项目规则给出进阶与恢复建议，并输出符合 schema 的导入包和导入链接；附只用标准库的 `scripts/make_link.py`。不做医疗诊断，伤病建议就医。
+- **英文文档**：`README.en.md` 与中文 README 完整对应，两者顶部互相切换；另有 `CONTRIBUTING.en.md`、`docs/food-database.en.md`、`docs/data-format.en.md`。界面仍只有简体中文。
+- README 新增「搭配 AI 使用」一节。
+
+### 变更
+- `npm run check` 增加导入包校验：示例文件与文档中的 JSON 示例须符合 schema，反例须被拒绝；检查 skill 的 frontmatter。
+- `docs/data-model.md` 补充 `notes`、`imp`、`est`、`src: "import"`。
+
 ## [2.4.1] - 2026-10-12
 
 ### 修复

@@ -34,5 +34,76 @@ for (const f of foods) {
   const est = 4 * f.p + 4 * f.c + 9 * f.f;
   if (!ALCOHOL.has(f.id) && Math.abs(est - f.kcal) > Math.max(20, f.kcal * 0.3)) throw new Error(`食物热量与宏量不符: ${f.id} kcal=${f.kcal} 估算=${Math.round(est)}`);
 }
+
+// 导入包：JSON Schema（schema/freebody.schema.json）校验示例文件与文档中的示例；无第三方依赖的精简校验器，覆盖本 schema 用到的关键字
+const schema = JSON.parse(fs.readFileSync(path.join(root, 'schema', 'freebody.schema.json'), 'utf8'));
+function jsType(v) { return v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v === 'number' ? (Number.isInteger(v) ? 'integer' : 'number') : typeof v; }
+function validate(sc, v, at, errs) {
+  if (sc.$ref) { const d = sc.$ref.replace(/^#\/\$defs\//, ''); if (!schema.$defs[d]) throw new Error('schema 引用不存在: ' + sc.$ref); return validate(schema.$defs[d], v, at, errs); }
+  const n0 = errs.length, t = jsType(v);
+  if ('const' in sc && v !== sc.const) errs.push(`${at} 应为 ${JSON.stringify(sc.const)}`);
+  if (sc.enum && !sc.enum.includes(v)) errs.push(`${at} 不在 ${sc.enum.join('/')} 中`);
+  if (sc.type && !(sc.type === t || (sc.type === 'number' && t === 'integer'))) { errs.push(`${at} 类型应为 ${sc.type}，实际 ${t}`); return; }
+  if (t === 'string') {
+    if (sc.minLength != null && [...v].length < sc.minLength) errs.push(`${at} 过短`);
+    if (sc.maxLength != null && [...v].length > sc.maxLength) errs.push(`${at} 过长`);
+    if (sc.pattern && !new RegExp(sc.pattern).test(v)) errs.push(`${at} 格式不符 ${sc.pattern}`);
+  }
+  if (t === 'number' || t === 'integer') {
+    if (sc.minimum != null && v < sc.minimum) errs.push(`${at} 小于 ${sc.minimum}`);
+    if (sc.maximum != null && v > sc.maximum) errs.push(`${at} 大于 ${sc.maximum}`);
+  }
+  if (t === 'array') {
+    if (sc.minItems != null && v.length < sc.minItems) errs.push(`${at} 至少 ${sc.minItems} 项`);
+    if (sc.maxItems != null && v.length > sc.maxItems) errs.push(`${at} 最多 ${sc.maxItems} 项`);
+    if (sc.items) v.forEach((x, i) => validate(sc.items, x, `${at}[${i}]`, errs));
+  }
+  if (t === 'object') {
+    for (const k of sc.required || []) if (!(k in v)) errs.push(`${at} 缺少 ${k}`);
+    for (const k of Object.keys(v)) {
+      if (sc.properties && sc.properties[k]) validate(sc.properties[k], v[k], `${at}.${k}`, errs);
+      else if (sc.additionalProperties === false) errs.push(`${at} 不允许的字段 ${k}`);
+    }
+  }
+  if (sc.anyOf && !sc.anyOf.some((s2) => { const e2 = []; validate(s2, v, at, e2); return !e2.length; })) errs.push(`${at} 不满足 anyOf`);
+  if (sc.oneOf) {
+    const res = sc.oneOf.map((s2) => { const e2 = []; validate(s2, v, at, e2); return e2; });
+    const ok = res.filter((e2) => !e2.length).length;
+    if (ok !== 1) {
+      // 按 type 找到对应分支给出具体原因
+      const hit = sc.oneOf.findIndex((s2) => { const d = s2.$ref && schema.$defs[s2.$ref.replace(/^#\/\$defs\//, '')]; return d && d.properties && d.properties.type && v && d.properties.type.const === v.type; });
+      errs.push(...(hit >= 0 && ok === 0 ? res[hit] : [`${at} 应恰好匹配一种条目类型（type=${v && v.type}）`]));
+    }
+  }
+  return errs.length === n0;
+}
+function checkPack(obj, name) {
+  const errs = []; validate(schema, obj, '$', errs);
+  if (errs.length) throw new Error(`${name} 不符合 schema：\n  ` + errs.slice(0, 8).join('\n  '));
+  const ids = new Set();
+  for (const e of obj.entries) { const k = e.type + '|' + e.id; if (ids.has(k)) throw new Error(`${name} 中 id 重复: ${e.id}`); ids.add(k); }
+  return obj.entries.length;
+}
+const impDir = path.join(root, 'examples', 'import');
+let nPack = 0, nEnt = 0;
+for (const n of fs.readdirSync(impDir).filter((x) => x.endsWith('.json')).sort()) { nEnt += checkPack(JSON.parse(fs.readFileSync(path.join(impDir, n), 'utf8')), 'examples/import/' + n); nPack++; }
+// 文档与 skill 中的 JSON 示例（```json 代码块且含 "freebody": "import"）同样必须通过
+const docFiles = ['docs/data-format.md', 'docs/data-format.en.md', 'skills/freebody-coach/SKILL.md', 'skills/freebody-coach/SKILL.en.md'];
+let nDoc = 0;
+for (const f of docFiles) {
+  const fp = path.join(root, f); if (!fs.existsSync(fp)) throw new Error('缺少文档 ' + f);
+  const md = fs.readFileSync(fp, 'utf8');
+  for (const m of md.matchAll(/```json\n([\s\S]*?)```/g)) if (/"freebody"\s*:\s*"import"/.test(m[1])) { checkPack(JSON.parse(m[1]), f + ' 中的示例'); nDoc++; }
+}
+// 反例必须被拒绝，防止校验器失效
+for (const bad of [{ freebody: 'import', version: 1, entries: [] }, { freebody: 'import', version: 1, entries: [{ type: 'meal', id: 'x', date: '2026-13-01', name: 'a', kcal: 1 }] },
+  { freebody: 'import', version: 1, entries: [{ type: 'body', id: 'b', date: '2026-01-01' }] }, { freebody: 'import', version: 1, entries: [{ type: 'workout', id: 'w', date: '2026-01-01', exercise: 'x', sets: [{ reps: 1.5 }] }] }]) {
+  const e = []; validate(schema, bad, '$', e); if (!e.length) throw new Error('schema 校验器未能拒绝反例: ' + JSON.stringify(bad));
+}
+// skill：通用 Agent Skill 格式（frontmatter 含 name / description）
+const sk = fs.readFileSync(path.join(root, 'skills', 'freebody-coach', 'SKILL.md'), 'utf8');
+const fm = /^---\n([\s\S]*?)\n---\n/.exec(sk);
+if (!fm || !/^name:\s*freebody-coach\s*$/m.test(fm[1]) || !/^description:\s*\S/m.test(fm[1])) throw new Error('skills/freebody-coach/SKILL.md 缺少 frontmatter name / description');
+console.log(`[ok] 导入包 schema 校验通过（示例 ${nPack} 个、${nEnt} 条；文档示例 ${nDoc} 个；反例均被拒绝）`);
 console.log(`[ok] 食物库 ${foods.length} 项，id / ref 校验通过`);
 console.log(`[ok] 语法检查通过（${scripts.length} 段脚本）`);

@@ -1,0 +1,38 @@
+{
+  "freebody": "import",
+  "version": 1,
+  "source": "示例 AI 教练",
+  "created": "2026-10-12T12:40:00+08:00",
+  "note": "吃前、吃后两张照片对比估算；实际摄入 = 克重 × (1 − 剩余比例)",
+  "entries": [
+    {
+      "type": "meal",
+      "id": "ex-20261012-lunch-noodle",
+      "date": "2026-10-12",
+      "time": "12:20",
+      "name": "牛肉面",
+      "g": 420,
+      "kcal": 483,
+      "p": 27,
+      "c": 63,
+      "f": 13,
+      "estimated": true,
+      "lo": 420,
+      "hi": 560,
+      "note": "原约 560g，剩约 25%"
+    },
+    {
+      "type": "meal",
+      "id": "ex-20261012-lunch-egg",
+      "date": "2026-10-12",
+      "time": "12:20",
+      "name": "卤蛋",
+      "g": 50,
+      "kcal": 72,
+      "p": 6.3,
+      "c": 0.6,
+      "f": 4.8,
+      "estimated": true
+    }
+  ]
+}

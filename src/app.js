@@ -14,9 +14,9 @@ var FOOD_DB=(window.FIT_DATA&&window.FIT_DATA.foods)||{foods:[]};
 var EXAMPLE_PROFILES=(window.FIT_DATA&&window.FIT_DATA.examples)||[];
 /** 底部导航 4 个分组；HUB 分组的首页不显示子标签，详情页显示返回按钮 */
 var ICONS={today:'home',train:'train',data:'chart',me:'user'};
-var GROUPS=[['today','今天',['overview','diet','dietAdd','dietAI','dietFood']],['train','训练',['train','cardio','perf']],['data','数据',['data','body','nutri','tstats','sleep','hormone','injury','supp']],['me','我的',['settings']]];
-var HUB={today:'overview',data:'data'};
-var SEC_LABEL={overview:'今天',diet:'饮食',dietAdd:'添加食物',dietFood:'食物',dietAI:'拍照识别',train:'力量',cardio:'有氧',perf:'表现',data:'数据',body:'身体',nutri:'营养',tstats:'训练统计',muscle:'肌群恢复',sleep:'睡眠',supp:'补剂',hormone:'恢复/化验',injury:'伤病',settings:'我的'};
+var GROUPS=[['today','今天',['overview','diet','dietAdd','dietAI','dietFood']],['train','训练',['train','cardio','perf']],['data','数据',['data','body','nutri','tstats','sleep','hormone','injury','supp','notes']],['me','我的',['settings','impPack']]];
+var HUB={today:'overview',data:'data',me:'settings'};
+var SEC_LABEL={overview:'今天',diet:'饮食',dietAdd:'添加食物',dietFood:'食物',dietAI:'拍照识别',train:'力量',cardio:'有氧',perf:'表现',data:'数据',body:'身体',nutri:'营养',tstats:'训练统计',muscle:'肌群恢复',sleep:'睡眠',supp:'补剂',hormone:'恢复/化验',injury:'伤病',settings:'我的',impPack:'粘贴导入',notes:'心得'};
 var lastSub={};
 /** 内联 SVG 图标（见 src/icons.js） */
 function IC(n){return window.FitIcons?FitIcons.svg(n):'';}
@@ -31,7 +31,7 @@ function defaults(){return{v:1,
  perfEvents:[{id:'vj',name:'纵跳',unit:'cm',better:'higher',hist:null}],perfLog:[],
  // 伤病：默认空，可在设置中加载示例配置
  plans:[],sessions:[],active:null,exRules:{},
- injuries:[],wristLog:[],rehabLog:{},rehab:[],restricted:[],customFoods:[],suppLog:{},sleep:[],body:[],recov:[],labs:[],theme:'auto'};}
+ injuries:[],wristLog:[],rehabLog:{},rehab:[],restricted:[],customFoods:[],suppLog:{},sleep:[],body:[],recov:[],labs:[],notes:[],theme:'auto'};}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 var S;
 function load(){var d=defaults();try{var raw=localStorage.getItem(KEY);if(raw==null){for(var li=0;li<LEGACY_KEYS.length;li++){raw=localStorage.getItem(LEGACY_KEYS[li]);if(raw!=null){localStorage.setItem(KEY,raw);break;}}}var r=JSON.parse(raw||'null');if(r&&typeof r==='object'){for(var k in d){if(r[k]===undefined)r[k]=d[k];}for(var g in d.goals){if(r.goals[g]===undefined)r.goals[g]=d.goals[g];}for(var pk in d.profile){if(r.profile[pk]===undefined)r.profile[pk]=d.profile[pk];}return r;}}catch(e){}return d;}
@@ -131,7 +131,7 @@ function otHtml(d){var s=otSignals(d);if(!s.length)return'';var lvl=s.length>=3?
 /* ---------- 渲染 ---------- */
 function render(){
  document.querySelectorAll('[data-rng]').forEach(function(el){var k=el.getAttribute('data-rng'),v=rng(k);el.innerHTML=[[7,'7天'],[30,'30天'],[90,'90天'],[0,'全部']].map(function(o){return'<button data-rngk="'+k+'" data-rngv="'+o[0]+'" class="'+(o[0]===v?'on':'')+'">'+o[1]+'</button>';}).join('');});
- if(cur==='overview')rOverview();else if(cur==='diet')rDiet();else if(cur==='dietAdd')rDietAdd();else if(cur==='dietFood')rDietFood();else if(cur==='dietAI')rDietAI();else if(cur==='nutri')chNutrition();else if(cur==='data')rData();else if(cur==='train'||cur==='cardio'||cur==='perf'||cur==='tstats')rTrain();else if(cur==='muscle')rMuscle();else if(cur==='supp')rSupp();else if(cur==='sleep')rSleep();else if(cur==='body')rBody();else if(cur==='hormone')rHormone();else if(cur==='settings'){rSettings();rAiCard();}else if(cur==='injury')rInjury();
+ if(cur==='overview')rOverview();else if(cur==='diet')rDiet();else if(cur==='dietAdd')rDietAdd();else if(cur==='dietFood')rDietFood();else if(cur==='dietAI')rDietAI();else if(cur==='nutri')chNutrition();else if(cur==='data')rData();else if(cur==='train'||cur==='cardio'||cur==='perf'||cur==='tstats')rTrain();else if(cur==='muscle')rMuscle();else if(cur==='supp')rSupp();else if(cur==='sleep')rSleep();else if(cur==='body')rBody();else if(cur==='hormone')rHormone();else if(cur==='settings'){rSettings();rAiCard();}else if(cur==='injury')rInjury();else if(cur==='impPack')rImp();else if(cur==='notes')rNotes();
 }
 function drawCharts(){render();}
 
@@ -195,12 +195,12 @@ function rData(){var g=S.goals,h='',d7=[],d14=[],i;for(i=6;i>=0;i--)d7.push(addD
  CH.bars($('#chDTr'),{h:80,cats:d7.map(function(d){var n=S.workouts.filter(function(w){return w.date===d;}).reduce(function(a,w){return a+(w.sets||1);},0);return{l:md(d),d:d,v:n,has:n>0,color:'var(--acc)'};}),unit:' 组',emptyMsg:'近 7 天没有力量训练',emptyHint:'在「训练」中开始今日推荐'});
  CH.bars($('#chDNut'),{h:80,cats:d7.map(function(d){return{l:md(d),d:d,v:Math.round(dayTot(d).k),color:'var(--k)'};}),goal:g.kcal,unit:' kcal',emptyMsg:'暂无饮食记录'});
  CH.line($('#chDRd'),{h:80,series:[{name:'准备度',color:'var(--acc)',pts:d14.map(function(d){var x=readiness(d);return{d:d,y:x?x.score:null};}),area:true}],yl:{min:0,max:100},emptyMsg:'暂无准备度',emptyHint:'记录睡眠与晨起指标后计算'});
- $('#dataMore').innerHTML=[['sleep','睡眠'],['hormone','恢复/化验'],['muscle','肌群'],['injury','伤病'],['supp','补剂'],['perf','运动表现'],['tstats','训练统计'],['nutri','营养分析']].map(function(x){return'<button class="chip" data-go="'+x[0]+'">'+x[1]+'</button>';}).join('');
+ $('#dataMore').innerHTML=[['sleep','睡眠'],['notes','心得'],['hormone','恢复/化验'],['muscle','肌群'],['injury','伤病'],['supp','补剂'],['perf','运动表现'],['tstats','训练统计'],['nutri','营养分析']].map(function(x){return'<button class="chip" data-go="'+x[0]+'">'+x[1]+'</button>';}).join('');
 }
 
 /* ---------- 饮食（v2.1）：餐次分配 / 记录快照 / 最近常吃 / 月历 / 目标推导 / 自定义与组合 ---------- */
 var MEALS=['早餐','午餐','晚餐','加餐'],SPLIT0=[25,35,30,10];
-var SRC_LBL={lib:'内置库',quick:'快速输入',photo:'教练照片估算',ai:'拍照识别估算',custom:'自定义'};
+var SRC_LBL={lib:'内置库',quick:'快速输入',photo:'教练照片估算',ai:'拍照识别估算',import:'AI 导入',custom:'自定义'};
 /** 旧版"练前/练后"等餐次计入加餐 */
 function mealGroup(m){return MEALS.indexOf(m)>=0?m:'加餐';}
 function mealSplit(){var s=S.goals.mealSplit||{},o={},sum=0;MEALS.forEach(function(m,i){o[m]=s[m]!=null?s[m]:SPLIT0[i];sum+=o[m];});o._sum=sum||100;return o;}
@@ -216,7 +216,7 @@ function mkMeal(o){var m={id:uid(),date:sel,meal:o.meal||dMeal(),food:o.name||o.
  ['foodId','amount','unit','g','nutrimentsPer100g','lo','hi','na','fib','kcalOnly','via'].forEach(function(k){if(o[k]!=null&&o[k]!=='')m[k]=o[k];});return m;}
 function cloneMeal(m){var o=JSON.parse(JSON.stringify(m));o.id=uid();o.date=sel;o.meal=dMeal();return o;}
 function mealLabel(m){return m.food||m.name||'';}
-function mealTags(m){var t='';if(m.src==='ai')t+='<span class="tag est">估算</span> ';else if(m.src==='photo')t+='<span class="tag est">估算'+(m.lo&&m.hi?' '+Math.round(m.lo)+'–'+Math.round(m.hi):'')+'</span> ';else if(m.kcalOnly)t+='<span class="tag">仅热量</span> ';
+function mealTags(m){var t='';if(m.src==='ai'||m.est)t+='<span class="tag est">估算</span> ';else if(m.src==='photo')t+='<span class="tag est">估算'+(m.lo&&m.hi?' '+Math.round(m.lo)+'–'+Math.round(m.hi):'')+'</span> ';else if(m.kcalOnly)t+='<span class="tag">仅热量</span> ';
  if(m.meal&&MEALS.indexOf(m.meal)<0)t+='<span class="tag">'+esc(m.meal)+'</span> ';return t;}
 /** 最近 / 最常吃：近 60 天按次数、再按最近日期排序，取 8 项 */
 function recentFoods(){var from=addDays(today(),-60),map={},list=[];S.meals.forEach(function(m){if(m.date<from)return;var k=normName(mealLabel(m))+'|'+Math.round(m.kcal||0);var e=map[k];if(!e){e=map[k]={m:m,n:0,last:''};list.push(e);}e.n++;if(m.date>=e.last){e.last=m.date;e.m=m;}});
@@ -1245,6 +1245,164 @@ $('#aiBox').addEventListener('click',function(e){var b=e.target.closest('[data-a
  else if(a==='again'){AI.phase='pick';AI.items=[];rDietAI();}
  else if(a==='rec')aiRecord();});
 
+/* ===== v2.5 导入包：AI 教练生成数据 → 本机预览 → 确认后合并（只在本机处理，不经过服务器）。格式见 docs/data-format.md ===== */
+var IMP={phase:'paste',text:'',pack:null,rows:[],err:null,undo:null,res:null,viaLink:false};
+var IMP_MAX_LINK=60000,IMP_MAX_TEXT=2097152,IMP_MAX_N=2000;
+var IMP_TYPES={meal:['饮食','diet'],workout:['训练','train'],supplement:['补剂','pill'],sleep:['睡眠','moon'],body:['身体','body'],note:['心得','note']};
+var IMP_MEAL={breakfast:'早餐',lunch:'午餐',dinner:'晚餐',snack:'加餐'};
+var IMP_ST={'new':['新增','ok'],update:['更新','acc'],merge:['合并','acc'],same:['已存在','mut'],bad:['无效','bad']};
+var IMP_ID=/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/,IMP_D=/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,IMP_T=/^([01]\d|2[0-3]):[0-5]\d$/;
+function impErr(m){var e=new Error(m);e.imp=true;return e;}
+/* 数字字段：缺省返回 undefined；类型或范围不对抛出说明 */
+function impN(e,k,lo,hi,int){var v=e[k];if(v==null)return undefined;if(typeof v!=='number'||!isFinite(v))throw impErr(k+' 应为数字');if(v<lo||v>hi)throw impErr(k+' 超出范围 '+lo+'–'+hi);if(int&&v!==Math.round(v))throw impErr(k+' 应为整数');return v;}
+function impS(e,k,max,req){var v=e[k];if(v==null||v===''){if(req)throw impErr('缺少 '+k);return undefined;}if(typeof v!=='string')throw impErr(k+' 应为文本');v=v.trim();if(!v&&req)throw impErr('缺少 '+k);if(v.length>max)throw impErr(k+' 超过 '+max+' 字');return v;}
+function impFind(arr,id){for(var i=0;i<arr.length;i++)if(arr[i].imp===id||arr[i].id===id)return arr[i];return null;}
+function impSame(a,b,keys){for(var i=0;i<keys.length;i++){var k=keys[i],x=a[k],y=b[k];if(x==null&&y==null)continue;if(JSON.stringify(x)!==JSON.stringify(y))return false;}return true;}
+function impKcal(n){return Math.round(n)+' kcal';}
+/** 单条：校验 + 规范化为 FreeBody 记录 + 与本机数据比对，返回预览行 */
+function impRow(e,seen,src){var row={type:e&&e.type,id:e&&e.id,date:e&&e.date,status:'bad',title:'',detail:'',tags:[]};
+ try{
+  if(!e||typeof e!=='object'||Array.isArray(e))throw impErr('条目应为对象');
+  if(!IMP_TYPES[e.type])throw impErr('不支持的类型 '+(e.type==null?'(缺少 type)':String(e.type)));
+  if(typeof e.id!=='string'||!IMP_ID.test(e.id))throw impErr('id 缺失或格式不对（字母数字开头，可含 . _ : -，最长 64）');
+  if(seen[e.type+'|'+e.id])throw impErr('包内重复的 id');seen[e.type+'|'+e.id]=1;
+  if(typeof e.date!=='string'||!IMP_D.test(e.date))throw impErr('date 应为 YYYY-MM-DD');
+  var t=e.type,id=e.id,d=e.date,old,rec;
+  if(t==='meal'){
+   var nm=impS(e,'name',80,true),ml=e.meal==null?null:(IMP_MEAL[String(e.meal).toLowerCase()]||e.meal),tm=impS(e,'time',5);
+   if(tm&&!IMP_T.test(tm))throw impErr('time 应为 HH:MM');
+   if(ml==null&&tm)ml=mealOfHour(+tm.slice(0,2));if(MEALS.indexOf(ml)<0)throw impErr('meal 应为 早餐 / 午餐 / 晚餐 / 加餐');
+   var g=impN(e,'g',0,5000),k=impN(e,'kcal',0,10000);if(k==null)throw impErr('缺少 kcal');
+   var p=impN(e,'p',0,1000),c=impN(e,'c',0,2000),f=impN(e,'f',0,1000),fib=impN(e,'fib',0,300),na=impN(e,'na',0,50000),lo=impN(e,'lo',0,10000),hi=impN(e,'hi',0,10000);
+   if(e.estimated!=null&&typeof e.estimated!=='boolean')throw impErr('estimated 应为 true / false');
+   var disp=nm+(g&&!/\d\s*(g|克|ml|毫升)$/i.test(nm)?' '+Math.round(g)+'g':'');
+   rec={id:id,imp:id,date:d,meal:ml,food:disp,name:disp,kcal:r1(k),p:r1(p||0),c:r1(c||0),f:r1(f||0),src:'import',via:'import',est:!!e.estimated};
+   if(fib!=null)rec.fib=r1(fib);if(na!=null)rec.na=Math.round(na);if(lo!=null&&hi!=null&&hi>=lo){rec.lo=lo;rec.hi=hi;}
+   if(g){rec.g=r1(g);rec.amount=r1(g);rec.unit='g';var q=100/g;rec.nutrimentsPer100g={kcal:r1(k*q),p:r1((p||0)*q),c:r1((c||0)*q),f:r1((f||0)*q)};}
+   var nt=impS(e,'note',200);if(nt)rec.note=nt;
+   row.title=ml+' · '+disp;row.detail=impKcal(k)+' · 蛋白 '+r1(p||0)+' · 碳水 '+r1(c||0)+' · 脂肪 '+r1(f||0)+' g';if(rec.est)row.tags.push('估算');
+   old=impFind(S.meals,id);row.recs=[rec];row.old=old;row.status=!old?'new':impSame(old,rec,['date','meal','name','kcal','p','c','f','g','est','fib','na','note'])?'same':'update';
+  }else if(t==='workout'){
+   var ex=impS(e,'exercise',60,true);if(!Array.isArray(e.sets)||!e.sets.length)throw impErr('sets 应为非空数组');if(e.sets.length>50)throw impErr('sets 最多 50 组');
+   if(e.flag!=null&&typeof e.flag!=='boolean')throw impErr('flag 应为 true / false');var wn=impS(e,'note',200)||'';
+   rec=e.sets.map(function(s,i){if(!s||typeof s!=='object')throw impErr('第 '+(i+1)+' 组格式不对');var r=impN(s,'reps',0,500,true);if(r==null)throw impErr('第 '+(i+1)+' 组缺少 reps');
+    var w=impN(s,'weight',0,1000)||0,ri=impN(s,'rir',0,10);return{id:id+'#'+(i+1),imp:id,date:d,exercise:ex,sets:1,reps:r,weight:w,rir:ri==null?null:ri,rpe:ri==null?null:10-ri,note:impS(s,'note',100)||wn,wrist:!!e.flag,via:'import'};});
+   var grp={};rec.forEach(function(x){var k2=x.reps+'×'+(x.weight?x.weight+'kg':'自重');grp[k2]=(grp[k2]||0)+1;});
+   var ks=Object.keys(grp);row.title=ex;row.detail=rec.length+' 组 · '+ks.map(function(k2){return k2.replace('×',' 次 × ')+(grp[k2]>1?' ×'+grp[k2]:'');}).join('，')+(rec[0].rir!=null?' · RIR '+rec.map(function(x){return x.rir==null?'-':x.rir;}).join('/'):'');if(e.flag)row.tags.push(S.profile.injuryFlagLabel||'伤处不适');
+   old=S.workouts.filter(function(w){return w.imp===id;});row.recs=rec;row.old=old;
+   row.status=!old.length?'new':old.length===rec.length&&rec.every(function(x,i){return impSame(old[i],x,['date','exercise','reps','weight','rir','wrist','note']);})?'same':'update';
+  }else if(t==='supplement'){
+   var sn=impS(e,'name',40,true),ds=impS(e,'dose',40),at=impS(e,'time',5);if(at&&!IMP_T.test(at))throw impErr('time 应为 HH:MM');
+   var sp=S.supps.find(function(x){return x.name.trim().toLowerCase()===sn.toLowerCase();}),lg=sp&&S.suppLog[d]&&S.suppLog[d][sp.id];
+   row.title=sn+(ds?' '+ds:'');row.detail=(at?'打卡 '+at:'打卡')+(sp?'':' · 将新增到补剂清单');row.recs=[{name:sn,dose:ds||'',at:at||'',imp:id,date:d}];
+   row.status=!lg?'new':(!at||lg.at===at)?'same':'update';
+  }else if(t==='sleep'){
+   var bd=impS(e,'bed',5,true),wk=impS(e,'wake',5,true);if(!IMP_T.test(bd)||!IMP_T.test(wk))throw impErr('bed / wake 应为 HH:MM');
+   var qq=impN(e,'q',1,5,true),sn2=impS(e,'note',200);
+   old=impFind(S.sleep,id)||S.sleep.find(function(x){return x.date===d;});
+   rec={date:d,bed:bd,wake:wk,dur:sleepDur(bd,wk)};rec.q=qq!=null?qq:old?old.q:null;rec.note=sn2!=null?sn2:old?old.note||'':'';
+   row.title='睡眠 '+bd+'–'+wk;row.detail=r1(rec.dur)+' 小时'+(rec.q?' · 质量 '+rec.q+'/5':'');row.recs=[rec];row.old=old;
+   row.status=!old?'new':impSame(old,rec,['date','bed','wake','q','note'])?'same':(old.imp===id||old.id===id)?'update':'merge';
+  }else if(t==='body'){
+   var bo={weight:impN(e,'weight',20,400),bf:impN(e,'bf',2,75),waist:impN(e,'waist',30,250),rhr:impN(e,'rhr',20,220,true)};
+   if(bo.weight==null&&bo.bf==null&&bo.waist==null&&bo.rhr==null)throw impErr('weight / bf / waist / rhr 至少填一项');
+   old=impFind(S.body,id)||S.body.find(function(x){return x.date===d;});rec={date:d};['weight','bf','waist','rhr'].forEach(function(k2){rec[k2]=bo[k2]!=null?bo[k2]:old&&old[k2]!=null?old[k2]:null;});
+   row.title='身体指标';row.detail=[['weight','体重 ',' kg'],['bf','体脂 ','%'],['waist','腰围 ',' cm'],['rhr','静息心率 ',' bpm']].filter(function(x){return bo[x[0]]!=null;}).map(function(x){return x[1]+bo[x[0]]+x[2];}).join(' · ');row.recs=[rec];row.old=old;
+   row.status=!old?'new':impSame(old,rec,['weight','bf','waist','rhr'])?'same':(old.imp===id||old.id===id)?'update':'merge';
+  }else if(t==='note'){
+   var tx=impS(e,'text',2000,true),ti=impS(e,'title',60),tg=e.tags==null?[]:e.tags;
+   if(!Array.isArray(tg)||tg.length>10||tg.some(function(x){return typeof x!=='string'||!x.trim()||x.length>20;}))throw impErr('tags 应为最多 10 个、每个不超过 20 字的文本');
+   rec={id:id,imp:id,date:d,title:ti||'',text:tx,tags:tg.map(function(x){return x.trim();}),from:src||''};
+   row.title=ti||'心得';row.detail=tx.length>60?tx.slice(0,60)+'…':tx;old=impFind(S.notes,id);row.recs=[rec];row.old=old;
+   row.status=!old?'new':impSame(old,rec,['date','title','text','tags'])?'same':'update';
+  }
+ }catch(x){if(!x.imp)throw x;row.status='bad';row.reason=x.message;if(!row.title)row.title=IMP_TYPES[row.type]?IMP_TYPES[row.type][0]:'未知条目';}
+ return row;}
+/** 解析整包（对象）；包级错误抛出 */
+function impPlan(pk){
+ if(Array.isArray(pk))pk={freebody:'import',version:1,entries:pk};
+ if(!pk||typeof pk!=='object')throw impErr('内容不是 FreeBody 导入包');
+ if(pk.freebody!=='import'){if(pk.v===1&&(pk.meals||pk.workouts))throw impErr('这是完整备份文件，请用「导入 JSON」恢复备份。');throw impErr('缺少 "freebody": "import"，不是 FreeBody 导入包');}
+ if(pk.version!==1)throw impErr(typeof pk.version==='number'&&pk.version>1?'导入包版本 '+pk.version+' 较新，请先更新 FreeBody':'version 应为 1');
+ if(!Array.isArray(pk.entries)||!pk.entries.length)throw impErr('entries 为空');
+ if(pk.entries.length>IMP_MAX_N)throw impErr('一次最多导入 '+IMP_MAX_N+' 条，请拆分');
+ var seen={},src=typeof pk.source==='string'?pk.source.slice(0,60):'';
+ return pk.entries.map(function(e){return impRow(e,seen,src);});}
+function impStrip(t){t=String(t||'').trim();var m=/^```[a-z]*\s*([\s\S]*?)\s*```$/i.exec(t);if(m)t=m[1].trim();return t;}
+function impB64(s){s=s.replace(/-/g,'+').replace(/_/g,'/').replace(/\s/g,'');if(/[^A-Za-z0-9+/=]/.test(s))throw impErr('链接中含有无效字符');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+var IMP_CUT='链接内容不完整，可能在转发时被截断。请让 AI 改为输出 JSON，然后用「粘贴导入」。';
+/** 链接载荷 → JSON 文本（Promise）。z. 前缀 = deflate-raw 压缩；否则为未压缩 UTF-8 JSON 的 base64url */
+function impDecode(s){return new Promise(function(res,rej){
+ try{s=decodeURIComponent(s);}catch(e){}
+ if(s.length>IMP_MAX_LINK)return rej(impErr('链接过长（'+s.length+' 字符），请让 AI 输出 JSON，改用「粘贴导入」。'));
+ var z=s.slice(0,2)==='z.',u;try{u=impB64(z?s.slice(2):s);}catch(e){return rej(impErr(IMP_CUT));}
+ var txt=function(b){try{res(new TextDecoder('utf-8',{fatal:true}).decode(b));}catch(e){rej(impErr(IMP_CUT));}};
+ if(!z)return txt(u);
+ if(typeof DecompressionStream==='undefined')return rej(impErr('当前浏览器不支持压缩链接，请让 AI 输出 JSON，改用「粘贴导入」。'));
+ try{new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(ab){txt(new Uint8Array(ab));},function(){rej(impErr(IMP_CUT));});}catch(e){rej(impErr(IMP_CUT));}});}
+function impLinkPart(t){var m=/#import=([^\s]+)/.exec(t);return m?m[1]:null;}
+/** 文本 / 链接 → 预览 */
+function impLoad(t,viaLink){IMP.err=null;IMP.viaLink=!!viaLink;
+ var lp=viaLink?t:impLinkPart(t);
+ var go=function(json){var pk;if(json.length>IMP_MAX_TEXT){IMP.err='内容过大（超过 2 MB），请拆分后再导入。';return impShow();}
+  try{pk=JSON.parse(impStrip(json));}catch(e){IMP.err=(lp?IMP_CUT:'不是有效的 JSON：'+e.message);return impShow();}
+  try{IMP.rows=impPlan(pk);IMP.pack=pk;IMP.phase='preview';}catch(e){if(!e.imp)throw e;IMP.err=e.message;}impShow();};
+ if(lp)impDecode(lp).then(go,function(e){IMP.err=e.message;impShow();});else go(t);}
+function impShow(){if(IMP.err&&IMP.viaLink)IMP.phase='paste';if(cur!=='impPack')show('impPack',true);else rImp();}
+function impCount(){var c={'new':0,update:0,merge:0,same:0,bad:0};IMP.rows.forEach(function(r){c[r.status]++;});return c;}
+/** 写入：逐条按预览时的判断合并；写前保存快照，可撤销 */
+function impApply(){var rows=IMP.rows.filter(function(r){return r.status==='new'||r.status==='update'||r.status==='merge';});if(!rows.length)return;
+ IMP.undo=JSON.stringify(S);
+ rows.forEach(function(r){var rec=r.recs[0],i;
+  if(r.type==='meal'){i=S.meals.indexOf(r.old);if(i>=0)S.meals[i]=rec;else S.meals.push(rec);}
+  else if(r.type==='workout'){S.workouts=S.workouts.filter(function(w){return w.imp!==r.id;});r.recs.forEach(function(x){S.workouts.push(x);});}
+  else if(r.type==='supplement'){var sp=S.supps.find(function(x){return x.name.trim().toLowerCase()===rec.name.toLowerCase();});if(!sp){sp={id:uid(),name:rec.name,dose:rec.dose,time:''};S.supps.push(sp);}
+   var L=S.suppLog[rec.date]||(S.suppLog[rec.date]={}),n=new Date();L[sp.id]={at:rec.at||(L[sp.id]&&L[sp.id].at)||pad(n.getHours())+':'+pad(n.getMinutes()),imp:r.id};}
+  else if(r.type==='sleep'||r.type==='body'){var arr=S[r.type];if(r.old){for(var k in rec)r.old[k]=rec[k];r.old.imp=r.old.imp||r.id;}else{rec.id=r.id;rec.imp=r.id;arr.push(rec);}}
+  else if(r.type==='note'){i=S.notes.indexOf(r.old);if(i>=0)S.notes[i]=rec;else S.notes.push(rec);}});
+ save();var c=impCount();IMP.res={n:rows.length,c:c,dates:rows.map(function(r){return r.date;}).sort()};IMP.phase='done';impClearHash();toast('已导入 '+rows.length+' 条');rImp();}
+function impClearHash(){if(/^#import=/.test(location.hash))try{history.replaceState(null,'',location.pathname+location.search);}catch(e){location.hash='';}}
+function impReset(){IMP.phase='paste';IMP.rows=[];IMP.pack=null;IMP.err=null;IMP.res=null;IMP.viaLink=false;}
+function impWd(d){var x=new Date(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10));return(+d.slice(5,7))+'月'+(+d.slice(8,10))+'日 '+DT_WD[x.getDay()]+(d===today()?' · 今天':'');}
+function rImp(){var h='',b=$('#impBox');if(!b)return;SEC_LABEL.impPack=IMP.phase==='preview'?'导入预览':IMP.phase==='done'?'导入完成':'粘贴导入';var snt=document.querySelector('#subnav .sn-t');if(snt&&cur==='impPack')snt.textContent=SEC_LABEL.impPack;
+ if(IMP.phase==='paste'){
+  h+='<div class="card"><h2>粘贴导入</h2><p class="mut">粘贴 AI 教练生成的 FreeBody 导入包（JSON），或包含 <code>#import=</code> 的导入链接。内容只在本机解析，不经过任何服务器；确认前不会写入。</p>'+
+   '<textarea id="ipText" rows="8" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="导入内容" placeholder=\'{"freebody":"import","version":1,"entries":[ … ]}\'>'+esc(IMP.text)+'</textarea>'+
+   (IMP.err?'<div class="alert bad imp-err" role="alert">'+IC('alert')+'<div>'+esc(IMP.err)+'</div></div>':'')+
+   '<div class="actions"><button id="ipGo">'+IC('search')+'预览</button>'+(navigator.clipboard&&navigator.clipboard.readText?'<button class="ghost" id="ipClip">'+IC('paste')+'从剪贴板粘贴</button>':'')+'</div>'+
+   '<p class="mut imp-foot">格式见仓库 docs/data-format.md。也可以让 AI 给出导入链接，在本机浏览器打开即可。</p></div>';
+ }else if(IMP.phase==='preview'){var c=impCount(),pk=IMP.pack||{},n=c['new']+c.update+c.merge,byD={};
+  IMP.rows.forEach(function(r){var k=r.date&&IMP_D.test(r.date)?r.date:'?';(byD[k]=byD[k]||[]).push(r);});
+  h+='<div class="card imp-sum"><div class="hrow"><h2>导入预览</h2><span class="mut">'+IMP.rows.length+' 条</span></div>'+
+   ((pk.source||pk.created)?'<p class="mut imp-src">'+IC('link')+'<span>'+(pk.source?'来自 '+esc(String(pk.source).slice(0,60)):'')+(pk.source&&pk.created?' · ':'')+(pk.created?esc(String(pk.created).slice(0,16).replace('T',' ')):'')+'</span></p>':'')+
+   '<div class="imp-stats">'+[['new','新增',c['new']],['update','合并',c.update+c.merge],['same','已存在',c.same],['bad','无效',c.bad]].map(function(x){return'<div class="imp-st st-'+x[0]+(x[2]?'':' zero')+'"><b>'+x[2]+'</b><span>'+x[1]+'</span></div>';}).join('')+'</div>'+
+   (c.same?'<p class="mut imp-note">已存在且内容相同的条目会跳过。</p>':'')+(c.bad?'<p class="imp-note bad-t">无效条目不会写入，原因见下方。</p>':'')+'</div>';
+  Object.keys(byD).sort().reverse().forEach(function(d){h+='<div class="card imp-day"><h3>'+(d==='?'?'日期无效':impWd(d))+'</h3><ul class="imp-list">'+byD[d].map(function(r){var ty=IMP_TYPES[r.type],st=IMP_ST[r.status];
+   return'<li class="imp-it is-'+r.status+'"><span class="imp-ic" aria-hidden="true">'+IC(ty?ty[1]:'alert')+'</span><div class="imp-tx"><b>'+esc(r.title)+'</b>'+(r.detail?'<div class="mut">'+esc(r.detail)+'</div>':'')+(r.reason?'<div class="bad-t">'+esc(r.reason)+'</div>':'')+'</div>'+
+    '<div class="imp-tg">'+r.tags.map(function(t){return'<span class="tag est">'+esc(t)+'</span>';}).join('')+'<span class="tag st-'+r.status+'">'+st[0]+'</span></div></li>';}).join('')+'</ul></div>';});
+  h+='<div class="imp-bar"><button id="ipOk"'+(n?'':' disabled')+'>'+IC('check')+(n?'确认导入 '+n+' 条':'没有可导入的条目')+'</button><button class="ghost" id="ipNo">取消</button></div>';
+ }else{var r=IMP.res||{n:0,dates:[]},last=r.dates[r.dates.length-1];
+  h+='<div class="card imp-done"><div class="imp-ok">'+IC('check')+'</div><h2>已导入 '+r.n+' 条</h2><p class="mut">可以在对应页面查看、修改或删除。'+(r.dates.length?'日期 '+md(r.dates[0])+(r.dates[0]!==last?'–'+md(last):'')+'。':'')+'</p>'+
+   '<div class="actions"><button id="ipView">查看 '+(last===today()?'今天':md(last||today()))+'</button><button class="ghost" id="ipUndo">撤销导入</button><button class="ghost" id="ipDone">完成</button></div></div>';}
+ b.innerHTML=h;}
+document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('#ipGo,#ipClip,#ipOk,#ipNo,#ipView,#ipUndo,#ipDone,#pasteImp');if(!t)return;var id=t.id;
+ if(id==='pasteImp'){impReset();show('impPack',true);setTimeout(function(){var x=$('#ipText');if(x)x.focus();},50);}
+ else if(id==='ipGo'){IMP.text=$('#ipText').value;if(!IMP.text.trim()){IMP.err='请先粘贴导入包内容。';rImp();return;}impLoad(IMP.text,false);}
+ else if(id==='ipClip'){navigator.clipboard.readText().then(function(x){IMP.text=x||'';rImp();if(IMP.text.trim())impLoad(IMP.text,false);},function(){toast('无法读取剪贴板，请手动粘贴');});}
+ else if(id==='ipOk')impApply();
+ else if(id==='ipNo'){impClearHash();var v=IMP.viaLink;impReset();if(v)show('overview');else rImp();}
+ else if(id==='ipUndo'){if(IMP.undo&&confirm('撤销这次导入？导入后的其他修改也会一并撤回。')){S=JSON.parse(IMP.undo);IMP.undo=null;save();toast('已撤销');impReset();show('settings');}}
+ else if(id==='ipView'){var r=IMP.res;sel=r&&r.dates.length?r.dates[r.dates.length-1]:today();$('#dSel').value=sel;impReset();show('overview');}
+ else if(id==='ipDone'){impReset();show('settings');}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='ipText')IMP.text=e.target.value;});
+function impFromHash(){var m=/^#import=(.+)$/.exec(location.hash||'');if(!m)return;IMP.text='';impLoad(m[1],true);}
+window.addEventListener('hashchange',impFromHash);
+/* 心得 */
+function rNotes(){var L=S.notes.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0;});$('#ntDate').textContent=impWd(sel);
+ $('#ntList').innerHTML=L.length?L.map(function(n){return'<li class="nt-it"><div class="nt-h"><b>'+esc(n.title||md(n.date))+'</b><span class="mut">'+md(n.date)+(n.from?' · '+esc(n.from):'')+'</span><button class="ghost sm nt-del" data-delnote="'+esc(n.id)+'" aria-label="删除这条心得">'+IC('trash')+'</button></div><p>'+esc(n.text).replace(/\n/g,'<br>')+'</p>'+(n.tags&&n.tags.length?'<div class="nt-tags">'+n.tags.map(function(t){return'<span class="tag">'+esc(t)+'</span>';}).join('')+'</div>':'')+'</li>';}).join(''):'<li class="empty mut">还没有心得。可以在这里记下训练或饮食的体会，也可以让 AI 教练整理后导入。</li>';}
+$('#ntSave').onclick=function(){var t=$('#ntText').value.trim();if(!t){toast('请先写点内容');return;}S.notes.push({id:uid(),date:sel,title:'',text:t.slice(0,2000),tags:[]});$('#ntText').value='';save();toast('已保存');render();};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-delnote]');if(!b)return;if(!confirm('删除这条心得？'))return;var a=b.getAttribute('data-delnote');S.notes=S.notes.filter(function(x){return x.id!==a;});save();render();});
+
 /* 通用点击：删除/模板 */
 document.addEventListener('click',function(e){var t=e.target.closest('button,input[type=checkbox]');if(!t)return;var a;
  if((a=t.getAttribute('data-delmeal'))){S.meals=S.meals.filter(function(x){return x.id!==a;});}
@@ -1335,6 +1493,7 @@ document.addEventListener('click',function(e){var t=e.target;if(t&&t.tagName==='
 document.addEventListener('keydown',function(e){var t=e.target;if(!(t&&t.tagName==='INPUT'&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('dtf')))return;
  if(e.key==='Enter'||e.key===' '){if(dtPick(t))e.preventDefault();}},true);
 (function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();dtWrap();todayBtn();layFill();};})();a11y();dtWrap();todayBtn();layFill();window.addEventListener('resize',layFill);
+impFromHash();
 function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
 /** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */
 document.addEventListener('keydown',function(e){var t=e.target;

@@ -318,6 +318,15 @@
  <div class="card"><div class="hrow"><h2>睡眠时长与质量</h2><div class="rng" data-rng="sleep"></div></div><div class="mut" id="slAvg"></div><div class="chart" id="chSleep"></div><div id="slList"></div></div>
 </section>
 
+<!-- 心得 -->
+<section id="notes">
+ <div class="card"><h2>写心得 <span class="mut" id="ntDate"></span></h2>
+  <textarea id="ntText" rows="3" maxlength="2000" placeholder="今天的训练、饮食或恢复体会" aria-label="心得内容"></textarea>
+  <div class="actions"><button id="ntSave">保存</button></div>
+ </div>
+ <div class="card"><h2>全部心得</h2><ul class="list nt-list" id="ntList"></ul></div>
+</section>
+
 <!-- 身体指标 -->
 <section id="body">
  <div class="card"><h2>记录</h2>
@@ -409,6 +418,7 @@
 </section>
 
 <!-- 设置 -->
+<section id="impPack"><div id="impBox"></div></section>
 <section id="settings" data-lay="dense">
  <div class="card"><h2>常用</h2><div class="chips"><button class="chip" data-go="supp">补剂清单</button><button class="chip" data-go="injury">伤病与限制</button><button class="chip" data-go="perf">运动表现</button><button class="chip" data-go="nutri">营养分析</button></div></div>
  <div class="card"><h2>个人配置</h2>
@@ -453,8 +463,8 @@
   <div class="row" style="margin-top:8px" id="csvTpl"></div>
  </details>
  <div class="card"><h2>数据备份</h2>
-  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。</p>
-  <div class="actions"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
+  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。「粘贴导入」可合并 AI 教练生成的导入包，先预览再写入。</p>
+  <div class="actions"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><button class="ghost" id="pasteImp"><i data-ic="paste"></i>粘贴导入</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card mut" style="font-size:12px">FreeBody · 数据只存本机 · 不构成医疗建议</div>

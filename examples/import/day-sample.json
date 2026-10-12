@@ -1,0 +1,123 @@
+{
+  "freebody": "import",
+  "version": 1,
+  "source": "示例 AI 教练",
+  "created": "2026-10-12T21:30:00+08:00",
+  "entries": [
+    {
+      "type": "meal",
+      "id": "ex-20261012-breakfast-oats",
+      "date": "2026-10-12",
+      "meal": "早餐",
+      "name": "燕麦牛奶",
+      "g": 300,
+      "kcal": 360,
+      "p": 16,
+      "c": 52,
+      "f": 9,
+      "estimated": false
+    },
+    {
+      "type": "meal",
+      "id": "ex-20261012-lunch-rice",
+      "date": "2026-10-12",
+      "meal": "午餐",
+      "name": "米饭",
+      "g": 200,
+      "kcal": 232,
+      "p": 5,
+      "c": 51,
+      "f": 0.6,
+      "estimated": true,
+      "note": "按一碗估算"
+    },
+    {
+      "type": "meal",
+      "id": "ex-20261012-lunch-chicken",
+      "date": "2026-10-12",
+      "meal": "午餐",
+      "name": "宫保鸡丁",
+      "g": 180,
+      "kcal": 320,
+      "p": 26,
+      "c": 12,
+      "f": 18,
+      "estimated": true,
+      "lo": 270,
+      "hi": 380
+    },
+    {
+      "type": "workout",
+      "id": "ex-20261012-squat",
+      "date": "2026-10-12",
+      "exercise": "杠铃深蹲",
+      "sets": [
+        {
+          "reps": 5,
+          "weight": 60,
+          "rir": 3
+        },
+        {
+          "reps": 5,
+          "weight": 60,
+          "rir": 2
+        },
+        {
+          "reps": 5,
+          "weight": 60,
+          "rir": 2
+        }
+      ]
+    },
+    {
+      "type": "workout",
+      "id": "ex-20261012-pullup",
+      "date": "2026-10-12",
+      "exercise": "引体向上",
+      "sets": [
+        {
+          "reps": 8,
+          "rir": 2
+        },
+        {
+          "reps": 7,
+          "rir": 1
+        }
+      ]
+    },
+    {
+      "type": "supplement",
+      "id": "ex-20261012-creatine",
+      "date": "2026-10-12",
+      "name": "肌酸",
+      "dose": "5g",
+      "time": "08:30"
+    },
+    {
+      "type": "sleep",
+      "id": "ex-20261012-sleep",
+      "date": "2026-10-12",
+      "bed": "23:30",
+      "wake": "07:10",
+      "q": 4
+    },
+    {
+      "type": "body",
+      "id": "ex-20261012-body",
+      "date": "2026-10-12",
+      "weight": 70.2,
+      "waist": 80
+    },
+    {
+      "type": "note",
+      "id": "ex-20261012-note",
+      "date": "2026-10-12",
+      "title": "深蹲手感",
+      "text": "第三组速度略慢，下次保持 60kg，先把三组都做到 RIR 2 再加重。",
+      "tags": [
+        "训练",
+        "深蹲"
+      ]
+    }
+  ]
+}

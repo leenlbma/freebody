@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/leenlbma/freebody/blob/main/schema/freebody.schema.json",
+  "title": "FreeBody 导入包 / FreeBody import pack",
+  "description": "增量导入包：由 AI 教练或其他工具生成，在 FreeBody「我的 › 数据备份 › 粘贴导入」或通过 #import= 链接导入。格式说明见 docs/data-format.md。An incremental import pack; see docs/data-format.en.md.",
+  "type": "object",
+  "required": [
+    "freebody",
+    "version",
+    "entries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "freebody": {
+      "const": "import"
+    },
+    "version": {
+      "const": 1,
+      "description": "格式版本 / format version"
+    },
+    "source": {
+      "type": "string",
+      "maxLength": 60,
+      "description": "生成方名称，如「AI 教练」，显示在预览中 / producer name shown in the preview"
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:?\\d{2})?)?$",
+      "description": "生成时间 ISO 8601 / creation time"
+    },
+    "note": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2000,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/meal"
+          },
+          {
+            "$ref": "#/$defs/workout"
+          },
+          {
+            "$ref": "#/$defs/supplement"
+          },
+          {
+            "$ref": "#/$defs/sleep"
+          },
+          {
+            "$ref": "#/$defs/body"
+          },
+          {
+            "$ref": "#/$defs/note"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$",
+      "description": "稳定的唯一标识。同一条目重复导入时用于去重合并。Stable unique id used to de-duplicate on re-import."
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
+      "description": "本地日期 YYYY-MM-DD / local date"
+    },
+    "time": {
+      "type": "string",
+      "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+      "description": "24 小时制 HH:MM / 24-hour time"
+    },
+    "meal": {
+      "type": "object",
+      "description": "一样食物 / one food item",
+      "required": [
+        "type",
+        "id",
+        "date",
+        "name",
+        "kcal"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "meal"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "meal": {
+          "enum": [
+            "早餐",
+            "午餐",
+            "晚餐",
+            "加餐",
+            "breakfast",
+            "lunch",
+            "dinner",
+            "snack"
+          ],
+          "description": "餐次；缺省时按 time 推断 / meal slot; inferred from time if omitted"
+        },
+        "time": {
+          "$ref": "#/$defs/time"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "g": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "实际吃下的克数（已扣除剩余）/ grams actually eaten"
+        },
+        "kcal": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000,
+          "description": "本条合计热量 / total kcal for this item"
+        },
+        "p": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "蛋白质 g / protein"
+        },
+        "c": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2000,
+          "description": "碳水 g / carbohydrate"
+        },
+        "f": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "脂肪 g / fat"
+        },
+        "fib": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 300,
+          "description": "膳食纤维 g / fibre"
+        },
+        "na": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50000,
+          "description": "钠 mg / sodium"
+        },
+        "estimated": {
+          "type": "boolean",
+          "description": "是否为估算值（照片或描述估算时为 true）/ true when estimated"
+        },
+        "lo": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000,
+          "description": "热量估算区间下限 / lower bound"
+        },
+        "hi": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000,
+          "description": "热量估算区间上限 / upper bound"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "workout": {
+      "type": "object",
+      "description": "一个动作的若干组 / one exercise with its sets",
+      "required": [
+        "type",
+        "id",
+        "date",
+        "exercise",
+        "sets"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "workout"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "exercise": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "sets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "required": [
+              "reps"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "reps": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 500,
+                "description": "次数 / reps"
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000,
+                "description": "重量 kg，自重填 0 或省略 / load in kg"
+              },
+              "rir": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10,
+                "description": "余力次数 RIR（RPE = 10 − RIR）"
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 100
+              }
+            }
+          }
+        },
+        "flag": {
+          "type": "boolean",
+          "description": "伤处不适标记 / pain or injury flag"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "supplement": {
+      "type": "object",
+      "description": "补剂打卡 / supplement check-in",
+      "required": [
+        "type",
+        "id",
+        "date",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "supplement"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "description": "按名称匹配补剂清单，没有则新增 / matched by name"
+        },
+        "dose": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "time": {
+          "$ref": "#/$defs/time"
+        }
+      }
+    },
+    "sleep": {
+      "type": "object",
+      "description": "睡眠，date 记在起床当天 / sleep, dated on the wake-up day",
+      "required": [
+        "type",
+        "id",
+        "date",
+        "bed",
+        "wake"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "sleep"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "bed": {
+          "$ref": "#/$defs/time"
+        },
+        "wake": {
+          "$ref": "#/$defs/time"
+        },
+        "q": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "主观质量 1–5 / quality"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "body": {
+      "type": "object",
+      "description": "身体指标，至少一项 / body metrics, at least one",
+      "required": [
+        "type",
+        "id",
+        "date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "body"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 400,
+          "description": "体重 kg"
+        },
+        "bf": {
+          "type": "number",
+          "minimum": 2,
+          "maximum": 75,
+          "description": "体脂 %"
+        },
+        "waist": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 250,
+          "description": "腰围 cm"
+        },
+        "rhr": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 220,
+          "description": "静息心率 bpm"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "weight"
+          ]
+        },
+        {
+          "required": [
+            "bf"
+          ]
+        },
+        {
+          "required": [
+            "waist"
+          ]
+        },
+        {
+          "required": [
+            "rhr"
+          ]
+        }
+      ]
+    },
+    "note": {
+      "type": "object",
+      "description": "心得 / journal note",
+      "required": [
+        "type",
+        "id",
+        "date",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "note"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          }
+        }
+      }
+    }
+  }
+}

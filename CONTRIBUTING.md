@@ -1,5 +1,7 @@
 # 贡献指南
 
+[中文](CONTRIBUTING.md) | [English](CONTRIBUTING.en.md)
+
 感谢你的贡献！本项目保持 **零依赖、单文件、离线可用** 的原则。
 
 ## 开发流程
@@ -27,6 +29,16 @@
 - 不得复制其他项目（尤其是 GPL/AGPL 项目）的代码、文案或素材；借鉴交互思路可以，需自行实现，并在 NOTICE 中说明。引入任何第三方 MIT 等宽松许可的数据时，须在 NOTICE 与 README 保留其版权声明。
 - 涉及健康/医疗的文案应保持"记录与参考"定位，不给出诊断或处方式建议。
 
+## 导入格式与 skill
+
+- 导入包格式由 `docs/data-format.md`、`schema/freebody.schema.json` 与应用内的 `impRow()` 共同定义，三者必须一致。新增字段时请同时更新 schema、`examples/import/` 示例、中英文文档和 `skills/freebody-coach/`。
+- `npm run check` 会用 schema 校验示例和文档中的 JSON 示例。
+- skill 中不得包含任何个人信息，并保留安全边界（不做医疗诊断，伤病建议就医）。
+
+## 文档语言
+
+界面只有简体中文；文档为中英双语。修改 README、`docs/data-format`、`docs/food-database`、本文件或 skill 时，请同步更新对应的 `.en.md`（英文版可以意译，但内容需对应）。
+
 ## 食物库贡献
 
 见 [docs/food-database.md](docs/food-database.md)。请注明数据来源，数值为每 100g 可食部。
@@ -34,7 +46,7 @@
 ## 隐私红线
 
 - 禁止在仓库中提交任何真实个人记录（导出 JSON、截图中的真实数据等）。
-- `examples/` 只能包含**配置与清单**，不得包含记录数据（体重、化验值、成绩等记录）。
+- `examples/` 只能包含**配置与清单**，不得包含记录数据（体重、化验值、成绩等记录）。`examples/import/` 中的导入包示例必须是明显的通用示例数据。
 
 ## 行为准则
 

@@ -1,5 +1,7 @@
 # 扩展食物库
 
+[中文](food-database.md) | [English](food-database.en.md)
+
 食物库位于 `data/foods.json`，构建时内联进 `index.html`。用户也可在应用内「我的 › 食物库 › 导入自定义食物 JSON」临时扩展（只存本机，不修改仓库）。
 
 ## 格式

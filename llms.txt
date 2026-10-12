@@ -1,6 +1,6 @@
 # FreeBody
 
-> 离线、单文件的健身追踪：训练 / 饮食 / 恢复 / 运动表现。隐私优先：全部数据只保存在浏览器 localStorage；无账号、无后端、不联网。
+> AI 健身教练的仪表盘：离线、单文件的训练 / 饮食 / 恢复记录与可视化。用户与自己的 AI 讨论训练和饮食，AI 生成导入包（JSON）或导入链接，FreeBody 在本机预览、去重合并并可视化。隐私优先：全部数据只保存在浏览器 localStorage；无账号、无后端。
 
 语言：简体中文。许可：MIT。
 
@@ -18,12 +18,16 @@ FreeBody is an offline, single-file fitness tracker (training, diet, recovery, p
 - docs/data-model.md：全量数据结构
 - docs/food-database.md：食物库结构与扩展方法
 - docs/csv-import.md：CSV 批量导入说明
+- docs/data-format.md（英文 docs/data-format.en.md）：增量导入包格式与导入链接 #import=
+- schema/freebody.schema.json：导入包 JSON Schema；examples/import/：示例
+- skills/freebody-coach/SKILL.md（英文 SKILL.en.md）：教 AI 估算饮食、记录训练、按 FreeBody 规则给建议并输出导入包的通用 Agent Skill
+- README.en.md：英文说明
 
 ## 构建
 
 - 环境：Node.js ≥ 14，零第三方依赖
 - `npm run build` → 生成单文件 index.html（内联全部资源、食物库与示例配置）
-- `npm run check` → 自检：确认产物为最新构建、内联脚本可解析、无 emoji、无占位符残留
+- `npm run check` → 自检：确认产物为最新构建、内联脚本可解析、无 emoji、无占位符残留，食物库与导入包示例符合 schema
 
 ## 许可
 

@@ -1,5 +1,7 @@
 # 数据结构
 
+AI 或其他工具向 FreeBody 写入数据请使用增量导入包，见 [data-format.md](data-format.md)。
+
 全部数据以一个 JSON 对象保存在 `localStorage['freeBody_v1']`（v2.0 起；首次启动时若存在旧键 `fitTracker_v1` 会自动复制过来，旧键保留，结构不变），导出文件即该对象原样。日期统一为本地日期字符串 `YYYY-MM-DD`；`id` 为随机短字符串。加载时会用 `defaults()` 为缺失字段补默认值，因此新增字段向后兼容。
 
 ```jsonc
@@ -21,7 +23,9 @@
                  "kcal", "p", "c", "f", "na", "fib",             // 本条合计；na 钠 mg、fib 膳食纤维 g 可缺省
                  "foodId", "amount", "unit", "g",                // 食物 id、输入的数量与单位（如 1 碗）、折算克数，可缺省
                  "nutrimentsPer100g": { "kcal", "p", "c", "f", "na", "fib" }, // 记录时的营养快照，可缺省
-                 "src": "lib|quick|photo|custom",                // 内置库 / 快速输入 / 教练照片估算 / 自定义；旧记录可缺省
+                 "src": "lib|quick|photo|ai|import|custom",      // 内置库 / 快速输入 / 教练照片估算 / 拍照识别 / 导入包 / 自定义；旧记录可缺省
+                 "est": true,                                    // 导入包中标为估算（src=import）
+                 "imp": "<导入包 id>",                            // 由导入包写入的记录（各类记录通用，用于重复导入时去重合并）
                  "lo", "hi",                                     // 照片估算区间 kcal（src=photo）
                  "kcalOnly": true }],                            // 只填了热量（如 "外卖 650"）
   "favFoods": [{ "food", "kcal", "p", "c", "f" }],
@@ -56,6 +60,9 @@
 
   // 身体指标
   "body": [{ "id", "date", "weight", "bf", "waist", "rhr" }],
+
+  // 心得（v2.5）
+  "notes": [{ "id", "date", "title", "text", "tags": [], "from": "导入包 source", "imp" }],
 
   // 激素/恢复
   "recov": [{ "id", "date", "rhr", "hrv", "stress", "energy", "soreness", "mood", "appetite" }], // 主观项 1-5

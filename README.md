@@ -1,14 +1,16 @@
+<p align="right"><b>中文</b> | <a href="README.en.md">English</a></p>
+
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/logo-reverse.svg"><img src="assets/logo.svg" alt="FreeBody" width="260"></picture></p>
 
-<p align="center">离线、单文件的个人训练与饮食记录。数据只在你自己的设备上。</p>
+<p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.4.1-2148b8" alt="version 2.4.1">
+<img src="https://img.shields.io/badge/version-2.5.0-2148b8" alt="version 2.5.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
 
-<p align="center"><a href="https://leenlbma.github.io/freebody/"><b>在线体验 →</b></a> &nbsp;·&nbsp; <a href="#快速开始">快速开始</a> &nbsp;·&nbsp; <a href="#english">English</a></p>
+<p align="center"><a href="https://leenlbma.github.io/freebody/"><b>在线体验 →</b></a> &nbsp;·&nbsp; <a href="#快速开始">快速开始</a> &nbsp;·&nbsp; <a href="#搭配-ai-使用">搭配 AI 使用</a> &nbsp;·&nbsp; <a href="README.en.md">English</a></p>
 
 <br>
 
@@ -20,7 +22,9 @@
 
 <br>
 
-FreeBody 是一个打开就能用的网页应用：一个 `index.html`，无账号、无后台、无第三方依赖。它记录力量训练、有氧、睡眠、体重与饮食，并把这些数据整理成一个每天可执行的决定——今天练什么、还能吃多少。
+FreeBody 是一个打开就能用的网页应用：一个 `index.html`，无账号、无后台、无第三方依赖。它记录力量训练、有氧、睡眠、体重与饮食，并把这些数据整理成每天可执行的决定：今天练什么、还能吃多少。
+
+你可以在应用里手动记录，也可以把它当作 **AI 健身教练的仪表盘**：在你常用的 AI 里聊训练、发餐食照片，AI 按[公开的数据格式](docs/data-format.md)生成导入包或导入链接，FreeBody 在本机预览、去重合并后写入，再用热图和图表呈现出来。
 
 > 本项目仅用于个人记录与趋势参考，**不构成医疗建议**。化验指标、伤病与补剂相关问题请咨询医生或专业人士。
 
@@ -77,7 +81,7 @@ FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pa
 ```bash
 git clone https://github.com/leenlbma/freebody.git && cd freebody
 npm run build    # 生成根目录 index.html 与 sw.js
-npm run check    # 语法、emoji、占位符、食物库校验
+npm run check    # 语法、emoji、占位符、食物库、导入包 schema 校验
 ```
 
 也可以只下载 `index.html` 直接用浏览器打开（`file://` 下没有离线缓存与更新提示，其余功能照常）。
@@ -116,6 +120,7 @@ npm run check    # 或 node scripts/check.js  → 语法自检
 
 - **数据只存本地**：所有记录只保存在本机浏览器的 localStorage（键名 `freeBody_v1`），不上传任何服务器。旧版 `fitTracker_v1` 数据会自动迁移，旧备份可直接导入。
 - **Key 只存本地**：拍照识别的 API Key 单独保存在本机（`freeBody_ai_v1`），导出备份时**默认不包含 Key**（可在设置中勾选包含，不推荐）。
+- **导入只在本机处理**：粘贴导入与链接导入（`#import=`）都在浏览器中解析，`#` 之后的内容不会发送给任何服务器，确认前不写入。
 - **唯一的网络请求**是你主动发起的拍照识别或测试连接：压缩后的照片会发送给你所选的服务商，并受其隐私政策约束。FreeBody 不保存照片。不配置 Key 时应用不发起任何网络请求。
 - 清除浏览器数据或换设备会丢失记录，请定期在「我的 › 数据备份」导出 JSON。备份含个人健康信息，请妥善保管，不要提交到仓库。
 
@@ -137,6 +142,24 @@ npm run check    # 或 node scripts/check.js  → 语法自检
 - 无网络、跨域失败、Key 无效、限流等情况都会给出明确提示，并可一键改用手动记录。
 - 识别结果是估算，确认前请核对克重。
 
+## 搭配 AI 使用
+
+FreeBody 不内置聊天。你继续用自己习惯的 AI，FreeBody 只负责把结果存好、画清楚。
+
+1. **给 AI 装上 skill**：仓库里的 [`skills/freebody-coach`](skills/freebody-coach/SKILL.md) 是一份通用的 Agent Skill（frontmatter 含 `name` 与 `description`），不绑定任何平台。它教 AI 估算饮食（文字、单张照片、吃前吃后对比）、记录训练、按 FreeBody 的进阶与恢复规则给建议，并输出符合 schema 的导入包。支持 skill 的工具可以直接加载这个目录；不支持的，把 `SKILL.md` 的内容作为系统提示或项目说明粘贴进去即可。
+2. **和 AI 聊**：例如「午饭吃了一碗牛肉面，剩了四分之一，帮我记一下」，或「今天深蹲 60kg 5×5，最后两组 RIR 1」。AI 会先列出估算结果请你确认。
+3. **导入**：
+   - **链接**：AI 给出 `https://leenlbma.github.io/freebody/#import=…`，在你平时使用 FreeBody 的浏览器中打开；
+   - **粘贴**：复制 AI 给出的 JSON，在「我的 › 数据备份 › 粘贴导入」中粘贴。
+4. **预览确认**：FreeBody 列出每条记录是新增、合并、已存在还是无效，确认后才写入。同一份数据重复导入不会产生重复记录，导入后还可以撤销。
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-import-dark.png"><img src="docs/screenshots/f-import-light.png" alt="粘贴导入与导入预览" width="620"></picture></p>
+
+- **导入包覆盖**：饮食（餐次、食物、克重、热量、蛋白质 / 碳水 / 脂肪、是否估算）、训练（动作、组、次数、重量、RIR）、补剂、睡眠、体重与身体指标、心得。
+- **相关文件**：数据格式见 [docs/data-format.md](docs/data-format.md)，JSON Schema 见 [schema/freebody.schema.json](schema/freebody.schema.json)，示例见 [examples/import/](examples/import/)。
+- **生成链接**：`python3 skills/freebody-coach/scripts/make_link.py pack.json`（只用 Python 标准库）。链接较长（约 1800 字符以上）时容易被聊天软件截断，请改用粘贴。
+- **安全边界**：skill 规定不做医疗诊断，伤病与异常症状建议就医，导入包中不放个人身份信息。
+
 ## 数据来源与免责声明
 
 - 内置食物库 `data/foods.json` 共 322 项。名称、id 与分类为本项目自拟。
@@ -150,12 +173,12 @@ npm run check    # 或 node scripts/check.js  → 语法自检
 
 - 食物库继续补充地方菜与常见外卖，欢迎按 `ref` 规范贡献
 - 拍照识别结果与常吃组合的关联，减少重复确认
+- 从 FreeBody 导出给 AI 的「近期摘要」，让教练建议基于完整趋势
 - 训练计划模板的导入与分享（不含个人数据）
-- 更多可选语言
 
 ## 贡献
 
-欢迎提交 Issue 与 PR，尤其是食物库条目。食物数据请填写 `source` 与 `ref`，只使用自整理或 CC0 等可再分发的数值，不要提交任何真实个人数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/food-database.md](docs/food-database.md)。
+欢迎提交 Issue 与 PR，尤其是食物库条目。食物数据请填写 `source` 与 `ref`，只使用自整理或 CC0 等可再分发的数值，不要提交任何真实个人数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/food-database.md](docs/food-database.md)。导入格式或 skill 有改动时，请同步更新 schema、示例和中英文文档，`npm run check` 会校验它们是否一致。
 
 <details>
 <summary>项目结构</summary>
@@ -179,11 +202,13 @@ freebody/
 │   ├── app.js                 # 应用逻辑（按板块分节注释）
 │   └── sw.template.js         # Service Worker 模板
 ├── data/foods.json            # 食物营养库（322 项，每条带 ref 来源）
-├── examples/                  # 可选通用示例配置（profile-sample.json，不含任何记录数据）
+├── examples/                  # 通用示例配置（profile-sample.json）与导入包示例（import/），不含真实数据
+├── schema/                    # 导入包 JSON Schema（freebody.schema.json）
+├── skills/freebody-coach/     # 通用 Agent Skill：教 AI 生成导入包与链接（含 make_link.py）
 ├── scripts/build.js           # 内联构建 + 生成 sw.js
-├── scripts/check.js           # 语法 / emoji / 食物库校验
+├── scripts/check.js           # 语法 / emoji / 食物库 / 导入包 schema 校验
 ├── scripts/gen-foods.js       # 食物库生成（原料值 + 自拟配方 → foods.json）
-├── docs/                      # 数据结构、食物库扩展、CSV 导入、截图
+├── docs/                      # 数据格式、数据结构、食物库扩展、CSV 导入、截图
 ├── LICENSE                    # MIT
 └── NOTICE                     # 第三方声明
 ```
@@ -200,13 +225,3 @@ freebody/
 - 字标与 B 图标由 Archivo（SIL OFL 1.1）字形轮廓化并定制。
 - 食物原料数值参考 USDA FoodData Central（CC0）。
 - 拍照识别的提示词与代码为本项目自行编写。
-
-<br>
-
-<a id="english"></a>
-
-### English
-
-**FreeBody** is a single-file, offline-first web app for strength training, sleep, body metrics and nutrition logging. Simplified Chinese UI. Install it as a PWA. Everything stays in your browser's localStorage. There are no accounts and no servers.
-
-Optional photo-based food recognition uses a vision model you configure yourself (Zhipu GLM, Qwen, Gemini or any OpenAI-compatible endpoint). Your key never leaves the device except in requests to that provider. MIT licensed. Not medical advice.
