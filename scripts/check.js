@@ -22,4 +22,17 @@ new vm.Script(sw, { filename: 'sw.js' });
 const mf = JSON.parse(fs.readFileSync(path.join(root, 'manifest.webmanifest'), 'utf8'));
 for (const i of mf.icons) if (!fs.existsSync(path.join(root, i.src))) throw new Error('manifest 图标缺失: ' + i.src);
 if (!mf.icons.some((i) => i.purpose === 'maskable')) throw new Error('manifest 缺少 maskable 图标');
+// 食物库：id / 名称唯一、每条有来源 ref、热量与宏量营养大致自洽
+const foods = JSON.parse(fs.readFileSync(path.join(root, 'data', 'foods.json'), 'utf8')).foods;
+const seen = new Set(), seenName = new Set();
+const ALCOHOL = new Set(['beer', 'red-wine']);
+for (const f of foods) {
+  if (seen.has(f.id)) throw new Error('食物 id 重复: ' + f.id);
+  if (seenName.has(f.name)) throw new Error('食物名称重复: ' + f.name);
+  seen.add(f.id); seenName.add(f.name);
+  if (!f.ref || !f.source) throw new Error('食物缺少 source / ref: ' + f.id);
+  const est = 4 * f.p + 4 * f.c + 9 * f.f;
+  if (!ALCOHOL.has(f.id) && Math.abs(est - f.kcal) > Math.max(20, f.kcal * 0.3)) throw new Error(`食物热量与宏量不符: ${f.id} kcal=${f.kcal} 估算=${Math.round(est)}`);
+}
+console.log(`[ok] 食物库 ${foods.length} 项，id / ref 校验通过`);
 console.log(`[ok] 语法检查通过（${scripts.length} 段脚本）`);

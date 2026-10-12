@@ -126,7 +126,7 @@
         var tip = c.tip || (esc(c.d || c.l) + '\n' + (c.stack ? c.stack.map(function (p) { return esc(p.name) + ' ' + fmt(p.v) + (opt.unit || ''); }).join('\n') : fmt(c.v) + (opt.unit || '')));
         o += '<rect class="hit" x="' + (L + i * bw).toFixed(1) + '" y="' + T + '" width="' + bw.toFixed(1) + '" height="' + ih + '" data-tip="' + tip + '"/>';
       });
-      if (opt.goal) o += '<line class="ref" style="stroke:var(--ok)" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(opt.goal) + '" y2="' + Y(opt.goal) + '"/><text class="ax rl" style="fill:var(--ok)" x="' + (W - R - 2) + '" y="' + (Y(opt.goal) - 4) + '" text-anchor="end">' + esc(opt.goalName || '目标') + ' ' + fmt(opt.goal) + '</text>';
+      if (opt.goal) o += '<line class="ref" style="stroke:var(--mut)" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(opt.goal) + '" y2="' + Y(opt.goal) + '"/><text class="ax rl" style="fill:var(--mut)" x="' + (W - R - 2) + '" y="' + (Y(opt.goal) - 4) + '" text-anchor="end">' + esc(opt.goalName || '目标') + ' ' + fmt(opt.goal) + '</text>';
       if (ov) {
         var OY = function (v) { return T + (1 - v / ov.max) * ih; }, d = '', first = true;
         ov.pts.forEach(function (v, i) { if (v == null) return; d += (first ? 'M' : 'L') + (L + i * bw + bw / 2).toFixed(1) + ' ' + OY(v).toFixed(1); first = false; });

@@ -14,9 +14,9 @@ var FOOD_DB=(window.FIT_DATA&&window.FIT_DATA.foods)||{foods:[]};
 var EXAMPLE_PROFILES=(window.FIT_DATA&&window.FIT_DATA.examples)||[];
 /** 底部导航 4 个分组；HUB 分组的首页不显示子标签，详情页显示返回按钮 */
 var ICONS={today:'home',train:'train',data:'chart',me:'user'};
-var GROUPS=[['today','今天',['overview','diet','dietAdd','dietFood']],['train','训练',['train','cardio','perf']],['data','数据',['data','body','nutri','tstats','sleep','hormone','injury','supp']],['me','我的',['settings']]];
+var GROUPS=[['today','今天',['overview','diet','dietAdd','dietAI','dietFood']],['train','训练',['train','cardio','perf']],['data','数据',['data','body','nutri','tstats','sleep','hormone','injury','supp']],['me','我的',['settings']]];
 var HUB={today:'overview',data:'data'};
-var SEC_LABEL={overview:'今天',diet:'饮食',dietAdd:'添加食物',dietFood:'食物',train:'力量',cardio:'有氧',perf:'表现',data:'数据',body:'身体',nutri:'营养',tstats:'训练统计',muscle:'肌群恢复',sleep:'睡眠',supp:'补剂',hormone:'恢复/化验',injury:'伤病',settings:'我的'};
+var SEC_LABEL={overview:'今天',diet:'饮食',dietAdd:'添加食物',dietFood:'食物',dietAI:'拍照识别',train:'力量',cardio:'有氧',perf:'表现',data:'数据',body:'身体',nutri:'营养',tstats:'训练统计',muscle:'肌群恢复',sleep:'睡眠',supp:'补剂',hormone:'恢复/化验',injury:'伤病',settings:'我的'};
 var lastSub={};
 /** 内联 SVG 图标（见 src/icons.js） */
 function IC(n){return window.FitIcons?FitIcons.svg(n):'';}
@@ -64,22 +64,24 @@ function applyTheme(){document.documentElement.setAttribute('data-theme',S.theme
 $('#themeBtn').onclick=function(){var o=['auto','light','dark'];S.theme=o[(o.indexOf(S.theme)+1)%3];save();applyTheme();toast('主题：'+{auto:'跟随系统',light:'浅色',dark:'深色'}[S.theme]);drawCharts();};
 
 /* ---------- 导航 ---------- */
-$('#nav').innerHTML=GROUPS.map(function(g){return'<button data-go="'+g[0]+'">'+IC(ICONS[g[0]])+g[1]+'</button>';}).join('');
+$('#nav').innerHTML='<div class="nav-brand" aria-hidden="true">'+$('#appTitle').innerHTML.replace(/id="whd"/,'id="whd2"').replace(/url\(#whd\)/,'url(#whd2)')+'</div>'+GROUPS.map(function(g){return'<button data-go="'+g[0]+'">'+IC(ICONS[g[0]])+g[1]+'</button>';}).join('');
 function groupOf(sec){for(var i=0;i<GROUPS.length;i++)if(GROUPS[i][2].indexOf(sec)>=0)return GROUPS[i];return GROUPS[0];}
 document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(b.getAttribute('data-go'));var sb=e.target.closest('[data-sub]');if(sb)show(sb.getAttribute('data-sub'),true);});
 function show(id,direct){var toMus=id==='muscle';if(toMus){id='train';direct=true;} // 肌群热图位于 训练 › 力量 顶部
 var grp=!direct&&GROUPS.find(function(g){return g[0]===id;});if(grp)id=HUB[grp[0]]||lastSub[grp[0]]||grp[2][0];if(!document.getElementById(id))id='overview';grp=groupOf(id);lastSub[grp[0]]=id;
  var hub=HUB[grp[0]];
- var par=id==='dietAdd'?'diet':id==='dietFood'?dfBack:null;
+ var par=id==='dietAdd'?'diet':id==='dietAI'?'dietAdd':id==='dietFood'?dfBack:null;
  $('#subnav').innerHTML=hub?(id===hub?'':'<button data-sub="'+(par||hub)+'" class="back">'+IC('left')+(par?SEC_LABEL[par]:grp[1])+'</button><span class="sn-t">'+SEC_LABEL[id]+'</span>'):grp[2].length>1?grp[2].map(function(s){return'<button data-sub="'+s+'" class="'+(s===id?'on':'')+'">'+SEC_LABEL[s]+'</button>';}).join(''):'';
  cur=id;document.querySelectorAll('section').forEach(function(s){s.classList.toggle('on',s.id===id);});document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-go')===grp[0]);});window.scrollTo(0,0);render();if(toMus&&$('#musWrap'))$('#musWrap').scrollIntoView({block:'start'});}
 
 /* ---------- 日期 ---------- */
 $('#dSel').value=sel;
+$('#dSel').addEventListener('click',function(){try{if(this.showPicker)this.showPicker();}catch(e){}});
 $('#dSel').onchange=function(){if(this.value){sel=this.value;render();}};
 $('#dPrev').onclick=function(){sel=addDays(sel,-1);$('#dSel').value=sel;render();};
 $('#dNext').onclick=function(){sel=addDays(sel,1);$('#dSel').value=sel;render();};
 $('#dToday').onclick=function(){sel=today();$('#dSel').value=sel;render();};
+function todayBtn(){var b=$('#dToday');if(b)b.classList.toggle('is-today',sel===today());}
 
 /* ---------- 图表 ---------- */
 function ring(val,goal,color,label,unit){var pc=goal?Math.min(val/goal,1):0,r=34,C=2*Math.PI*r,over=goal&&val>goal*1.05;
@@ -130,14 +132,14 @@ function otHtml(d){var s=otSignals(d);if(!s.length)return'';var lvl=s.length>=3?
 /* ---------- 渲染 ---------- */
 function render(){
  document.querySelectorAll('[data-rng]').forEach(function(el){var k=el.getAttribute('data-rng'),v=rng(k);el.innerHTML=[[7,'7天'],[30,'30天'],[90,'90天'],[0,'全部']].map(function(o){return'<button data-rngk="'+k+'" data-rngv="'+o[0]+'" class="'+(o[0]===v?'on':'')+'">'+o[1]+'</button>';}).join('');});
- if(cur==='overview')rOverview();else if(cur==='diet')rDiet();else if(cur==='dietAdd')rDietAdd();else if(cur==='dietFood')rDietFood();else if(cur==='nutri')chNutrition();else if(cur==='data')rData();else if(cur==='train'||cur==='cardio'||cur==='perf'||cur==='tstats')rTrain();else if(cur==='muscle')rMuscle();else if(cur==='supp')rSupp();else if(cur==='sleep')rSleep();else if(cur==='body')rBody();else if(cur==='hormone')rHormone();else if(cur==='settings')rSettings();else if(cur==='injury')rInjury();
+ if(cur==='overview')rOverview();else if(cur==='diet')rDiet();else if(cur==='dietAdd')rDietAdd();else if(cur==='dietFood')rDietFood();else if(cur==='dietAI')rDietAI();else if(cur==='nutri')chNutrition();else if(cur==='data')rData();else if(cur==='train'||cur==='cardio'||cur==='perf'||cur==='tstats')rTrain();else if(cur==='muscle')rMuscle();else if(cur==='supp')rSupp();else if(cur==='sleep')rSleep();else if(cur==='body')rBody();else if(cur==='hormone')rHormone();else if(cur==='settings'){rSettings();rAiCard();}else if(cur==='injury')rInjury();
 }
 function drawCharts(){render();}
 
 /* ---------- 今天（一屏：准备度 / 推荐训练 / 营养剩余 / 打卡） ---------- */
 function activeInjury(){return S.injuries.some(function(x){return x.status!=='已恢复';});}
 function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(sel),wk=recWeek(sel);
- $('#ovAlerts').innerHTML=(!S.meals.length&&!S.workouts.length&&!S.body.length&&!S.sleep.length)?'<div class="alert info">'+IC('hello')+' 欢迎使用 FreeBody。数据只存在本机。</div>':'';
+ $('#ovAlerts').innerHTML=(!S.hideHello&&!S.meals.length&&!S.workouts.length&&!S.body.length&&!S.sleep.length)?'<div class="hello-bar">'+IC('hello')+'<span>欢迎使用 FreeBody。数据只存在本机，可在「我的」中导出备份。</span><button class="ghost hello-x" id="helloX" aria-label="关闭欢迎提示">'+IC('x')+'</button></div>':'';
  var lv=rd?(rd.score>=70?'ok':rd.score>=50?'warn':'bad'):'',
   sent=rd?(rd.score>=70?'状态不错，按计划练':rd.score>=50?'状态一般，控制强度':'恢复偏弱，以休息为主'):'记录睡眠后显示准备度';
  if(ot.length>=2){lv='bad';sent='恢复不足信号 '+ot.length+' 项，建议减量';}
@@ -149,6 +151,8 @@ function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(
  else if(ws.length){var n=ws.reduce(function(s,w){return s+(w.sets||1);},0);
   th='<div class="mut">今日训练</div><h2 class="rec-t">已完成 '+n+' 组</h2><div class="mut">'+(dayVol(sel)>0?'训练量 '+Math.round(dayVol(sel))+' kg':'自重训练')+'</div><button class="ghost btn-big" data-sub="train">查看</button>';}
  else th='<div class="mut">今日推荐</div><h2 class="rec-t">'+esc(rc.title)+'</h2><div class="mut">'+esc(rc.why)+'</div><button class="btn-big'+(rc.rest?' ghost':'')+'" data-ss="rec">'+IC('play')+(rc.rest?'仍要训练':'开始训练')+'</button>';
+ var wi0=weekInfo(sel),td=Math.max(1,S.goals.trainDays||4),dots='';for(var di=0;di<Math.min(td,7);di++)dots+='<i class="'+(di<wi0.days?'on':'')+'"></i>';
+ th+='<div class="wk-prog" data-sub="tstats" role="button" tabindex="0" aria-label="本周训练 '+wi0.days+' / '+td+' 天"><span class="mut">本周</span><span class="wk-dots" aria-hidden="true">'+dots+'</span><span class="mut">'+wi0.days+' / '+td+' 天</span></div>';
  $('#ovTrain').innerHTML=th;
  var left=Math.round(g.kcal-t.k),pl=Math.max(0,Math.round(g.p-t.p)),nm=dayMeals(sel).length;
  $('#ovNut').innerHTML='<div class="hrow"><span class="mut">营养剩余</span><span class="mut">'+(nm?nm+' 条记录':'未记录')+IC('right')+'</span></div><div class="nut1"><div><b class="xl">'+left+'</b> <span class="mut">kcal</span></div><div><b class="xl">'+pl+'</b> <span class="mut">g 蛋白</span></div></div><div class="bar"><i style="width:'+Math.min(100,g.kcal?t.k/g.kcal*100:0)+'%;background:'+(left<0?'var(--bad)':'var(--k)')+'"></i></div>'+
@@ -159,7 +163,7 @@ function rOverview(){var g=S.goals,t=dayTot(sel),rd=readiness(sel),ot=otSignals(
  var s=sleepOf(sel),ls=lastSleepBefore(sel);
  c+=tile(!!s,'moon','睡眠','sleep',s?r1(s.dur)+' h':'未记录',s?'<span class="ck-ok">'+IC('ok')+'</span>':ls?'<button class="sm" id="ovSlReuse">确认 '+r1(ls.dur)+' h</button>':'<button class="ghost sm" data-go="sleep">记录</button>');
  var b=S.body.find(function(x){return x.date===sel&&x.weight!=null;});
- c+=tile(!!b,'chart','体重','body',b?b.weight+' kg':'','<input id="ovWt" type="number" inputmode="decimal" step="0.1" placeholder="'+(b?'修改':'kg')+'" enterkeyhint="done">');
+ c+=tile(!!b,'chart','体重','body',b?b.weight+' kg':'未记录','<input id="ovWt" type="number" inputmode="decimal" step="0.1" placeholder="'+(b?'修改':'kg')+'" enterkeyhint="done">');
  if(activeInjury()){var wp=wpOf(sel);c+='<div class="ck-t wide'+(wp?' done':'')+'"><div class="ck-h" data-go="injury">'+IC('bandage')+'<span>伤处疼痛</span><b id="ovPainV" class="ck-pv">'+(wp?wp.pain:'—')+'</b><span class="mut">/10</span></div><input type="range" id="ovPain" min="0" max="10" step="1" value="'+(wp?wp.pain:0)+'"></div>';}
  $('#ovChecks').innerHTML=c;
  rOvTrend();
@@ -169,7 +173,7 @@ function rOvTrend(){var box=$('#ovTrend');if(!box)return;if(!(window.matchMedia&
  var g=S.goals,d7=[],i;for(i=6;i>=0;i--)d7.push(addDays(sel,-i));
  box.innerHTML='<div class="hrow"><h2>近 7 天</h2><button class="ghost sm" data-sub="data">数据'+IC('right')+'</button></div><div class="tr2"><div><div class="mut">热量 kcal</div><div class="chart" id="chOvK"></div></div><div><div class="mut">睡眠 h</div><div class="chart" id="chOvS"></div></div></div>';
  CH.bars($('#chOvK'),{h:110,cats:d7.map(function(d){var k=Math.round(dayTot(d).k);return{l:md(d),d:d,v:k,color:'var(--k)',tip:d+'\n'+k+' kcal'};}),goal:g.kcal,goalName:'目标',unit:' kcal',emptyMsg:'暂无饮食记录'});
- CH.bars($('#chOvS'),{h:110,cats:d7.map(function(d){var x=sleepOf(d);return{l:md(d),d:d,v:x?r1(x.dur):0,color:x&&x.dur>=g.sleepH?'var(--ok)':'var(--warn)',tip:d+'\n'+(x?r1(x.dur)+' h':'无记录')};}),goal:g.sleepH,goalName:'目标',unit:' h',emptyMsg:'暂无睡眠记录'});
+ CH.bars($('#chOvS'),{h:110,cats:d7.map(function(d){var x=sleepOf(d);return{l:md(d),d:d,v:x?r1(x.dur):0,color:x&&x.dur>=g.sleepH?'var(--acc)':'var(--c)',tip:d+'\n'+(x?r1(x.dur)+' h':'无记录')};}),goal:g.sleepH,goalName:'目标',unit:' h',emptyMsg:'暂无睡眠记录'});
 }
 document.addEventListener('input',function(e){if(e.target.id==='ovPain')$('#ovPainV').textContent=e.target.value;});
 document.addEventListener('change',function(e){var t=e.target;
@@ -184,19 +188,20 @@ function rData(){var g=S.goals,h='',d7=[],d14=[],i;for(i=6;i>=0;i--)d7.push(addD
  var lg=d7.filter(function(d){return dayMeals(d).length;}),ak=avg(lg.map(function(d){return dayTot(d).k;})),pOk=lg.filter(function(d){return dayTot(d).p>=g.p*0.9;}).length;
  h+=card('nutri','营养',lg.length?'日均 <b class="xl">'+Math.round(ak)+'</b> / '+g.kcal+' kcal <span class="mut">· 蛋白达标 '+pOk+'/'+lg.length+' 天</span>':'<span class="mut">近 7 天无记录</span>','<div class="chart" id="chDNut"></div>');
  var wi=weekInfo(sel),st=muscleState(),cn={};Object.keys(st).forEach(function(k){cn[st[k].status]=(cn[st[k].status]||0)+1;});
- h+=card('tstats','训练','本周 <b class="xl">'+wi.days+'</b> / '+g.trainDays+' 天 <span class="mut">· '+Math.round(wi.vol)+' kg</span>','<div class="mini" data-go="muscle">'+IC('body')+'<span>肌群 已恢复 '+((cn.recovered||0)+(cn.stale||0))+' · 恢复中 '+((cn.recovering||0)+(cn.fatigued||0))+'</span>'+IC('right')+'</div>');
+ h+=card('tstats','训练','本周 <b class="xl">'+wi.days+'</b> / '+g.trainDays+' 天'+(wi.vol>0?' <span class="mut">· '+Math.round(wi.vol)+' kg</span>':''),'<div class="chart" id="chDTr"></div><div class="mini" data-go="muscle">'+IC('body')+'<span>肌群 已恢复 '+((cn.recovered||0)+(cn.stale||0))+' · 恢复中 '+((cn.recovering||0)+(cn.fatigued||0))+'</span>'+IC('right')+'</div>');
  var rd=readiness(sel),sl=avg(d7.map(function(d){var s=sleepOf(d);return s?s.dur:null;}));
  h+=card('hormone','恢复','准备度 <b class="xl">'+(rd?rd.score:'—')+'</b>'+(sl!=null?' <span class="mut">· 睡眠均 '+r1(sl)+' h</span>':''),'<div class="chart" id="chDRd"></div>');
  $('#dataBox').innerHTML=h;
  chTodayWeight();
+ CH.bars($('#chDTr'),{h:80,cats:d7.map(function(d){var n=S.workouts.filter(function(w){return w.date===d;}).reduce(function(a,w){return a+(w.sets||1);},0);return{l:md(d),d:d,v:n,has:n>0,color:'var(--acc)'};}),unit:' 组',emptyMsg:'近 7 天没有力量训练',emptyHint:'在「训练」中开始今日推荐'});
  CH.bars($('#chDNut'),{h:80,cats:d7.map(function(d){return{l:md(d),d:d,v:Math.round(dayTot(d).k),color:'var(--k)'};}),goal:g.kcal,unit:' kcal',emptyMsg:'暂无饮食记录'});
- CH.line($('#chDRd'),{h:80,series:[{name:'准备度',color:'var(--ok)',pts:d14.map(function(d){var x=readiness(d);return{d:d,y:x?x.score:null};}),area:true}],yl:{min:0,max:100},emptyMsg:'暂无准备度',emptyHint:'记录睡眠与晨起指标后计算'});
+ CH.line($('#chDRd'),{h:80,series:[{name:'准备度',color:'var(--acc)',pts:d14.map(function(d){var x=readiness(d);return{d:d,y:x?x.score:null};}),area:true}],yl:{min:0,max:100},emptyMsg:'暂无准备度',emptyHint:'记录睡眠与晨起指标后计算'});
  $('#dataMore').innerHTML=[['sleep','睡眠'],['hormone','恢复/化验'],['muscle','肌群'],['injury','伤病'],['supp','补剂'],['perf','运动表现'],['tstats','训练统计'],['nutri','营养分析']].map(function(x){return'<button class="chip" data-go="'+x[0]+'">'+x[1]+'</button>';}).join('');
 }
 
 /* ---------- 饮食（v2.1）：餐次分配 / 记录快照 / 最近常吃 / 月历 / 目标推导 / 自定义与组合 ---------- */
 var MEALS=['早餐','午餐','晚餐','加餐'],SPLIT0=[25,35,30,10];
-var SRC_LBL={lib:'内置库',quick:'快速输入',photo:'教练照片估算',custom:'自定义'};
+var SRC_LBL={lib:'内置库',quick:'快速输入',photo:'教练照片估算',ai:'拍照识别估算',custom:'自定义'};
 /** 旧版"练前/练后"等餐次计入加餐 */
 function mealGroup(m){return MEALS.indexOf(m)>=0?m:'加餐';}
 function mealSplit(){var s=S.goals.mealSplit||{},o={},sum=0;MEALS.forEach(function(m,i){o[m]=s[m]!=null?s[m]:SPLIT0[i];sum+=o[m];});o._sum=sum||100;return o;}
@@ -209,10 +214,10 @@ function per100(f){var o={kcal:f.kcal,p:f.p,c:f.c,f:f.f};if(f.na!=null)o.na=f.na
 function fromFood(f,g,amount,unit){var r=g/100,o={foodId:f.id,name:f.name.replace(/[（(].*?[）)]/g,''),amount:amount!=null?amount:Math.round(g),unit:unit||'g',g:Math.round(g),nutrimentsPer100g:per100(f),src:f.custom?'custom':'lib',
  kcal:Math.round(f.kcal*r),p:r1(f.p*r),c:r1(f.c*r),f:r1(f.f*r)};if(f.na!=null)o.na=Math.round(f.na*r);if(f.fib!=null)o.fib=r1(f.fib*r);return o;}
 function mkMeal(o){var m={id:uid(),date:sel,meal:o.meal||dMeal(),food:o.name||o.food,name:o.name||o.food,kcal:Math.round(o.kcal||0),p:r1(o.p||0),c:r1(o.c||0),f:r1(o.f||0),src:o.src||'custom'};
- ['foodId','amount','unit','g','nutrimentsPer100g','lo','hi','na','fib','kcalOnly'].forEach(function(k){if(o[k]!=null&&o[k]!=='')m[k]=o[k];});return m;}
+ ['foodId','amount','unit','g','nutrimentsPer100g','lo','hi','na','fib','kcalOnly','via'].forEach(function(k){if(o[k]!=null&&o[k]!=='')m[k]=o[k];});return m;}
 function cloneMeal(m){var o=JSON.parse(JSON.stringify(m));o.id=uid();o.date=sel;o.meal=dMeal();return o;}
 function mealLabel(m){return m.food||m.name||'';}
-function mealTags(m){var t='';if(m.src==='photo')t+='<span class="tag est">估算'+(m.lo&&m.hi?' '+Math.round(m.lo)+'–'+Math.round(m.hi):'')+'</span> ';else if(m.kcalOnly)t+='<span class="tag">仅热量</span> ';
+function mealTags(m){var t='';if(m.src==='ai')t+='<span class="tag est">估算</span> ';else if(m.src==='photo')t+='<span class="tag est">估算'+(m.lo&&m.hi?' '+Math.round(m.lo)+'–'+Math.round(m.hi):'')+'</span> ';else if(m.kcalOnly)t+='<span class="tag">仅热量</span> ';
  if(m.meal&&MEALS.indexOf(m.meal)<0)t+='<span class="tag">'+esc(m.meal)+'</span> ';return t;}
 /** 最近 / 最常吃：近 60 天按次数、再按最近日期排序，取 8 项 */
 function recentFoods(){var from=addDays(today(),-60),map={},list=[];S.meals.forEach(function(m){if(m.date<from)return;var k=normName(mealLabel(m))+'|'+Math.round(m.kcal||0);var e=map[k];if(!e){e=map[k]={m:m,n:0,last:''};list.push(e);}e.n++;if(m.date>=e.last){e.last=m.date;e.m=m;}});
@@ -605,12 +610,12 @@ function movAvg(pts,n){return pts.map(function(p){var w=pts.filter(function(q){v
 function sortPts(a){return a.filter(function(p){return p.y!=null;}).sort(function(x,y){return x.d<y.d?-1:1;});}
 
 function chTodayWeight(){var pts=sortPts(S.body.map(function(b){return{d:b.date,y:b.weight};})).filter(function(p){return p.d<=sel&&p.d>=addDays(sel,-29);});
- CH.line($('#chOvWt'),{h:100,series:[{name:'体重',color:'var(--acc)',pts:pts,unit:' kg',area:true},{name:'7日均线',color:'var(--warn)',pts:movAvg(pts,7),dash:true,unit:' kg'}],refs:[{y:S.goals.weight,name:'目标',color:'var(--ok)'}],h:80,emptyMsg:'还没有体重记录',emptyHint:'在「今天」或 身体 中记录'});}
+ CH.line($('#chOvWt'),{h:100,series:[{name:'体重',color:'var(--acc)',pts:pts,unit:' kg',area:true},{name:'7日均线',color:'var(--acc2)',pts:movAvg(pts,7),dash:true,unit:' kg'}],refs:[{y:S.goals.weight,name:'目标',color:'var(--mut)'}],h:80,emptyMsg:'还没有体重记录',emptyHint:'在「今天」或 身体 中记录'});}
 
 function chNutrition(){var g=S.goals,from=since('nut',S.meals.map(function(m){return m.date;})),days=daysBetween(from,sel),cats=[],withMeals=[];
  days.forEach(function(d){var t=dayTot(d),has=dayMeals(d).length>0;if(has)withMeals.push({d:d,t:t});
-  cats.push({l:md(d),d:d,v:Math.round(t.k),has:has,color:!has?'var(--bd)':t.k>g.kcal*1.1?'var(--warn)':t.k<g.kcal*0.8?'var(--c)':'var(--acc)',tip:d+'\n热量 '+Math.round(t.k)+' / '+g.kcal+' kcal'+(has?'\n'+(t.k>g.kcal?'超出 ':'差 ')+Math.abs(Math.round(t.k-g.kcal)):'\n无记录')});});
- CH.bars($('#chKcal'),{h:170,cats:cats,goal:g.kcal,goalName:'目标',unit:' kcal',emptyMsg:'暂无饮食记录',emptyHint:'记录餐次后显示每日热量对比',legend:[{name:'目标±10%内',color:'var(--acc)'},{name:'超出',color:'var(--warn)'},{name:'明显不足',color:'var(--c)'}]});
+  cats.push({l:md(d),d:d,v:Math.round(t.k),has:has,color:!has?'var(--bd)':t.k>g.kcal*1.1?'var(--acc2)':t.k<g.kcal*0.8?'var(--c)':'var(--acc)',tip:d+'\n热量 '+Math.round(t.k)+' / '+g.kcal+' kcal'+(has?'\n'+(t.k>g.kcal?'超出 ':'差 ')+Math.abs(Math.round(t.k-g.kcal)):'\n无记录')});});
+ CH.bars($('#chKcal'),{h:170,cats:cats,goal:g.kcal,goalName:'目标',unit:' kcal',emptyMsg:'暂无饮食记录',emptyHint:'记录餐次后显示每日热量对比',legend:[{name:'目标±10%内',color:'var(--acc)'},{name:'超出',color:'var(--acc2)'},{name:'明显不足',color:'var(--c)'}]});
  var n=withMeals.length,aP=n?avg(withMeals.map(function(x){return x.t.p;})):0,aC=n?avg(withMeals.map(function(x){return x.t.c;})):0,aF=n?avg(withMeals.map(function(x){return x.t.f;})):0;
  CH.donut($('#chMacro'),{parts:[{name:'蛋白质',v:aP*4,color:'var(--p)',tip:'蛋白质 日均 '+r1(aP)+'g · '+Math.round(aP*4)+' kcal'},{name:'碳水',v:aC*4,color:'var(--c)',tip:'碳水 日均 '+r1(aC)+'g · '+Math.round(aC*4)+' kcal'},{name:'脂肪',v:aF*9,color:'var(--f)',tip:'脂肪 日均 '+r1(aF)+'g · '+Math.round(aF*9)+' kcal'}],center:Math.round(aP*4+aC*4+aF*9)+'',sub:'kcal/日',emptyMsg:'暂无数据'});
  var hit=withMeals.filter(function(x){return x.t.p>=g.p*0.95;}).length,rate=n?Math.round(hit/n*100):null;
@@ -633,7 +638,7 @@ function chTrain(){var from=since('train',S.workouts.map(function(w){return w.da
  $('#ormEx').innerHTML=exs.length?exs.map(function(e){return'<option'+(e===ormSel?' selected':'')+'>'+esc(e)+'</option>';}).join(''):'<option>无</option>';
  var by={};S.workouts.forEach(function(w){if(w.exercise!==ormSel)return;var e=epley(w);if(e&&(!by[w.date]||e>by[w.date]))by[w.date]=e;});
  var op=Object.keys(by).map(function(d){return{d:d,y:r1(by[d])};}).filter(function(p){return p.d>=from&&p.d<=sel;}),best=Object.keys(by).reduce(function(m,d){return Math.max(m,by[d]);},0);
- CH.line($('#chOrm'),{h:160,from:from,to:sel,series:[{name:'估算1RM',color:'var(--k)',pts:op,unit:' kg',area:true}],refs:[{y:best?r1(best):null,name:'最佳',color:'var(--ok)'}],emptyMsg:'暂无可估算的动作',emptyHint:'记录带重量的组后，按 重量×(1+次数/30) 估算'});
+ CH.line($('#chOrm'),{h:160,from:from,to:sel,series:[{name:'估算1RM',color:'var(--k)',pts:op,unit:' kg',area:true}],refs:[{y:best?r1(best):null,name:'最佳',color:'var(--mut)'}],emptyMsg:'暂无可估算的动作',emptyHint:'记录带重量的组后，按 重量×(1+次数/30) 估算'});
  // 热力日历
  var n=rng('train'),weeks=n?Math.min(52,Math.max(13,Math.ceil(n/7))):52,val={},tip={},from2=addDays(sel,-weeks*7);
  daysBetween(from2,sel).forEach(function(d){var l=S.workouts.filter(function(w){return w.date===d;}),sets=l.reduce(function(s,w){return s+(w.sets||0);},0),cm=S.cardio.filter(function(c){return c.date===d;}).reduce(function(s,c){return s+(c.min||0);},0),sm=S.swims.filter(function(c){return c.date===d;}).reduce(function(s,c){return s+(c.dist||0);},0);
@@ -643,9 +648,9 @@ $('#ormEx').addEventListener('change',function(){ormSel=this.value;render();});
 
 function chPerf(){var from=since('perf',pbEntries().map(function(x){return x.date;}).concat(S.run800.map(function(x){return x.date;})));
  var pe=pbEntries(),best=pe.reduce(function(b,x){return b==null||x.sec<b?x.sec:b;},null);
- CH.line($('#chPb'),{h:160,series:[{name:'100m 蛙泳',color:'var(--c)',pts:pe.filter(function(x){return x.date>=from;}).map(function(x){return{d:x.date,y:x.sec};}),fmt:fmtT}],refs:[{y:best,name:'PB',color:'var(--ok)'}],emptyMsg:'暂无成绩',emptyHint:'记录计时测试或比赛成绩'});
+ CH.line($('#chPb'),{h:160,series:[{name:'100m 蛙泳',color:'var(--c)',pts:pe.filter(function(x){return x.date>=from;}).map(function(x){return{d:x.date,y:x.sec};}),fmt:fmtT}],refs:[{y:best,name:'PB',color:'var(--mut)'}],emptyMsg:'暂无成绩',emptyHint:'记录计时测试或比赛成绩'});
  var rn=S.run800,rb=rn.reduce(function(b,x){return b==null||x.sec<b?x.sec:b;},null);
- CH.line($('#chRun'),{h:160,series:[{name:'800m',color:'var(--warn)',pts:rn.filter(function(x){return x.date>=from;}).map(function(x){return{d:x.date,y:x.sec};}),fmt:fmtT}],refs:[{y:S.run800Hist,name:'历史最佳',color:'var(--ok)'},{y:rb!==S.run800Hist?rb:null,name:'当前最佳',color:'var(--k)'}],emptyMsg:'暂无成绩',emptyHint:'记录 800m 计时后显示与历史最佳的差距'});}
+ CH.line($('#chRun'),{h:160,series:[{name:'800m',color:'var(--acc2)',pts:rn.filter(function(x){return x.date>=from;}).map(function(x){return{d:x.date,y:x.sec};}),fmt:fmtT}],refs:[{y:S.run800Hist,name:'历史最佳',color:'var(--mut)'},{y:rb!==S.run800Hist?rb:null,name:'当前最佳',color:'var(--k)'}],emptyMsg:'暂无成绩',emptyHint:'记录 800m 计时后显示与历史最佳的差距'});}
 
 /* 其他测试成绩（纵跳等，可自定义项目） */
 var ptEv=null;
@@ -657,7 +662,7 @@ function rPerfTests(){var evs=S.perfEvents;if(!ptEv||!evs.some(function(e){retur
  var log=S.perfLog.filter(function(x){return x.ev===ptEv;}).sort(function(a,b){return a.date<b.date?-1:1;}),lower=ev&&ev.better==='lower';
  var best=log.reduce(function(b,x){return b==null||(lower?x.value<b:x.value>b)?x.value:b;},null),from=since('perf',log.map(function(x){return x.date;}));
  $('#ptBox').innerHTML=ev?'<div class="mut">'+(best!=null?'当前最佳 <b>'+ptFmt(ev,best)+'</b>':'暂无成绩')+(ev.hist!=null?' · 历史最佳 '+ptFmt(ev,ev.hist)+(best!=null?'（差 '+r1(Math.abs(best-ev.hist))+'）':''):'')+'</div>':'';
- CH.line($('#chTest'),{h:150,series:[{name:ev?ev.name:'',color:'var(--acc)',pts:log.filter(function(x){return x.date>=from;}).map(function(x){return{d:x.date,y:x.value};}),fmt:function(v){return ptFmt(ev,v);}}],refs:[{y:best,name:'最佳',color:'var(--k)'},{y:ev?ev.hist:null,name:'历史最佳',color:'var(--ok)'}],emptyMsg:'暂无成绩',emptyHint:'选择项目并记录第一次测试'});
+ CH.line($('#chTest'),{h:150,series:[{name:ev?ev.name:'',color:'var(--acc)',pts:log.filter(function(x){return x.date>=from;}).map(function(x){return{d:x.date,y:x.value};}),fmt:function(v){return ptFmt(ev,v);}}],refs:[{y:best,name:'最佳',color:'var(--k)'},{y:ev?ev.hist:null,name:'历史最佳',color:'var(--mut)'}],emptyMsg:'暂无成绩',emptyHint:'选择项目并记录第一次测试'});
  $('#ptList').innerHTML=log.length?'<ul class="list">'+log.slice().reverse().slice(0,10).map(function(x){return'<li><div>'+esc(x.date)+' · <b>'+ptFmt(ev,x.value)+'</b>'+(x.value===best?' '+IC('medal'):'')+(x.note?'<div class="mut">'+esc(x.note)+'</div>':'')+'</div><button class="del" data-delpt="'+x.id+'">'+IC('x')+'</button></li>';}).join('')+'</ul>':'';}
 $('#ptAdd').onclick=function(){var raw=$('#ptV').value.trim(),v=raw.indexOf(':')>=0?parseT(raw):num(raw),d=$('#ptD').value,ev=$('#ptEv').value;if(v==null||!d||!ev){toast('请填写项目、成绩和日期');return;}
  S.perfLog.push({id:uid(),date:d,ev:ev,value:v,note:$('#ptN').value.trim()});ptEv=ev;save();$('#ptV').value='';$('#ptN').value='';toast('已记录');render();};
@@ -665,12 +670,12 @@ $('#peAdd').onclick=function(){var n=$('#peName').value.trim();if(!n){toast('请
  var e={id:uid(),name:n,unit:$('#peUnit').value.trim(),better:$('#peBetter').value,hist:hv};S.perfEvents.push(e);ptEv=e.id;save();['#peName','#peUnit','#peHist'].forEach(function(s){$(s).value='';});toast('已添加项目');render();};
 
 function chSleep(){var g=S.goals,from=since('sleep',S.sleep.map(function(x){return x.date;})),days=daysBetween(from,sel);
- CH.bars($('#chSleep'),{h:170,cats:days.map(function(d){var x=sleepOf(d);return{l:md(d),d:d,v:x?r1(x.dur):0,color:x&&x.dur>=g.sleepH?'var(--ok)':'var(--warn)',tip:d+'\n'+(x?'时长 '+r1(x.dur)+' h\n质量 '+(x.q||'-')+'/5\n'+x.bed+' → '+x.wake:'无记录')};}),goal:g.sleepH,goalName:'目标',unit:' h',
-  overlay:{name:'质量',color:'var(--k)',max:5,step:1,pts:days.map(function(d){var x=sleepOf(d);return x&&x.q?x.q:null;})},legend:[{name:'达标',color:'var(--ok)'},{name:'不足',color:'var(--warn)'},{name:'质量(右轴 1-5)',color:'var(--k)'}],emptyMsg:'暂无睡眠记录',emptyHint:'记录入睡与起床时间后显示'});}
+ CH.bars($('#chSleep'),{h:170,cats:days.map(function(d){var x=sleepOf(d);return{l:md(d),d:d,v:x?r1(x.dur):0,color:x&&x.dur>=g.sleepH?'var(--acc)':'var(--c)',tip:d+'\n'+(x?'时长 '+r1(x.dur)+' h\n质量 '+(x.q||'-')+'/5\n'+x.bed+' → '+x.wake:'无记录')};}),goal:g.sleepH,goalName:'目标',unit:' h',
+  overlay:{name:'质量',color:'var(--acc2)',max:5,step:1,pts:days.map(function(d){var x=sleepOf(d);return x&&x.q?x.q:null;})},legend:[{name:'达标',color:'var(--acc)'},{name:'不足',color:'var(--c)'},{name:'质量(右轴 1-5)',color:'var(--acc2)'}],emptyMsg:'暂无睡眠记录',emptyHint:'记录入睡与起床时间后显示'});}
 
 function chBody(){var from=since('body',S.body.map(function(b){return b.date;})),inR=function(b){return b.date>=from&&b.date<=sel;},bs=S.body.filter(inR);
  var wp=sortPts(bs.map(function(b){return{d:b.date,y:b.weight};})),bf=sortPts(bs.map(function(b){return{d:b.date,y:b.bf};}));
- CH.line($('#chBody'),{h:190,series:[{name:'体重',color:'var(--acc)',pts:wp,unit:' kg'},{name:'7日均线',color:'var(--warn)',pts:movAvg(wp,7),dash:true,unit:' kg'},{name:'体脂(右轴)',color:'var(--p)',pts:bf,axis:'r',unit:' %'}],refs:[{y:S.goals.weight,name:'目标',color:'var(--ok)'}],legend:true,emptyMsg:'暂无体重/体脂记录',emptyHint:'建议每天晨起空腹称重'});
+ CH.line($('#chBody'),{h:190,series:[{name:'体重',color:'var(--acc)',pts:wp,unit:' kg'},{name:'7日均线',color:'var(--acc2)',pts:movAvg(wp,7),dash:true,unit:' kg'},{name:'体脂(右轴)',color:'var(--p)',pts:bf,axis:'r',unit:' %'}],refs:[{y:S.goals.weight,name:'目标',color:'var(--mut)'}],legend:true,emptyMsg:'暂无体重/体脂记录',emptyHint:'建议每天晨起空腹称重'});
  var both=bs.filter(function(b){return b.weight!=null&&b.bf!=null;});
  CH.stack($('#chComp'),{h:160,unit:' kg',series:[{name:'瘦体重',color:'var(--c)',pts:both.map(function(b){return{d:b.date,y:r1(b.weight*(1-b.bf/100))};})},{name:'脂肪量',color:'var(--f)',pts:both.map(function(b){return{d:b.date,y:r1(b.weight*b.bf/100)};})}],emptyMsg:'需要同日的体重与体脂',emptyHint:'瘦体重 = 体重 × (1 − 体脂%)'});
  CH.line($('#chWaist'),{h:140,series:[{name:'腰围',color:'var(--k)',pts:sortPts(bs.map(function(b){return{d:b.date,y:b.waist};})),unit:' cm',area:true}],emptyMsg:'暂无腰围记录',emptyHint:'每周固定时间测量一次即可'});}
@@ -691,7 +696,7 @@ function readiness(d){var parts=[],add=function(w,v,n){if(v!=null&&!isNaN(v))par
  return{score:Math.round(parts.reduce(function(a,p){return a+p.w*p.v;},0)/tw*100),parts:parts};}
 function chRecovery(){var dates=S.recov.map(function(x){return x.date;}).concat(S.sleep.map(function(x){return x.date;})),from=since('rec',dates),days=daysBetween(from,sel);
  var rd=readiness(sel);$('#readyNow').innerHTML=rd?'<div class="score"><span class="big" style="color:'+(rd.score>=70?'var(--ok)':rd.score>=50?'var(--warn)':'var(--bad)')+'">'+rd.score+'</span><div><b>'+(sel===today()?'今日':sel)+'准备度</b><div class="mut">'+(rd.score>=70?'状态良好，可按计划训练':rd.score>=50?'一般，可适当降低强度':'偏低，建议减量或休息')+' · 依据：'+rd.parts.map(function(p){return p.n;}).join('、')+'</div></div></div>':'<div class="mut" style="margin-bottom:6px">准备度需要当天至少 2 项数据（睡眠、晨起心率、HRV、主观指标）。</div>';
- CH.line($('#chReady'),{h:150,series:[{name:'准备度',color:'var(--ok)',pts:days.map(function(d){var x=readiness(d);return{d:d,y:x?x.score:null};}),area:true}],yl:{min:0,max:100},refs:[{y:70,name:'良好',color:'var(--mut)'}],emptyMsg:'暂无准备度数据',emptyHint:'连续记录睡眠与晨起指标后自动计算'});
+ CH.line($('#chReady'),{h:150,series:[{name:'准备度',color:'var(--acc)',pts:days.map(function(d){var x=readiness(d);return{d:d,y:x?x.score:null};}),area:true}],yl:{min:0,max:100},refs:[{y:70,name:'良好',color:'var(--mut)'}],emptyMsg:'暂无准备度数据',emptyHint:'连续记录睡眠与晨起指标后自动计算'});
  var rhrOf=function(x){var rr=recovOf(x);if(rr&&rr.rhr!=null)return rr.rhr;var b=S.body.find(function(y){return y.date===x;});return b?b.rhr:null;};
  CH.line($('#chHrv'),{h:170,series:[{name:'静息心率',color:'var(--bad)',pts:days.map(function(d){return{d:d,y:rhrOf(d)};}),unit:' bpm'},{name:'HRV(右轴)',color:'var(--acc)',pts:days.map(function(d){var x=recovOf(d);return{d:d,y:x?x.hrv:null};}),axis:'r',unit:' ms'}],legend:true,emptyMsg:'暂无心率/HRV记录',emptyHint:'每天晨起同一时间、同一设备测量'});
  CH.line($('#chRv'),{h:140,series:[{name:RVM[rvMetric][0],color:'var(--k)',pts:days.map(function(d){var x=recovOf(d);return{d:d,y:x?x[rvMetric]:null};}),unit:RVM[rvMetric][1]?' '+RVM[rvMetric][1]:''}],yl:['rhr','hrv'].indexOf(rvMetric)<0?{min:1,max:5}:null,emptyMsg:'暂无该指标记录'});}
@@ -699,7 +704,7 @@ function chRecovery(){var dates=S.recov.map(function(x){return x.date;}).concat(
 function chPain(){var from=since('pain',S.wristLog.map(function(x){return x.date;})),flags={};S.workouts.forEach(function(x){if(x.wrist)flags[x.date]=1;});
  var pts=S.wristLog.filter(function(x){return x.date>=from&&x.date<=sel;}).map(function(x){return{d:x.date,y:x.pain};});
  var fl=Object.keys(flags).filter(function(d){return d>=from&&d<=sel;}).map(function(d){var p=wpOf(d);return{d:d,y:p?p.pain:0};});
- CH.line($('#chWp'),{h:160,series:[{name:'疼痛',color:'var(--warn)',pts:pts,unit:'/10',area:true},{name:flagLabel(),color:'var(--bad)',pts:fl,noline:true,unit:'/10'}],yl:{min:0,max:10},refs:[{y:3,name:'调整线',color:'var(--mut)'}],emptyMsg:'暂无疼痛记录',emptyHint:'每天记录 0-10 分（0 分也请记录）'});
+ CH.line($('#chWp'),{h:160,series:[{name:'疼痛',color:'var(--acc2)',pts:pts,unit:'/10',area:true},{name:flagLabel(),color:'var(--bad)',pts:fl,noline:true,unit:'/10'}],yl:{min:0,max:10},refs:[{y:3,name:'调整线',color:'var(--mut)'}],emptyMsg:'暂无疼痛记录',emptyHint:'每天记录 0-10 分（0 分也请记录）'});
  var l7=S.wristLog.filter(function(x){return x.date<=sel&&x.date>addDays(sel,-7);});$('#wpAvg').textContent=l7.length?'近7天均 '+r1(avg(l7.map(function(x){return x.pain;})))+'/10':'';}
 
 
@@ -768,7 +773,7 @@ function rMuscle(){var st=muscleState(),rc=recommend();
  if($('#recoBox'))$('#recoBox').innerHTML='<div class="big" style="font-size:20px;color:'+(rc.rest?'var(--warn)':'var(--fg)')+'">'+esc(rc.title)+'</div><div class="mut">'+esc(rc.why)+'</div>'+(!rc.rest&&rc.split?planHint(rc.keys):'');
  $('#mapMode').innerHTML=[['status','恢复状态'],['volume','近7天组数']].map(function(m){return'<button data-mapmode="'+m[0]+'" class="'+(mapMode===m[0]?'on':'')+'">'+m[1]+'</button>';}).join('');
  $('#bodyMap').innerHTML='<div class="bm">'+bodyMapSvg(st)+'</div>';
- $('#mapLegend').innerHTML=mapMode==='status'?'<div class="mlg">'+[['recovered','已恢复','var(--ok)'],['recovering','恢复中','var(--warn)'],['fatigued','疲劳高','var(--bad)'],['stale','太久没练','var(--c)'],['never','未训练','var(--bd)']].map(function(x){return'<span><i style="background:'+x[2]+'"></i>'+x[1]+'</span>';}).join('')+'</div>':'<div class="mlg"><span>颜色越深 = 近7天有效组数越多</span></div>';
+ $('#mapLegend').innerHTML=mapMode==='status'?'<div class="mlg">'+[['recovered','已恢复','var(--mu-rec)'],['recovering','恢复中','var(--mu-ing)'],['fatigued','疲劳高','var(--mu-fat)'],['stale','太久没练','var(--mu-old)'],['never','未训练','var(--mu-no)']].map(function(x){return'<span><i style="background:'+x[2]+'"></i>'+x[1]+'</span>';}).join('')+'</div>':'<div class="mlg"><span>颜色越深 = 近7天有效组数越多</span></div>';
  var k=musSel;$('#musDetail').innerHTML=k?'<div class="mdet"><div class="hrow"><b>'+MUS[k][0]+'</b><span class="st-tag st-'+st[k].status+'">'+ST_LABEL[st[k].status]+'</span></div><div class="mut" style="margin-top:4px">近7天有效组数 '+r1(st[k].sets7)+' · 剩余疲劳 '+r1(st[k].f)+' 组 · '+(st[k].last?'上次训练 '+st[k].last:'暂无记录')+(st[k].eta?' · 约 '+st[k].eta+' 小时后恢复':'')+' · 恢复半衰期 '+MUS[k][1]+'h</div></div>':'<div class="mut" style="text-align:center;margin-top:6px">点按肌群查看详情</div>';
  $('#musList').innerHTML='<ul class="list tight">'+Object.keys(MUS).map(function(k){var s=st[k];return'<li data-mus="'+k+'" style="cursor:pointer"><div><b>'+MUS[k][0]+'</b> <span class="st">近7天 '+r1(s.sets7)+' 组'+(s.last?' · '+(s.days===0?'今天':s.days+'天前'):'')+'</span></div><span class="st-tag st-'+s.status+'">'+ST_LABEL[s.status]+'</span></li>';}).join('')+'</ul>';}
 function planHint(keys){var best=null,sc=0;S.plans.forEach(function(p){var n=0;p.items.forEach(function(it){var m=musclesOf(it.ex).p;if(m.some(function(x){return keys.indexOf(x)>=0;}))n++;});if(n/Math.max(1,p.items.length)>sc){sc=n/p.items.length;best=p;}});
@@ -936,7 +941,7 @@ function mealByHour(){var h=new Date().getHours();return h<10?'早餐':h<14?'午
 function normName(n){return String(n).replace(/[（(].*?[）)]/g,'').replace(/\s/g,'').toLowerCase();}
 /** 在食物库中匹配名称：自定义优先；完全相等 > 文本包含最长关键字 > 关键字包含文本 */
 function matchFood(name){var t=normName(name);if(!t)return null;var best=null,score=0,cs=(S.customFoods||[]),list=cs.concat(FOOD_DB.foods||[]);
- list.forEach(function(f){var bonus=f.custom?5:0;[f.name].concat(f.aliases||[]).forEach(function(k){k=normName(k);if(!k)return;var sc=0;if(k===t)sc=1000+bonus*100;else if(t.indexOf(k)>=0)sc=100+k.length+bonus;else if(k.indexOf(t)>=0&&t.length>=2)sc=50+t.length+bonus;if(sc>score){score=sc;best=f;}});});return best;}
+ list.forEach(function(f){var bonus=f.custom?5:0;[f.name].concat(f.aliases||[]).forEach(function(k){k=normName(k);if(!k)return;var sc=0;if(k===t)sc=1000+bonus*100;else if(t.indexOf(k)>=0&&k.length>=2)sc=100+k.length+bonus;else if(k.indexOf(t)>=0&&t.length>=2)sc=50+t.length+bonus;if(sc>score){score=sc;best=f;}});});return best;}
 var CN_NUM={'半':0.5,'一':1,'两':2,'二':2,'三':3,'四':4,'五':5,'六':6};
 var COUNT_UNITS='个|只|勺|碗|杯|片|根|盒|份|袋|瓶|块|把',KCAL_UNITS='kcal|千卡|大卡|卡';
 /** 解析一行文字为营养估算：如 "鸡胸肉200g 米饭1碗 鸡蛋2个"、"外卖 650"（只填热量）、自定义食物或组合名 */
@@ -1044,13 +1049,202 @@ $('#cfFile').onchange=function(){var f=this.files[0];if(!f)return;var rd=new Fil
  save();toast('导入 '+ok.length+' 项'+(arr.length-ok.length?'，跳过 '+(arr.length-ok.length)+' 项无效':''));render();}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
 $('#cfClear').onclick=function(){if(confirm('清空自定义食物？')){S.customFoods=[];save();render();}};
 $('#g2Save').onclick=function(){var a=num($('#gSl').value),b=num($('#gTd').value),c=num($('#gSt').value);if(a)S.goals.sleepH=a;if(b)S.goals.trainDays=b;if(c)S.goals.stairMin=c;S.goals.weight=num($('#gWt').value);save();toast('已保存');};
-$('#exp').onclick=function(){var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='freebody-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);toast('已导出');};
+$('#exp').onclick=function(){var out={};for(var k in S)out[k]=S[k];out.aiConfig=aiExport();var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='freebody-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);toast(AIC.incKey&&AIC.key?'已导出（含 API Key，请妥善保管）':'已导出');};
 $('#impBtn').onclick=function(){$('#imp').click();};
 $('#exFile').onchange=function(){var f=this.files[0],inp=this;if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d||typeof d!=='object'||Array.isArray(d)||d.meals)throw new Error('不是配置文件（完整备份请用「数据备份」导入）');if(!d.title)d.title=f.name;applyExample(d);}catch(err){toast('读取失败：'+err.message);}inp.value='';};rd.readAsText(f);};
 $('#exFileBtn').onclick=function(){$('#exFile').click();};
 $('#imp').onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var d=JSON.parse(rd.result);if(!d||typeof d!=='object'||!Array.isArray(d.meals)||!d.goals)throw new Error('格式不符');
- if(!confirm('导入将覆盖当前全部数据，确定？'))return;localStorage.setItem(KEY,JSON.stringify(d));S=load();applyTheme();applyTitle();toast('导入成功');render();}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
-$('#wipe').onclick=function(){if(confirm('确定清空全部数据？建议先导出备份。')&&confirm('再次确认：不可恢复')){localStorage.removeItem(KEY);S=load();save();toast('已清空');render();}};
+ if(!confirm('导入将覆盖当前全部数据，确定？'))return;if(d.aiConfig){aiImport(d.aiConfig);}delete d.aiConfig;localStorage.setItem(KEY,JSON.stringify(d));S=load();applyTheme();applyTitle();toast('导入成功');render();}catch(e){toast('导入失败：'+e.message);}};rd.readAsText(f);this.value='';};
+$('#wipe').onclick=function(){if(confirm('确定清空全部数据（含本机保存的 API Key）？建议先导出备份。')&&confirm('再次确认：不可恢复')){localStorage.removeItem(KEY);localStorage.removeItem(AIKEY);AIC=aiLoad();S=load();save();toast('已清空');render();}};
+
+/* ---------- 拍照识别（v2.4）：模型 API 配置 / 照片压缩 / 识别 / 确认后记录 ----------
+ * 配置单独存于 localStorage「freeBody_ai_v1」，不进入主数据 S；导出时默认去掉 key。
+ * 所有服务商均走 OpenAI 兼容的 POST {baseUrl}/chat/completions，图片以 data URL 内联发送。
+ * 照片只在内存中压缩和发送，不写入本地存储。提示词与解析逻辑为本项目自行编写。 */
+var AIKEY='freeBody_ai_v1';
+var AI_PROV=[
+ ['zhipu','智谱 GLM','https://open.bigmodel.cn/api/paas/v4','glm-4.6v-flash',['glm-4.6v-flash','glm-4v-flash','glm-4.6v'],'在智谱开放平台（open.bigmodel.cn）创建 API Key。注意：glm-4v-flash 只接受图片链接、不支持本机照片（Base64），且仅 1 张图，建议用 glm-4.6v-flash。'],
+ ['qwen','通义千问 Qwen','https://dashscope.aliyuncs.com/compatible-mode/v1','qwen-vl-plus',['qwen-vl-plus','qwen-vl-max'],'在阿里云百炼（DashScope）控制台创建 API Key，使用 OpenAI 兼容模式。'],
+ ['gemini','Google Gemini','https://generativelanguage.googleapis.com/v1beta/openai','gemini-flash-latest',['gemini-flash-latest','gemini-3.5-flash-lite'],'在 Google AI Studio 创建 API Key，使用 OpenAI 兼容接口。部分网络环境无法直接访问。'],
+ ['custom','自定义（OpenAI 兼容）','','',[],'填写兼容 OpenAI Chat Completions 的接口地址（不含 /chat/completions）和支持图片输入的模型名。该服务需允许浏览器跨域访问（CORS）。']];
+function aiProv(id){return AI_PROV.find(function(p){return p[0]===id;})||AI_PROV[0];}
+function aiLoad(){var c=null;try{c=JSON.parse(localStorage.getItem(AIKEY)||'null');}catch(e){}if(!c||typeof c!=='object')c={};var p=aiProv(c.prov);
+ return{prov:p[0],base:typeof c.base==='string'?c.base:p[2],model:typeof c.model==='string'?c.model:p[3],key:typeof c.key==='string'?c.key:'',incKey:!!c.incKey};}
+var AIC=aiLoad();
+function aiSave(){try{localStorage.setItem(AIKEY,JSON.stringify(AIC));}catch(e){toast('保存失败：'+e.message);}}
+function aiReady(){return!!(AIC.key&&AIC.base&&AIC.model);}
+function aiProvName(){return aiProv(AIC.prov)[1];}
+/** 导出用：默认不含 key */
+function aiExport(){var o={prov:AIC.prov,base:AIC.base,model:AIC.model};if(AIC.incKey&&AIC.key){o.key=AIC.key;o.incKey=true;}return o;}
+/** 导入备份：恢复服务商与模型；备份中没有 key 时保留本机已有 key */
+function aiImport(c){if(!c||typeof c!=='object')return;var p=aiProv(c.prov);AIC.prov=p[0];if(typeof c.base==='string')AIC.base=c.base;if(typeof c.model==='string')AIC.model=c.model;if(typeof c.key==='string'&&c.key)AIC.key=c.key;AIC.incKey=!!c.incKey;aiSave();}
+function aiWeakModel(){return/^glm-4v-flash$/i.test(AIC.model||'');}
+
+/* 设置卡片 */
+$('#aiProv').innerHTML=AI_PROV.map(function(p){return'<option value="'+p[0]+'">'+esc(p[1])+'</option>';}).join('');
+function aiForm(){var p=aiProv($('#aiProv').value);$('#aiModels').innerHTML=p[4].map(function(m){return'<option value="'+esc(m)+'">';}).join('');
+ $('#aiHelp').textContent=p[5];$('#aiBase').readOnly=false;}
+function rAiCard(){$('#aiProv').value=AIC.prov;aiForm();$('#aiBase').value=AIC.base;$('#aiModel').value=AIC.model;$('#aiKey').value=AIC.key;$('#aiIncKey').checked=AIC.incKey;
+ $('#aiSum').textContent=aiReady()?aiProvName()+' · '+AIC.model:'未配置';$('#aiClear').disabled=!AIC.key;}
+$('#aiProv').addEventListener('change',function(){var p=aiProv(this.value);$('#aiBase').value=p[2];$('#aiModel').value=p[3];aiForm();$('#aiTestOut').innerHTML='';});
+$('#aiEye').onclick=function(){var k=$('#aiKey'),show=k.type==='password';k.type=show?'text':'password';this.textContent=show?'隐藏':'显示';};
+function aiFromForm(){var base=$('#aiBase').value.trim().replace(/\/+$/,'').replace(/\/chat\/completions$/,'');
+ if(base&&!/^https?:\/\//i.test(base)){toast('接口地址需以 https:// 开头');return false;}
+ AIC.prov=$('#aiProv').value;AIC.base=base;AIC.model=$('#aiModel').value.trim();AIC.key=$('#aiKey').value.trim();AIC.incKey=$('#aiIncKey').checked;return true;}
+$('#aiSave').onclick=function(){if(!aiFromForm())return;aiSave();rAiCard();toast(aiReady()?'已保存（仅本机）':'已保存，尚缺 '+(!AIC.key?'API Key':!AIC.base?'接口地址':'模型'));};
+$('#aiClear').onclick=function(){if(!confirm('清除本机保存的 API Key？'))return;AIC.key='';aiSave();rAiCard();$('#aiTestOut').innerHTML='';toast('已清除 Key');};
+$('#aiTest').onclick=function(){if(!aiFromForm())return;var out=$('#aiTestOut'),btn=this;
+ if(!aiReady()){out.innerHTML='<div class="alert warn">请先填写接口地址、模型和 API Key。</div>';return;}
+ btn.disabled=true;out.innerHTML='<div class="mut ai-wait">正在连接 '+esc(aiProvName())+'…</div>';var t0=Date.now();
+ aiCall([{role:'user',content:'连接测试，请只回复：OK'}],{max:16,timeout:20000}).then(function(){aiSave();rAiCard();
+  out.innerHTML='<div class="alert ok">'+IC('ok')+'连接成功 · '+esc(AIC.model)+' · '+(Date.now()-t0)+' ms。配置已保存。'+(aiWeakModel()?'<br>该模型不支持本机照片，拍照识别请改用 glm-4.6v-flash。':'')+'</div>';})
+ .catch(function(e){var m=aiErr(e);out.innerHTML='<div class="alert bad"><b>'+esc(m.t)+'</b><div>'+esc(m.d)+'</div></div>';})
+ .then(function(){btn.disabled=false;});};
+
+/* 网络请求 */
+function aiCall(messages,opt){opt=opt||{};
+ if(navigator.onLine===false)return Promise.reject({kind:'offline'});
+ var ctrl=typeof AbortController!=='undefined'?new AbortController():null,timedOut=false,tm=setTimeout(function(){timedOut=true;if(ctrl)ctrl.abort();},opt.timeout||60000);
+ if(opt.onCtrl)opt.onCtrl(ctrl);
+ var body={model:AIC.model,messages:messages,temperature:0.2,max_tokens:opt.max||1500};
+ return fetch(AIC.base+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+AIC.key},body:JSON.stringify(body),signal:ctrl?ctrl.signal:undefined})
+ .then(function(r){return r.text().then(function(tx){var j=null;try{j=JSON.parse(tx);}catch(e){}
+   if(!r.ok){var em=j&&(j.error&&(j.error.message||j.error.code)||j.message||j.msg)||tx;throw{kind:'http',status:r.status,msg:String(em||'').slice(0,160)};}
+   var c=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+   if(Array.isArray(c))c=c.map(function(x){return typeof x==='string'?x:x&&x.text||'';}).join('');
+   if(typeof c!=='string')throw{kind:'parse',msg:'响应中没有 choices[0].message.content'};return c;});},
+  function(e){if(e&&e.name==='AbortError')throw{kind:timedOut?'timeout':'cancel'};throw{kind:'network',msg:e&&e.message||''};})
+ .then(function(c){clearTimeout(tm);return c;},function(e){clearTimeout(tm);throw e;});}
+/** 错误分类：标题 + 说明（均为纯文本） */
+function aiErr(e){e=e||{};var k=e.kind,s=e.status,srv=e.msg?'（服务商返回：'+e.msg+'）':'';
+ if(k==='offline')return{t:'当前没有网络',d:'拍照识别需要联网。可以先用手动或快速输入记录，联网后再试。'};
+ if(k==='timeout')return{t:'请求超时',d:'服务商长时间没有响应。可稍后重试，或改用手动记录。'};
+ if(k==='cancel')return{t:'已取消',d:''};
+ if(k==='network')return{t:'无法连接到服务商',d:'可能是网络不通、接口地址填写有误，或该服务不允许浏览器直接访问（跨域 CORS 被拦截）。预设服务商均支持浏览器访问；自定义服务需开启 CORS。也可以改用手动记录。'};
+ if(k==='parse')return{t:'识别结果无法解析',d:'模型没有按约定格式返回。可点「重试」，或换一个模型。'+srv};
+ if(k==='nokey')return{t:'还没有配置模型 API',d:'请在「我的 › 拍照识别 · 模型 API」中选择服务商并填写 API Key。'};
+ if(s===401||s===403)return{t:'API Key 无效或没有权限',d:'请检查 Key 是否正确、是否已开通该模型。'+srv};
+ if(s===404)return{t:'接口地址或模型名不存在',d:'请检查 baseUrl（不含 /chat/completions）和模型名。'+srv};
+ if(s===429)return{t:'请求过于频繁或额度不足',d:'请稍后再试，或检查账户余额与免费额度。'+srv};
+ if(s===400||s===413||s===422)return{t:'请求被服务商拒绝',d:'可能是该模型不支持图片或本机照片（Base64）、图片过大或参数不受支持。'+srv};
+ if(s>=500)return{t:'服务商暂时不可用（'+s+'）',d:'请稍后重试。'+srv};
+ return{t:'识别失败',d:(s?'HTTP '+s+' ':'')+(e.msg||e.message||'')};}
+
+/* 提示词（本项目自写）：只要求固定 JSON；营养数值优先用本地食物库，模型数值仅作兜底 */
+var AI_SYS='你是饮食记录助手，只根据照片估计食物的种类和重量，不提供营养或医疗建议。\n'+
+ '只输出一个 JSON 对象，不要输出 Markdown 代码块或任何其他文字。格式：\n'+
+ '{"items":[{"name":"食物中文名","grams":数字,"leftRatio":数字,"per100g":{"kcal":数字,"p":数字,"c":数字,"f":数字},"confidence":数字}],"note":"一句话说明"}\n'+
+ '规则：\n'+
+ '1. name 使用常见的中文菜名或食材名，例如「米饭」「番茄炒蛋」「清炒西兰花」，不加形容词或品牌；同一道菜合并为一项，米饭、汤、饮料等分别列出。\n'+
+ '2. grams 为该食物在第一张照片中可食部分的熟重（克，整数），参考碗盘、餐具、手或包装的大小估计。\n'+
+ '3. leftRatio 为吃完后剩下的比例，0 到 1。只有一张照片时填 0；有两张照片时，第一张是吃前、第二张是吃后，按第二张中剩下的量估计：吃光填 0，没动填 1。\n'+
+ '4. per100g 为每 100 克可食部分的估计值：kcal 为千卡，p 蛋白质、c 碳水化合物、f 脂肪，单位为克，保留一位小数。\n'+
+ '5. confidence 为你对名称和重量判断的把握，0 到 1。\n'+
+ '6. 饮料按 1 毫升约等于 1 克。看不清或不是食物的物品不要列出；照片里没有食物时 items 为空数组，并在 note 中说明。';
+function aiUserMsg(imgs){var two=imgs.length>1,c=[{type:'text',text:two?'下面两张照片：第一张是吃前，第二张是吃后。请列出吃前的每样食物，并估计每样剩下的比例。':'下面是一餐的照片，请列出其中的每样食物。'}];
+ imgs.forEach(function(u){c.push({type:'image_url',image_url:{url:u}});});return{role:'user',content:c};}
+function aiNum(v,lo,hi,d){var n=parseFloat(v);if(isNaN(n))return d;return Math.min(hi,Math.max(lo,n));}
+/** 解析模型输出：容忍代码块包裹与前后多余文字 */
+function aiParse(txt){var s=String(txt||'').replace(/```(?:json)?/gi,'').trim(),a=s.indexOf('{'),b=s.lastIndexOf('}'),j=null;
+ if(a>=0&&b>a){try{j=JSON.parse(s.slice(a,b+1));}catch(e){}}
+ if(!j){var x=s.indexOf('['),y=s.lastIndexOf(']');if(x>=0&&y>x){try{j={items:JSON.parse(s.slice(x,y+1))};}catch(e){}}}
+ if(!j||!Array.isArray(j.items))throw{kind:'parse',msg:s.slice(0,80)};
+ var items=j.items.filter(function(it){return it&&typeof it.name==='string'&&it.name.trim();}).slice(0,20).map(function(it){var p=it.per100g||{};
+  return{name:it.name.trim().slice(0,30),g:Math.round(aiNum(it.grams,0,3000,100)),left:aiNum(it.leftRatio,0,1,0),
+   est:{kcal:aiNum(p.kcal,0,900,0),p:aiNum(p.p,0,100,0),c:aiNum(p.c,0,100,0),f:aiNum(p.f,0,100,0)},conf:aiNum(it.confidence,0,1,null)};});
+ return{items:items,note:typeof j.note==='string'?j.note.slice(0,120):''};}
+
+/* 识别页状态：照片只保存在内存（压缩后的 data URL） */
+var AI={mode:1,photos:[],slot:0,phase:'pick',items:[],meal:null,mealWhy:'',note:'',err:null,ctrl:null};
+function aiMatch(name){var t=normName(name);if(!t)return null;var f=matchFood(name);if(!f)return null;
+ var best=0;[f.name].concat(f.aliases||[]).forEach(function(k){k=normName(k);if(k===t)best=1;else if(t.indexOf(k)>=0||k.indexOf(t)>=0)best=Math.max(best,Math.min(k.length,t.length)/Math.max(k.length,t.length));});
+ return best>=0.6?f:null;}
+function aiItem(o){o.lib=aiMatch(o.name);o.useLib=!!o.lib;return o;}
+function aiPer(it){return it.useLib&&it.lib?per100(it.lib):it.est;}
+function aiEaten(it){return Math.max(0,Math.round((it.g||0)*(1-(it.left||0))));}
+function aiNut(it){var p=aiPer(it),r=aiEaten(it)/100;return{kcal:Math.round((p.kcal||0)*r),p:r1((p.p||0)*r),c:r1((p.c||0)*r),f:r1((p.f||0)*r)};}
+function mealOfHour(h){return h<10?'早餐':h<14?'午餐':h<17?'加餐':h<21?'晚餐':'加餐';}
+function openAI(){if(AI.phase!=='busy'){AI.phase='pick';AI.err=null;}show('dietAI',true);}
+$('#faPhoto').onclick=openAI;
+$('#dPhoto').onclick=function(){curMeal=null;openAI();};
+/** 压缩为最长边 1280px 的 JPEG */
+function aiCompress(file){return new Promise(function(res,rej){var url=URL.createObjectURL(file),im=new Image();
+ im.onload=function(){var s=Math.min(1,1280/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*s)),h=Math.max(1,Math.round(im.naturalHeight*s)),cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,w,h);cx.drawImage(im,0,0,w,h);URL.revokeObjectURL(url);res(cv.toDataURL('image/jpeg',0.8));};
+ im.onerror=function(){URL.revokeObjectURL(url);rej(new Error('无法读取该图片'));};im.src=url;});}
+function aiPick(inp){var f=inp.files&&inp.files[0];inp.value='';if(!f)return;var slot=AI.slot;
+ aiCompress(f).then(function(u){AI.photos[slot]={url:u,time:f.lastModified||Date.now()};AI.err=null;if(AI.mode===1&&aiReady())aiGo();else rDietAI();}).catch(function(e){toast(e.message);});}
+$('#aiCam').onchange=function(){aiPick(this);};$('#aiLib').onchange=function(){aiPick(this);};
+function aiSlot(i){var ph=AI.photos[i],lb=AI.mode===2?(i?'吃后':'吃前'):'照片';
+ return'<div class="ai-slot'+(ph?' has':'')+'"><div class="ai-sl">'+lb+'</div>'+(ph?'<img src="'+ph.url+'" alt="'+lb+'"><button class="ghost sm ai-x" data-ai="rm" data-v="'+i+'" aria-label="移除'+lb+'">'+IC('x')+'</button>'
+  :'<div class="ai-pk"><button class="ghost" data-ai="cam" data-v="'+i+'">'+IC('camera')+'拍照</button><button class="ghost" data-ai="lib" data-v="'+i+'">'+IC('image')+'相册</button></div>')+'</div>';}
+function aiErrBox(){if(!AI.err)return'';var m=aiErr(AI.err);
+ return'<div class="alert bad ai-err"><b>'+(AI.err.kind==='offline'||AI.err.kind==='network'?IC('wifiOff'):IC('alert'))+esc(m.t)+'</b><div>'+esc(m.d)+'</div>'+
+  '<div class="actions">'+(AI.err.kind!=='nokey'?'<button class="sm" data-ai="go">重试</button>':'')+'<button class="ghost sm" data-ai="manual">手动记录</button><button class="ghost sm" data-ai="cfg">'+(AI.err.kind==='nokey'?'去配置':'检查设置')+'</button></div></div>';}
+function rDietAI(){var box=$('#aiBox'),h='';
+ if(AI.phase==='confirm'){rAiConfirm();return;}
+ var need=AI.mode,have=AI.photos.slice(0,need).filter(Boolean).length,busy=AI.phase==='busy';
+ h+='<div class="card ai-pick"><div class="tabs4 tabs2" id="aiMode"><button class="'+(AI.mode===1?'on':'')+'" data-ai="mode" data-v="1">单张</button><button class="'+(AI.mode===2?'on':'')+'" data-ai="mode" data-v="2">吃前 + 吃后</button></div>'+
+  '<div class="ai-slots n'+need+'">'+aiSlot(0)+(need===2?aiSlot(1):'')+'</div>'+
+  '<p class="mut ai-tip">'+(need===2?'两张照片尽量同一角度。识别按吃前估重量，按吃后估剩余比例。':'俯拍、光线充足、整份入镜，识别更准。')+'</p>'+
+  (busy?'<div class="ai-busy"><span class="spin" aria-hidden="true"></span><span>正在识别，通常需要 5–20 秒…</span><button class="ghost sm" data-ai="cancel">取消</button></div>'
+   :'<div class="actions"><button data-ai="go"'+(have<need?' disabled':'')+'>开始识别</button><button class="ghost" data-ai="manual">改用手动记录</button></div>')+'</div>';
+ h+=aiErrBox();
+ h+='<div class="mut ai-priv-s">'+IC('lock')+'<span>'+(aiReady()?'照片将发送给 '+esc(aiProvName())+'（'+esc(AIC.model)+'）识别，FreeBody 不保存照片。':'尚未配置模型 API，请先在「我的」中设置。')+(aiReady()&&aiWeakModel()?' 当前模型不支持本机照片，建议改用 glm-4.6v-flash。':'')+'</span> <button class="linkb" data-ai="cfg">设置</button></div>';
+ box.innerHTML=h;}
+function aiGo(){var need=AI.mode,imgs=AI.photos.slice(0,need).filter(Boolean);if(imgs.length<need){toast(need===2?'请选择吃前和吃后两张照片':'请先选择照片');return;}
+ if(!aiReady()){AI.err={kind:'nokey'};rDietAI();return;}
+ AI.phase='busy';AI.err=null;rDietAI();
+ aiCall([{role:'system',content:AI_SYS},aiUserMsg(imgs.map(function(p){return p.url;}))],{onCtrl:function(c){AI.ctrl=c;}}).then(aiParse).then(function(r){
+  var t=new Date(imgs[0].time||Date.now()),fromPhoto=Math.abs(Date.now()-t)>5*60000;AI.meal=mealOfHour(t.getHours());AI.mealWhy=(fromPhoto?'按拍摄时间 ':'按当前时间 ')+pad(t.getHours())+':'+pad(t.getMinutes());
+  AI.items=r.items.map(function(it){if(AI.mode===1)it.left=0;return aiItem(it);});AI.note=r.note;AI.phase='confirm';AI.ctrl=null;if(cur==='dietAI')rDietAI();})
+ .catch(function(e){AI.ctrl=null;AI.phase='pick';AI.err=e&&e.kind==='cancel'?null:(e&&e.kind?e:{kind:'other',message:e&&e.message});if(cur==='dietAI')rDietAI();});}
+function aiConf(c){return c==null?'':c>=0.75?'把握高':c>=0.45?'把握中':'把握低';}
+function aiRow(it,i){var n=aiNut(it),src=it.useLib&&it.lib;
+ return'<div class="ai-it" data-i="'+i+'"><div class="ai-r1"><input class="ai-n" data-aif="name" value="'+esc(it.name)+'" aria-label="名称"><button class="ghost sm ai-del" data-ai="del" data-v="'+i+'" aria-label="删除">'+IC('trash')+'</button></div>'+
+  '<div class="ai-r2"><div><label>克重 g</label><input type="number" inputmode="numeric" data-aif="g" value="'+it.g+'"></div>'+
+  '<div><label>剩余 %</label><input type="number" inputmode="numeric" min="0" max="100" data-aif="left" value="'+Math.round((it.left||0)*100)+'"></div>'+
+  '<div class="ai-k"><b>'+n.kcal+'</b> kcal<span class="mut">实吃 '+aiEaten(it)+' g</span></div></div>'+
+  '<div class="ai-r3">'+(src?'<button class="tag lib" data-ai="src" data-v="'+i+'" title="点按改用模型估算值">库 · '+esc(it.lib.name)+'</button>':'<button class="tag est" data-ai="src" data-v="'+i+'"'+(it.lib?' title="点按改用食物库数值"':' disabled')+'>估算'+(it.lib?' · 可改用库值':'')+'</button>')+
+  '<span class="mut">蛋白 '+n.p+' · 碳水 '+n.c+' · 脂肪 '+n.f+(it.conf!=null?' · '+aiConf(it.conf):'')+'</span></div></div>';}
+function aiTotals(){var t={k:0,p:0,c:0,f:0};AI.items.forEach(function(it){var n=aiNut(it);t.k+=n.kcal;t.p+=n.p;t.c+=n.c;t.f+=n.f;});return t;}
+function aiTotTxt(){var t=aiTotals();return'<b>'+Math.round(t.k)+'</b> kcal · 蛋白 '+r1(t.p)+' g · 碳水 '+r1(t.c)+' g · 脂肪 '+r1(t.f)+' g';}
+function rAiConfirm(){var h='<div class="card ai-head"><div class="ai-thumbs">'+AI.photos.slice(0,AI.mode).filter(Boolean).map(function(p,i){return'<img src="'+p.url+'" alt="'+(AI.mode===2?(i?'吃后':'吃前'):'照片')+'">';}).join('')+'</div>'+
+  '<div class="ai-hm"><label>记录到 '+md(sel)+'</label><div class="tabs4" id="aiMeal">'+MEALS.map(function(m){return'<button class="'+(m===AI.meal?'on':'')+'" data-ai="meal" data-v="'+m+'">'+m+'</button>';}).join('')+'</div><div class="mut ai-why">'+esc(AI.mealWhy)+' 自动判断，可修改</div></div></div>';
+ h+=AI.items.length?'<div class="card ai-list">'+AI.items.map(aiRow).join('')+'</div>':'<div class="card mut">没有识别到食物'+(AI.note?'：'+esc(AI.note):'')+'。可添加一项，或改用手动记录。</div>';
+ h+='<div class="card ai-sum"><div class="ai-tot" id="aiTot">'+aiTotTxt()+'</div><div class="mut ai-fn">实吃 = 克重 ×（1 − 剩余比例）。标「库」的按内置食物库每 100g 数值计算，标「估算」的为模型估算值，均仅供参考，不构成营养或医疗建议。'+(AI.note&&AI.items.length?'<br>模型说明：'+esc(AI.note):'')+'</div>'+
+  '<div class="actions"><button class="ghost" data-ai="add">'+IC('plus')+'添加一项</button><button class="ghost" data-ai="again">'+IC('repeat')+'重新识别</button></div>'+
+  '<div class="actions"><button data-ai="rec" id="aiRec"'+(AI.items.length?'':' disabled')+'>记录 '+AI.items.length+' 项到'+AI.meal+'</button></div></div>';
+ $('#aiBox').innerHTML=h;}
+/** 局部刷新一行（保留输入焦点） */
+function aiRefreshRow(i){var row=document.querySelector('.ai-it[data-i="'+i+'"]'),it=AI.items[i];if(!row||!it)return;var n=aiNut(it);
+ row.querySelector('.ai-k').innerHTML='<b>'+n.kcal+'</b> kcal<span class="mut">实吃 '+aiEaten(it)+' g</span>';
+ var tmp=document.createElement('div');tmp.innerHTML=aiRow(it,i);row.querySelector('.ai-r3').innerHTML=tmp.querySelector('.ai-r3').innerHTML;$('#aiTot').innerHTML=aiTotTxt();}
+$('#aiBox').addEventListener('input',function(e){var f=e.target.getAttribute('data-aif');if(!f)return;var row=e.target.closest('.ai-it'),i=+row.getAttribute('data-i'),it=AI.items[i];if(!it)return;
+ if(f==='name'){it.name=e.target.value;var lib=aiMatch(it.name);if(lib!==it.lib){it.lib=lib;it.useLib=!!lib;}}
+ else if(f==='g')it.g=Math.max(0,Math.round(num(e.target.value)||0));
+ else if(f==='left')it.left=Math.min(100,Math.max(0,num(e.target.value)||0))/100;
+ aiRefreshRow(i);});
+function aiRecord(){var list=AI.items.filter(function(it){return it.name.trim()&&aiEaten(it)>0;});if(!list.length){toast('没有可记录的条目（克重为 0 或全部剩下）');return;}
+ var meal=AI.meal;list.forEach(function(it){var g=aiEaten(it),o;
+  if(it.useLib&&it.lib){o=fromFood(it.lib,g,g,'g');o.name=o.name+' '+g+'g';}
+  else{var p=it.est,r=g/100;o={name:it.name.trim()+' '+g+'g',kcal:p.kcal*r,p:p.p*r,c:p.c*r,f:p.f*r,g:g,amount:g,unit:'g',nutrimentsPer100g:{kcal:p.kcal,p:p.p,c:p.c,f:p.f},src:'ai'};}
+  o.via='ai';o.meal=meal;S.meals.push(mkMeal(o));});
+ save();toast('已记入'+meal+' '+list.length+' 项');AI={mode:AI.mode,photos:[],slot:0,phase:'pick',items:[],meal:null,mealWhy:'',note:'',err:null,ctrl:null};curMeal=meal;show('diet',true);}
+$('#aiBox').addEventListener('click',function(e){var b=e.target.closest('[data-ai]');if(!b||b.disabled)return;var a=b.getAttribute('data-ai'),v=b.getAttribute('data-v');
+ if(a==='mode'){AI.mode=+v;AI.err=null;rDietAI();}
+ else if(a==='cam'||a==='lib'){AI.slot=+v;$(a==='cam'?'#aiCam':'#aiLib').click();}
+ else if(a==='rm'){AI.photos[+v]=null;rDietAI();}
+ else if(a==='go')aiGo();
+ else if(a==='cancel'){if(AI.ctrl)AI.ctrl.abort();}
+ else if(a==='manual'){openAdd(AI.meal||curMeal||dMeal(),'quick');}
+ else if(a==='cfg'){show('settings');var c=$('#aiCard');c.open=true;setTimeout(function(){c.scrollIntoView({block:'start'});},30);}
+ else if(a==='meal'){AI.meal=v;Array.prototype.forEach.call(document.querySelectorAll('#aiMeal button'),function(x){x.classList.toggle('on',x.getAttribute('data-v')===v);});$('#aiRec').textContent='记录 '+AI.items.length+' 项到'+v;}
+ else if(a==='del'){AI.items.splice(+v,1);rAiConfirm();}
+ else if(a==='add'){AI.items.push(aiItem({name:'',g:100,left:0,est:{kcal:0,p:0,c:0,f:0},conf:null}));rAiConfirm();var ns=document.querySelectorAll('.ai-n');if(ns.length)ns[ns.length-1].focus();}
+ else if(a==='src'){var it=AI.items[+v];if(it&&it.lib){it.useLib=!it.useLib;aiRefreshRow(+v);}}
+ else if(a==='again'){AI.phase='pick';AI.items=[];rDietAI();}
+ else if(a==='rec')aiRecord();});
 
 /* 通用点击：删除/模板 */
 document.addEventListener('click',function(e){var t=e.target.closest('button,input[type=checkbox]');if(!t)return;var a;
@@ -1058,6 +1252,7 @@ document.addEventListener('click',function(e){var t=e.target.closest('button,inp
  else if((a=t.getAttribute('data-delw'))){S.workouts=S.workouts.filter(function(x){return x.id!==a;});}
  else if((a=t.getAttribute('data-delsw'))){S.swims=S.swims.filter(function(x){return x.id!==a;});}
  else if(t.id==='ovSuppAll'){suppAll();return;}
+ else if(t.id==='helloX'){S.hideHello=true;save();render();return;}
  else if(t.id==='ovDietRepeat'){repeatDiet();return;}
  else if(t.id==='ovSlReuse'){reuseSleep();return;}
  else if(t.id==='wUseSug'){$('#wW').value=t.getAttribute('data-w');if(t.getAttribute('data-r'))$('#wR').value=t.getAttribute('data-r');$('#wSug').innerHTML='';return;}
@@ -1098,7 +1293,7 @@ if(S.active)setTimeout(tickRest,0);
 applyTheme();applyTitle();show('overview');
 /* ---------- 多端：主题色 / 键盘 / 可访问性 / 尺寸变化 / PWA ---------- */
 /** 浏览器 UI 颜色跟随当前主题（手动切换时覆盖媒体查询） */
-function syncThemeColor(){var ms=document.querySelectorAll('meta[name=theme-color]'),c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#f5f5f7';Array.prototype.forEach.call(ms,function(m){if((S.theme||'auto')==='auto')m.setAttribute('content',m.getAttribute('media')&&/dark/.test(m.getAttribute('media'))?'#0b0c0f':'#f5f5f7');else m.setAttribute('content',c);});}
+function syncThemeColor(){var ms=document.querySelectorAll('meta[name=theme-color]'),c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#f6f5f1';Array.prototype.forEach.call(ms,function(m){if((S.theme||'auto')==='auto')m.setAttribute('content',m.getAttribute('media')&&/dark/.test(m.getAttribute('media'))?'#0b0c0f':'#f5f5f7');else m.setAttribute('content',c);});}
 syncThemeColor();(function(){var _a=applyTheme;applyTheme=function(){_a();syncThemeColor();};})();
 /** 非按钮的可点元素可用键盘聚焦，Enter / 空格触发 */
 var TAP_SEL='[data-go]:not(button),[data-sub]:not(button),[data-entry],[data-fopen],[data-calday]:not(button)';
@@ -1116,7 +1311,7 @@ function dtWrap(){document.querySelectorAll('input[type=date],input[type=time],i
   if(!w.classList||!w.classList.contains('dtw')){w=document.createElement('span');w.className='dtw';el.parentNode.insertBefore(w,el);w.appendChild(el);}
   w.setAttribute('data-ph',el.getAttribute('placeholder')||DT_PH[el.type]||'选择');w.classList.toggle('dt-empty',!el.value);});}
 ['input','change','blur'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.parentNode&&t.parentNode.classList&&t.parentNode.classList.contains('dtw'))t.parentNode.classList.toggle('dt-empty',!t.value);},true);});
-(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();dtWrap();layFill();};})();a11y();dtWrap();layFill();window.addEventListener('resize',layFill);
+(function(){var _r=render;render=function(){_r.apply(this,arguments);a11y();dtWrap();todayBtn();layFill();};})();a11y();dtWrap();todayBtn();layFill();window.addEventListener('resize',layFill);
 function typing(el){return el&&(/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)||el.isContentEditable);}
 /** 快捷键（不在输入框内时）：1–4 切换分组，← / → 前后一天，T 回到今天，/ 搜索食物，Esc 返回 */
 document.addEventListener('keydown',function(e){var t=e.target;

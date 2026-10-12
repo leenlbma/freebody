@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101113" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -52,7 +52,7 @@
 <section id="diet" data-lay="fixed">
  <div class="card dsum" id="dietSum"></div>
  <div id="mealCards"></div>
- <div class="tools" id="dTools"><button class="ghost sm" id="dRepeat"><i data-ic="repeat"></i>重复昨天</button><button class="ghost sm" data-go-cal="1"><i data-ic="cal"></i>日历</button></div>
+ <div class="tools" id="dTools"><button class="ghost sm" id="dPhoto"><i data-ic="camera"></i>拍照识别</button><button class="ghost sm" id="dRepeat"><i data-ic="repeat"></i>重复昨天</button><button class="ghost sm" data-go-cal="1"><i data-ic="cal"></i>日历</button></div>
  <details class="card" id="calCard"><summary><b>饮食月历</b> <span class="mut" id="calSum"></span></summary><div id="calBox"></div></details>
  <details class="card"><summary><b>饮食目标</b></summary>
   <div class="grid2" style="margin-top:8px">
@@ -71,7 +71,7 @@
 
 <!-- 饮食：添加食物（搜索 / 最近 / 自定义 / 快速加） -->
 <section id="dietAdd">
- <div class="qrow fa-q"><input id="faSearch" type="search" placeholder="搜索食物（名称或别名）" autocomplete="off"></div>
+ <div class="qrow fa-q"><input id="faSearch" type="search" placeholder="搜索食物（名称或别名）" autocomplete="off"><button class="ghost" id="faPhoto" aria-label="拍照识别"><i data-ic="camera"></i>拍照</button></div>
  <div class="tabs4" id="faTabs"></div>
  <div id="faList"></div>
  <div id="faQuick" hidden>
@@ -123,6 +123,13 @@
   <ul class="list" id="cuList"></ul>
   </details>
  </div>
+</section>
+
+<!-- 饮食：拍照识别（选择照片 → 识别 → 确认后记录；照片只在内存中处理） -->
+<section id="dietAI">
+ <div id="aiBox"></div>
+ <input type="file" id="aiCam" accept="image/*" capture="environment" hidden>
+ <input type="file" id="aiLib" accept="image/*" hidden>
 </section>
 
 <!-- 饮食：食物详情（份量 / 单位 / 实时营养 / 餐次） -->
@@ -412,6 +419,20 @@
   </div>
   <div class="actions"><button id="pfSave">保存</button><span class="mut">身高用于计算 BMI；伤处标记是训练记录中「伤处不适」的显示名。</span></div>
  </div>
+ <details class="card" id="aiCard"><summary><b>拍照识别 · 模型 API</b> <span class="mut" id="aiSum"></span></summary>
+  <div class="alert info ai-priv"><i data-ic="lock"></i>识别时，照片会发送给你选择的服务商处理，并受其隐私政策约束；FreeBody 不保存照片。API Key 只存在本机浏览器，导出备份默认不含 Key。</div>
+  <div class="grid2">
+   <div><label>服务商</label><select id="aiProv"></select></div>
+   <div><label>模型</label><input id="aiModel" list="aiModels" autocomplete="off" spellcheck="false"><datalist id="aiModels"></datalist></div>
+   <div style="grid-column:1/-1"><label>接口地址 baseUrl</label><input id="aiBase" type="url" autocomplete="off" spellcheck="false" placeholder="https://…/v1"></div>
+   <div style="grid-column:1/-1"><label>API Key</label><div class="qrow ai-keyrow"><input id="aiKey" type="password" autocomplete="off" spellcheck="false" placeholder="仅保存在本机"><button class="ghost" id="aiEye" type="button">显示</button></div></div>
+  </div>
+  <p class="mut ai-help" id="aiHelp"></p>
+  <label class="chk ai-inc"><input type="checkbox" id="aiIncKey">导出备份时包含 API Key（不推荐）</label>
+  <div class="actions"><button id="aiSave">保存</button><button class="ghost" id="aiTest">测试连接</button></div>
+  <div id="aiTestOut"></div>
+  <div class="danger-zone"><button class="danger sm" id="aiClear">清除 Key</button></div>
+ </details>
  <details class="card"><summary><b>示例配置（可选）</b></summary><p class="mut">合并示例的伤病、受限动作、康复清单配置，不含记录数据。</p><ul class="list" id="exList2"></ul><div class="actions"><button class="ghost" id="exFileBtn">从文件加载配置</button><input type="file" id="exFile" accept=".json,application/json" hidden></div><p class="mut" style="font-size:12px">可加载与 examples/ 同格式的本地 JSON（如个人配置），只合并配置与清单。</p></details>
  <details class="card"><summary><b>食物库</b></summary><p class="mut" id="cfInfo"></p>
   <div class="actions"><button class="ghost" id="cfBtn">导入自定义食物 JSON</button><button class="danger" id="cfClear">清空自定义</button><input type="file" id="cfFile" accept=".json,application/json" hidden></div>
@@ -432,7 +453,7 @@
   <div class="row" style="margin-top:8px" id="csvTpl"></div>
  </details>
  <div class="card"><h2>数据备份</h2>
-  <p class="mut">数据只存本机。换设备或清缓存前请导出。</p>
+  <p class="mut">数据只存本机。换设备或清缓存前请导出。导出不含 API Key（除非在「拍照识别」中勾选）。</p>
   <div class="actions"><button id="exp">导出 JSON</button><button class="ghost" id="impBtn">导入 JSON</button><input type="file" id="imp" accept=".json,application/json" hidden></div>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>

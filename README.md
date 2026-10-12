@@ -1,87 +1,68 @@
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/logo-reverse.svg"><img src="assets/logo.svg" alt="FreeBody" width="280"></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/logo-reverse.svg"><img src="assets/logo.svg" alt="FreeBody" width="260"></picture></p>
 
-<p align="center"><b>FreeBody</b> — 身体会变，心永远自由。<br><i>Train the body, keep the heart forever free.</i></p>
+<p align="center">离线、单文件的个人训练与饮食记录。数据只在你自己的设备上。</p>
 
-一个**单文件、离线可用、零外部依赖**的个人训练与健康记录工具，面向手机浏览器，也适配平板与桌面，可作为 PWA 安装。适合增肌减脂、停训后回归、带伤训练等场景。
+<p align="center">
+<img src="https://img.shields.io/badge/version-2.4.0-2148b8" alt="version 2.4.0">
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
+<img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
+</p>
 
-> **注意**：本项目仅用于个人记录与趋势参考，**不构成任何医疗、营养或康复建议**。化验指标、伤病与补剂相关问题请咨询医生或专业人士。
+<p align="center"><a href="https://leenlbma.github.io/freebody/"><b>在线体验 →</b></a> &nbsp;·&nbsp; <a href="#快速开始">快速开始</a> &nbsp;·&nbsp; <a href="#english">English</a></p>
 
-## 截图
+<br>
 
-手机（390 宽）：
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-phones-dark.png"><img src="docs/screenshots/hero-phones-light.png" alt="手机：今天、训练、饮食" width="760"></picture></p>
 
-<img src="docs/screenshots/home.png" alt="FreeBody 今天页（空模板）" width="240"> <img src="docs/screenshots/diet.png" alt="饮食日记（空模板）" width="240"> <img src="docs/screenshots/diet-food.png" alt="食物详情（内置库示例，深色）" width="240"> <img src="docs/screenshots/muscle-map.png" alt="训练页肌群恢复热图（示例训练数据）" width="240">
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/desktop-1280-dark.png"><img src="docs/screenshots/desktop-1280-light.png" alt="桌面 1280" width="560"></picture>&nbsp;&nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/tablet-768-dark.png"><img src="docs/screenshots/tablet-768-light.png" alt="平板 768" width="236"></picture></p>
 
-桌面（1280 宽，深色）与平板（768 宽）：
+<p align="center"><sub>截图为当前版本，使用临时注入的通用示例数据，截图后即丢弃，不含任何个人数据。</sub></p>
 
-<img src="docs/screenshots/desktop-1280.png" alt="桌面布局：左侧导航、主卡 + 营养环 + 打卡 + 近 7 天趋势（示例数据，深色）" width="640"> <img src="docs/screenshots/tablet-768.png" alt="平板竖屏布局（示例数据）" width="300">
+<br>
 
-<sub>截图由当前版本生成（v2.3.2）。今天页、饮食日记、食物详情为空模板；肌群热图、桌面与平板截图使用临时注入的通用示例数据，截图后即丢弃，不含任何个人数据。其他截图可放入 `docs/screenshots/`（请勿包含真实个人数据）。</sub>
+FreeBody 是一个打开就能用的网页应用：一个 `index.html`，无账号、无后台、无第三方依赖。它记录力量训练、有氧、睡眠、体重与饮食，并把这些数据整理成一个每天可执行的决定——今天练什么、还能吃多少。
 
-## 设计原则（v2.0）
+> 本项目仅用于个人记录与趋势参考，**不构成医疗建议**。化验指标、伤病与补剂相关问题请咨询医生或专业人士。
 
-- **少即是多**：底部只有 4 个入口 **今天 / 训练 / 数据 / 我的**；高级字段与说明默认折叠（"更多"），所有功能都还在，只是收起来了。
-- **一屏今天**：准备度一句话、今日推荐训练（一键开始）、营养剩余、打卡（补剂、睡眠确认、体重、伤处疼痛滑块），无需滚动。
-- **一个饮食入口**：日记页一眼看剩余热量与三大宏量；每餐一个「+」，添加、修改、删除都在两步内完成。
+## 今天页和准备度
 
-### 饮食（v2.2）
-流程：**日记 → 餐次「+」→ 添加页 → 食物详情 → 添加**；点按日记条目即可修改份量、移动餐次或删除。
+一屏回答「今天怎么安排」。准备度综合睡眠、主观恢复、静息心率与肌群疲劳给出 0–100 分和一句话建议；今日推荐按肌群恢复状态选择推 / 拉 / 腿 / 全身，一键开始。营养剩余、补剂打卡、睡眠确认与体重都在同一屏，打卡只需一次点按。
 
-- **日记页**：剩余热量大环（已摄入 / 目标）+ 蛋白质、碳水、脂肪三条进度；早餐 / 午餐 / 晚餐 / 加餐卡片显示「已吃 / 本餐目标」（默认按 25 / 35 / 30 / 10 分配，可改）、宏量小计与已记条目。日期用顶部日期栏切换，或打开「饮食月历」点选某天。
-- **添加页**（标题显示添加到哪一餐）：搜索框 + 四个标签 **最近 / 搜索 / 自定义 / 快速加**。每行右侧「+」按默认份量一键加入；点按行进入详情。
-  - 最近：近 60 天最常吃 / 最近吃的条目。
-  - 搜索：内置库与自定义食物，按名称和别名匹配。
-  - 自定义：自建食物（按份）与组合 / 食谱（如「青椒鸡丁+米饭」），可新建和管理。
-  - 快速加：一行文字（`鸡胸肉200g 米饭1碗`、`外卖 650`、组合名）；手动 / 照片估算表单（来源选「教练照片估算」，填区间如 750–950，热量默认取中值）。
-- **食物详情页**：顶部显示当日合计与「本次 +x kcal」；热量与三大宏量随份量实时变化，营养明细（含膳食纤维、钠与每 100g 数值、来源）折叠；底部为数量 + 单位下拉（g 与该食物的份量单位，如 碗 / 个）、常用份量按钮、「添加到」餐次选择与添加按钮。修改已有条目时按钮变为「保存修改」，并可删除。
-- **记录快照**：每条记录保存食物 id、数量、单位、克数与每 100g 营养快照及来源（内置库 / 快速输入 / 教练照片估算 / 自定义），食物库日后更新不影响历史记录。照片估算条目标注「估算 750–950」，点按可改。
-- **饮食月历**（折叠）：按热量达标着色，显示连续记录天数，并按近 6 周体重趋势估算达到目标体重的大致日期。
-- **目标怎么来的**（折叠）：BMR（Mifflin-St Jeor；有体脂时可选 Katch-McArdle）× 活动系数 → 缺口 / 盈余 → 手动偏移，蛋白按 g/kg 体重，附文献；可一键应用到饮食目标。缺少身高、体重、年龄或性别时只提示，不自动填写。
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-today-dark.png"><img src="docs/screenshots/f-today-light.png" alt="今天页与准备度" width="620"></picture></p>
 
-## 功能
+## 按组训练与自动进阶
 
-### 今天
-| 卡片 | 内容 |
-|---|---|
-| 准备度 | 0–100 分 + 一句话建议；恢复不足信号≥2 项时提示减量；点按进入 恢复/化验 |
-| 今日推荐 | 按肌群恢复状态推荐 推 / 拉 / 腿 / 全身；"开始训练"直接进入引导；训练中显示"继续训练" |
-| 营养剩余 | 剩余热量与蛋白；点按进入饮食 |
-| 打卡 | 补剂全部打卡、睡眠确认（沿用上次）、体重、伤处疼痛 0–10 滑块（有未恢复伤病时显示） |
+训练时只显示当前一组的目标重量与次数，两个按钮：完成 / 调整。完成后自动进入组间休息倒计时。下次目标按规则自动计算：做满才加重，连续未完成或停滞提示减载，恢复期与伤处不适时保持。训练统计给出周训练量、肌群组数分布与估算 1RM。
 
-### 训练
-- **开始今日推荐**：优先使用与推荐部位匹配的已有计划，否则用通用模板。
-- **肌群恢复热图**（今日推荐下方）：正反面人体，恢复状态 / 近 7 天组数切换，点按肌群显示详情；各肌群状态列表默认折叠。训练进行中自动隐藏。
-- **逐组引导**：只显示当前一组的大号目标（重量 × 次数）与两个按钮：**完成** / **调整**（调整时显示重量、次数步进器与 RIR）。完成后自动进入组间休息倒计时（+30 秒 / 跳过）。
-- **更多**（折叠）：进阶规则与目标说明、本动作各组（点按撤销）、RIR 说明、加一组、下一个动作、伤处不适标记、动作队列、追加动作、放弃训练。
-- **其他计划**（折叠）：自建计划（每个动作可选 线性 / 双重进阶 / 保持）、通用模板、自由训练。
-- **完成总结**：时长、组数、训练量、估算 1RM 新纪录、每个动作的下次目标与理由。
-- **自动进阶**：未做满不加重；连续 2 次未完成或连续 3 次无进步提示减载 10%；恢复期前 2 周或伤处不适时保持；RIR 与 RPE 互通（RPE = 10 − RIR）。
-- 手动记录（补记、私教课）、恢复期设置均折叠在页面下方；子标签 **力量 / 有氧 / 表现**（爬楼、游泳、100m 蛙泳 PB、800m、自定义测试）。
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-train-dark.png"><img src="docs/screenshots/f-train-light.png" alt="训练会话与训练统计" width="620"></picture></p>
 
-### 数据
-4 张核心卡片，点开看细分：
+## 肌群热图
 
-| 卡片 | 概览 | 点开 |
-|---|---|---|
-| 身体 | 最新体重、30 天变化、30 天趋势 | 体重 + 体脂双轴、瘦体重/脂肪量、腰围、历史 |
-| 营养 | 近 7 天日均热量、蛋白达标天数、7 天热量柱 | 热量与目标、宏量比例、蛋白达标率、宏量构成 |
-| 训练 | 本周训练天数与训练量、肌群恢复摘要 | 训练统计（周训练量、肌群分布、估算 1RM、频率热力）；肌群热图见「训练」页 |
-| 恢复 | 准备度、睡眠 7 天均值、14 天准备度曲线 | 主观恢复、静息心率/HRV、化验趋势 |
+正反面人体图按恢复状态着色：已恢复、恢复中、疲劳、久未训练、未训练；也可切换为近 7 天组数。点按肌群查看详情，旁边有可读的各肌群状态列表。人体图为本项目自绘的简化 SVG。
 
-"更多"中可进入 睡眠、伤病与限制、补剂、运动表现 等全部板块。所有图表为零依赖内联 SVG，深浅色自适应，可点按查看数值，支持 7天 / 30天 / 90天 / 全部。
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-muscle-dark.png"><img src="docs/screenshots/f-muscle-light.png" alt="肌群恢复热图与近 7 天组数" width="620"></picture></p>
 
-### 我的
-常用入口、个人配置、示例配置、食物库、其他目标、批量导入 CSV（见 [docs/csv-import.md](docs/csv-import.md)）、数据备份。
+## 饮食与拍照识别
 
-界面不使用 emoji，统一为内联 SVG 线条图标（`src/icons.js`）。
+日记页一眼看剩余热量与三大宏量，每餐一个「+」。内置 322 项常见中餐与食材，支持最近常吃、自定义食物、组合与一行文字快速记录。
 
-## 使用方式
+v2.4 起可选拍照识别：拍一张，或吃前、吃后各拍一张，模型按固定格式返回每样食物的名称、克重、剩余比例与估算营养。实际摄入 = 克重 ×（1 − 剩余比例）；营养数值优先匹配本地食物库，匹配不到才使用模型估算并标注「估算」。确认页可逐项改名称、克重、餐次或删除，确认后才记录。
 
-**在线使用**：<https://leenlbma.github.io/freebody/>（GitHub Pages，首次打开后可离线使用，可安装到桌面 / 主屏幕，见下文）。
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-diet-dark.png"><img src="docs/screenshots/f-diet-light.png" alt="饮食日记与拍照识别确认" width="620"></picture></p>
 
-**直接使用**：下载 `index.html`，用手机或电脑浏览器打开即可。无需联网、无需安装。以 `file://` 本地打开时 Service Worker 不可用，应用照常运行（只是不会出现"安装"与更新提示）。
+## 数据可视化
 
-### 安装到手机 / 电脑
+身体、营养、训练、恢复四张卡片，点开看细分：体重与体脂双轴、7 日均线、热量与目标、蛋白达标率、准备度曲线、化验趋势。所有图表为零依赖内联 SVG，可点按查看数值，支持 7 天 / 30 天 / 90 天 / 全部。
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-data-dark.png"><img src="docs/screenshots/f-data-light.png" alt="数据概览与身体趋势" width="620"></picture></p>
+
+<br>
+
+## 快速开始
+
+**在线打开**　访问 <https://leenlbma.github.io/freebody/>。首次打开后即可离线使用。
+
+**添加到主屏幕**
 
 FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pages 链接或你自己的服务器）打开一次后，即可离线使用，并可像 App 一样安装。数据仍只保存在本机浏览器的 localStorage 中，安装与否不影响数据。
 
@@ -91,7 +72,18 @@ FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pa
 
 **更新**：发布新版本后，再次打开时页面底部会出现「有新版本，点此刷新」，点一下即切换到新版本；不点则继续使用当前版本。
 
-### 多端布局与快捷键
+**本地构建**　需要 Node.js ≥ 14，无第三方依赖。
+
+```bash
+git clone https://github.com/leenlbma/freebody.git && cd freebody
+npm run build    # 生成根目录 index.html 与 sw.js
+npm run check    # 语法、emoji、占位符、食物库校验
+```
+
+也可以只下载 `index.html` 直接用浏览器打开（`file://` 下没有离线缓存与更新提示，其余功能照常）。
+
+<details>
+<summary>多端布局与快捷键</summary>
 
 - 手机（< 600px）：底部导航，单列卡片。
 - 平板竖屏（600–1024px）：8 列网格、间距 16，卡片两栏等高；横屏手机改为左侧图标导航。
@@ -100,7 +92,10 @@ FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pa
 - 支持系统大字体、安全区（刘海 / 底部横条）、键盘焦点样式。
 - 快捷键（输入框外）：`1`–`4` 切换 今天 / 训练 / 数据 / 我的，`←` `→` 前一天 / 后一天，`T` 回到今天，`/` 搜索食物，`Esc` 返回上一级；`Enter` / 空格 可激活聚焦的卡片。
 
-### 部署到 GitHub Pages
+</details>
+
+<details>
+<summary>部署到自己的 GitHub Pages</summary>
 
 仓库已包含 `.github/workflows/pages.yml`：推送到 `main` 时构建并发布 `index.html`、`sw.js`、`manifest.webmanifest`、`icons/`。fork 后启用方法：
 
@@ -115,7 +110,55 @@ npm run build    # 或 node scripts/build.js  → 生成根目录 index.html
 npm run check    # 或 node scripts/check.js  → 语法自检
 ```
 
-## 项目结构
+</details>
+
+## 隐私说明
+
+- **数据只存本地**：所有记录只保存在本机浏览器的 localStorage（键名 `freeBody_v1`），不上传任何服务器。旧版 `fitTracker_v1` 数据会自动迁移，旧备份可直接导入。
+- **Key 只存本地**：拍照识别的 API Key 单独保存在本机（`freeBody_ai_v1`），导出备份时**默认不包含 Key**（可在设置中勾选包含，不推荐）。
+- **唯一的网络请求**是你主动发起的拍照识别或测试连接：压缩后的照片会发送给你所选的服务商，并受其隐私政策约束。FreeBody 不保存照片。不配置 Key 时应用不发起任何网络请求。
+- 清除浏览器数据或换设备会丢失记录，请定期在「我的 › 数据备份」导出 JSON。备份含个人健康信息，请妥善保管，不要提交到仓库。
+
+## AI 识别配置说明
+
+在「我的 › 拍照识别 · 模型 API」中选择服务商、填写 API Key，点「测试连接」确认可用。所有服务商均通过 OpenAI 兼容的 `chat/completions` 接口调用。
+
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-aicfg-dark.png"><img src="docs/screenshots/f-aicfg-light.png" alt="拍照识别 · 模型 API 配置" width="300"></picture></p>
+
+| 服务商 | 接口地址 baseUrl | 推荐模型 | 获取 Key |
+|---|---|---|---|
+| 智谱 GLM | `https://open.bigmodel.cn/api/paas/v4` | `glm-4.6v-flash` | 智谱开放平台 open.bigmodel.cn |
+| 通义千问 Qwen | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-vl-plus` / `qwen-vl-max` | 阿里云百炼 bailian.console.aliyun.com |
+| Google Gemini | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-flash-latest` | Google AI Studio aistudio.google.com |
+| 自定义 | 任意 OpenAI 兼容地址 | 支持图片输入的模型 | — |
+
+- `glm-4v-flash` 只接受图片链接、不支持本机照片（Base64），且仅 1 张图，因此默认使用 `glm-4.6v-flash`。
+- Gemini 在部分网络环境下无法访问；自定义接口需允许浏览器跨域（CORS）。
+- 无网络、跨域失败、Key 无效、限流等情况都会给出明确提示，并可一键改用手动记录。
+- 识别结果是估算，确认前请核对克重。
+
+## 数据来源与免责声明
+
+- 内置食物库 `data/foods.json` 共 322 项。名称、id 与分类为本项目自拟。
+- 原料与基础食材的营养数值参考公共事实值，优先参考 [USDA FoodData Central](https://fdc.nal.usda.gov/)（CC0），数值经取整整理。
+- 熟菜按本项目自拟配方，由原料生重与熟重比例计算每 100g 数值。
+- 每条都有 `ref` 字段注明参考来源或配方。
+- 本项目未整表复制《中国食物成分表》或任何第三方数据集。生成方式见 [docs/food-database.md](docs/food-database.md)。
+- 食物营养因品种、做法与份量差异很大，库内数值与拍照识别结果都只是估算。准备度、进阶建议与目标推导仅供参考，**不构成医疗、营养或康复建议**。
+
+## 路线图
+
+- 食物库继续补充地方菜与常见外卖，欢迎按 `ref` 规范贡献
+- 拍照识别结果与常吃组合的关联，减少重复确认
+- 训练计划模板的导入与分享（不含个人数据）
+- 更多可选语言
+
+## 贡献
+
+欢迎提交 Issue 与 PR，尤其是食物库条目。食物数据请填写 `source` 与 `ref`，只使用自整理或 CC0 等可再分发的数值，不要提交任何真实个人数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/food-database.md](docs/food-database.md)。
+
+<details>
+<summary>项目结构</summary>
 
 ```
 freebody/
@@ -135,30 +178,35 @@ freebody/
 │   ├── charts.js              # 零依赖 SVG 图表库
 │   ├── app.js                 # 应用逻辑（按板块分节注释）
 │   └── sw.template.js         # Service Worker 模板
-├── data/foods.json            # 食物营养库（欢迎贡献）
+├── data/foods.json            # 食物营养库（322 项，每条带 ref 来源）
 ├── examples/                  # 可选通用示例配置（profile-sample.json，不含任何记录数据）
 ├── scripts/build.js           # 内联构建 + 生成 sw.js
-├── scripts/check.js           # 语法自检
+├── scripts/check.js           # 语法 / emoji / 食物库校验
+├── scripts/gen-foods.js       # 食物库生成（原料值 + 自拟配方 → foods.json）
 ├── docs/                      # 数据结构、食物库扩展、CSV 导入、截图
 ├── LICENSE                    # MIT
 └── NOTICE                     # 第三方声明
 ```
 
-## 数据与隐私
+数据结构详见 [docs/data-model.md](docs/data-model.md)，更新记录见 [CHANGELOG.md](CHANGELOG.md)。
 
-- 所有数据**只保存在你本机浏览器的 localStorage**（键名 `freeBody_v1`），不上传任何服务器，应用不发起任何网络请求。
-- **从旧版升级**：首次打开 v2.0 时，若本机存在旧键 `fitTracker_v1` 的数据，会自动复制到 `freeBody_v1`（旧键保留不删）。数据结构与 v1.x 完全兼容，旧版导出的 JSON 也可直接导入。
-- **导出**：我的 › 数据备份 › 导出 JSON。**导入**：选择备份 JSON，确认后覆盖当前数据。
-- 清除浏览器数据/换设备会丢失记录，请定期导出备份。导出文件含个人健康信息，请妥善保管，**不要提交到仓库**（`.gitignore` 已忽略 `freebody-*.json` 与旧版 `fitness-tracker-*.json`）。
-- 默认模板通用，不含任何个人数据；`examples/` 中仅有通用示例（内容均标注「示例」），需手动加载，且仅合并配置与清单。
-- 个人配置请保存在仓库外，通过「我的 › 示例配置 › 从文件加载配置」加载，不要提交到仓库。
+</details>
 
-数据结构详见 [docs/data-model.md](docs/data-model.md)。
+## 许可证与致谢
 
-## 贡献
+[MIT](LICENSE)。第三方声明见 [NOTICE](NOTICE)。
 
-欢迎提交 Issue / PR，尤其是食物库条目。见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/food-database.md](docs/food-database.md)。
+- 训练引导与肌群恢复可视化的交互思路参考了 openGym（AGPL-3.0），饮食记录流程参考了 OpenNutriTracker（GPL-3.0），均未使用其代码、文案、图片或数据。
+- 字标与 B 图标由 Archivo（SIL OFL 1.1）字形轮廓化并定制。
+- 食物原料数值参考 USDA FoodData Central（CC0）。
+- 拍照识别的提示词与代码为本项目自行编写。
 
-## 许可证
+<br>
 
-[MIT](LICENSE)。第三方声明与设计参考说明见 [NOTICE](NOTICE)：训练引导等交互思路参考了 openGym（AGPL-3.0），但未使用其任何代码、文案或素材；人体肌群图为本项目自绘的简化 SVG；字标与 B 图标由 Archivo（SIL OFL 1.1）字形轮廓化并定制。
+<a id="english"></a>
+
+### English
+
+**FreeBody** is a single-file, offline-first web app for strength training, sleep, body metrics and nutrition logging. Simplified Chinese UI. Install it as a PWA. Everything stays in your browser's localStorage. There are no accounts and no servers.
+
+Optional photo-based food recognition uses a vision model you configure yourself (Zhipu GLM, Qwen, Gemini or any OpenAI-compatible endpoint). Your key never leaves the device except in requests to that provider. MIT licensed. Not medical advice.

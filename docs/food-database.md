@@ -6,14 +6,15 @@
 
 ```json
 {
-  "version": 3,
+  "version": 4,
   "per": "100g",
   "note": "说明文字",
   "foods": [
     { "id": "rice-cooked", "name": "米饭（熟）", "category": "主食", "kcal": 116, "p": 2.6, "c": 25.9, "f": 0.3,
       "fib": 0.4, "na": 1, "aliases": ["饭", "白饭"],
       "servings": [{ "unit": "碗", "g": 200, "label": "1碗米饭≈200g" }],
-      "source": "自整理（参考 USDA FoodData Central，CC0）" }
+      "source": "自整理（参考 USDA FoodData Central，CC0）",
+      "ref": "参考 USDA FoodData Central 同类条目（v2.1 自整理近似值）" }
   ]
 }
 ```
@@ -22,12 +23,23 @@
 |---|---|---|
 | `id` | 是 | 唯一英文短横线 id，如 `chicken-breast-cooked` |
 | `name` | 是 | 中文名，注明生/熟、品类等关键状态 |
-| `category` | 否 | 主食 / 蛋白质 / 乳制品 / 蔬果 / 油脂坚果 / 其他 |
+| `category` | 否 | 主食 / 蛋白质 / 乳制品 / 蔬果 / 油脂坚果 / 零食饮料 / 调味品 / 菜肴 / 汤粥 |
 | `kcal` `p` `c` `f` | 是 | **每 100g 可食部**的热量（kcal）、蛋白质、碳水、脂肪（g），非负数字 |
 | `aliases` | 否 | 别名数组，用于文字快速输入匹配，如 `["鸡蛋","蛋"]` |
 | `fib` `na` | 否 | 每 100g 膳食纤维（g）、钠（mg）；没有可靠数值时省略 |
 | `servings` | 否 | 常用份量：`[{"unit": "碗", "g": 200, "label": "1碗米饭≈200g"}]`；快速输入 `米饭1碗` 即按 200g 计算。旧格式 `units: {"碗": 200}` 仍兼容 |
-| `source` | 是 | 数据来源，只接受本项目自整理或 USDA FoodData Central（公有领域 / CC0）等可自由再分发的来源 |
+| `source` | 是 | 数据来源类型，只接受本项目自整理或 USDA FoodData Central（公有领域 / CC0）等可自由再分发的来源 |
+| `ref` | 是 | 具体参考：原料写所参考的 USDA FDC 条目英文描述（如 `USDA FDC: Rice, white, long-grain, regular, raw, unenriched`，便于在 fdc.nal.usda.gov 检索核对）；熟菜写自拟配方与熟重系数（如 `自拟配方（生重）：番茄 200g、鸡蛋 100g…；熟重按生重 85% 计`） |
+
+### 数据来源与生成方式（v2.4 起）
+
+`data/foods.json` 由 `scripts/gen-foods.js` 生成（`node scripts/gen-foods.js`），共约 320 项：
+
+- **原料**（米面、肉蛋、蔬果、豆制品、调味品等）：每 100g 可食部近似值，参考 USDA FoodData Central 公开条目（公有领域 / CC0）逐项整理、四舍五入，`ref` 写明参考条目描述。中式特有食材（如芥兰、苋菜）取 USDA 中最接近的条目，并在 `ref` 中标「近似」。
+- **熟菜、面点、汤粥**：按本项目自拟的家常配方（生重克数）由库内原料逐项累加，再按熟重系数（烹调失水）折算为每 100g。配方、名称、id、分类均为本项目自拟。
+- 不整表复制任何第三方食物成分表或数据集（包括《中国食物成分表》与其他开源应用的数据），不批量抓取任何在线数据库。
+- 旧版（v2.1–v2.3）已有条目保留原 id 与数值，仅补充 `ref`，历史记录不受影响。
+- 所有数值都是估算参考，实际以包装营养成分表为准，不构成营养或医疗建议。
 
 ### 快速输入的匹配规则
 
@@ -41,9 +53,9 @@
 
 ## 贡献步骤
 
-1. 在 `data/foods.json` 的 `foods` 末尾追加条目（同一食物请区分生/熟）。
-2. 在条目 `source` 中注明来源。只接受本项目自整理的近似值或 USDA FoodData Central（CC0）；不要录入受版权限制的数据库数值（包括其他开源应用的食物数据）。
-3. 运行 `node scripts/build.js`——脚本会校验必填字段、数值类型与 id 唯一性。
+1. 原料或熟菜请加到 `scripts/gen-foods.js` 的 `BASE` / `RECIPES` 列表后运行 `node scripts/gen-foods.js`；也可直接在 `data/foods.json` 末尾追加条目（生成脚本会原样保留不在列表里的条目）。同一食物请区分生/熟。
+2. 在条目 `source` 中注明来源类型，在 `ref` 中写明具体参考条目或配方。只接受本项目自整理的近似值或 USDA FoodData Central（CC0）；不要录入受版权限制的数据库数值（包括其他开源应用的食物数据）。
+3. 运行 `node scripts/build.js` 与 `node scripts/check.js`——会校验必填字段、数值类型、id 与名称唯一、`ref` 必填，以及热量与宏量是否大致自洽。
 4. 自查：`4p + 4c + 9f` 应与 `kcal` 大致相符（膳食纤维、酒精等会造成偏差）。
 
 ## 注意
