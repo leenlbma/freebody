@@ -24,7 +24,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - name: 单元测试与覆盖率（纯逻辑模块行覆盖 ≥ 85%）
-        run: node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=85 tests/
+        run: node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=85 tests/*.test.js
 
   e2e:
     runs-on: ubuntu-latest
