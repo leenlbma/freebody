@@ -39,35 +39,9 @@
 
 <!-- 饮食 -->
 <section id="diet">
- <div class="card"><div class="hrow"><h2>今日饮食</h2><span class="mut" id="ovKcalTxt"></span></div>
-  <div id="dietSum"></div>
-  <div class="mealtabs" id="mealTabs"></div>
-  <div class="qrow"><input id="qText2" placeholder="如：鸡胸肉200g 米饭1碗，或 外卖 650" enterkeyhint="done"><button id="qAdd2">记录</button></div>
-  <div class="mut" id="qPrev2"></div>
-  <div class="row recent" id="dRecent"></div>
-  <details class="more" id="mForm"><summary id="mFormTitle">手动添加 / 修改</summary>
-   <div class="grid2" style="margin-top:8px">
-    <div><label>餐次</label><select id="mMeal"><option>早餐</option><option>午餐</option><option>晚餐</option><option>加餐</option></select></div>
-    <div><label>来源</label><select id="mSrc"><option value="custom">自定义</option><option value="photo">教练照片估算</option></select></div>
-    <div style="grid-column:1/-1"><label>食物</label><input id="mFood" placeholder="如：青椒鸡丁"></div>
-    <div class="photoOnly"><label>估算下限 kcal</label><input id="mLo" type="number" inputmode="numeric"></div>
-    <div class="photoOnly"><label>估算上限 kcal</label><input id="mHi" type="number" inputmode="numeric"></div>
-    <div><label>热量 kcal（可留空）</label><input id="mK" type="number" inputmode="decimal"></div>
-    <div><label>蛋白 g</label><input id="mP" type="number" inputmode="decimal" step="0.1"></div>
-    <div><label>碳水 g</label><input id="mC" type="number" inputmode="decimal" step="0.1"></div>
-    <div><label>脂肪 g</label><input id="mF" type="number" inputmode="decimal" step="0.1"></div>
-   </div>
-   <details class="more"><summary>钠 / 膳食纤维（可选）</summary>
-    <div class="grid2"><div><label>钠 mg</label><input id="mNa" type="number" inputmode="numeric"></div><div><label>膳食纤维 g</label><input id="mFib" type="number" inputmode="decimal" step="0.1"></div></div>
-   </details>
-   <details class="more" id="mLib"><summary>从食物库选 / 改份量</summary>
-    <div><label>克数 g</label><input id="mG" type="number" inputmode="decimal" placeholder="100"></div>
-    <div class="row" id="foodTpl" style="margin-top:6px"></div>
-   </details>
-   <div class="row" style="margin-top:8px"><button id="mAdd">添加</button><button class="ghost" id="mCancel" hidden>取消修改</button><button class="ghost sm" id="mSaveFav">存为常用</button></div>
-  </details>
- </div>
- <div class="card"><div class="hrow"><h2>记录</h2><button class="ghost sm" id="dRepeat"><i data-ic="repeat"></i>重复昨天</button></div><div id="dietList"></div><div class="mut" style="font-size:12px;margin-top:4px">点按条目可修改</div></div>
+ <div class="card dsum" id="dietSum"></div>
+ <div id="mealCards"></div>
+ <div class="row" style="margin:-2px 0 10px"><button class="ghost sm" id="dRepeat"><i data-ic="repeat"></i>重复昨天</button><button class="ghost sm" data-go-cal="1"><i data-ic="cal"></i>日历</button></div>
  <details class="card" id="calCard"><summary><b>饮食月历</b> <span class="mut" id="calSum"></span></summary><div id="calBox"></div></details>
  <details class="card"><summary><b>饮食目标</b></summary>
   <div class="grid2" style="margin-top:8px">
@@ -82,8 +56,42 @@
   <p class="mut">按 2–3 周体重/腰围趋势，每次 ±100–150 kcal 微调。</p>
  </details>
  <details class="card" id="tgtCard"><summary><b>目标怎么来的</b> <span class="mut">BMR × 活动 → 缺口 → 偏移</span></summary><div id="tgtBox"></div></details>
- <details class="card"><summary><b>自定义食物与组合</b> <span class="mut" id="cfCnt"></span></summary>
-  <div class="seg" style="margin-top:8px"><button class="chip" data-cfmode="food" id="cfmFood">单个食物</button><button class="chip" data-cfmode="combo" id="cfmCombo">组合 / 食谱</button></div>
+</section>
+
+<!-- 饮食：添加食物（搜索 / 最近 / 自定义 / 快速加） -->
+<section id="dietAdd">
+ <div class="qrow fa-q"><input id="faSearch" type="search" placeholder="搜索食物（名称或别名）" autocomplete="off"></div>
+ <div class="tabs4" id="faTabs"></div>
+ <div id="faList"></div>
+ <div id="faQuick" hidden>
+  <div class="card"><h3 style="margin-top:0">一行文字</h3>
+   <div class="qrow"><input id="qText2" placeholder="如：鸡胸肉200g 米饭1碗，或 外卖 650" enterkeyhint="done"><button id="qAdd2">记录</button></div>
+   <div class="mut" id="qPrev2"></div>
+   <div class="mut" style="font-size:12px;margin-top:4px">支持克数、计数单位（碗 / 个 / 片…）、自定义食物与组合名；只知道热量时写「外卖 650」。</div>
+  </div>
+  <div class="card" id="mForm"><h3 style="margin-top:0" id="mFormTitle">手动 / 照片估算</h3>
+   <div class="grid2">
+    <div><label>餐次</label><select id="mMeal"><option>早餐</option><option>午餐</option><option>晚餐</option><option>加餐</option></select></div>
+    <div><label>来源</label><select id="mSrc"><option value="custom">自定义</option><option value="photo">教练照片估算</option></select></div>
+    <div style="grid-column:1/-1"><label>食物</label><input id="mFood" placeholder="如：青椒鸡丁"></div>
+    <div class="photoOnly"><label>估算下限 kcal</label><input id="mLo" type="number" inputmode="numeric"></div>
+    <div class="photoOnly"><label>估算上限 kcal</label><input id="mHi" type="number" inputmode="numeric"></div>
+    <div><label>热量 kcal（可留空）</label><input id="mK" type="number" inputmode="decimal"></div>
+    <div><label>蛋白 g</label><input id="mP" type="number" inputmode="decimal" step="0.1"></div>
+    <div><label>碳水 g</label><input id="mC" type="number" inputmode="decimal" step="0.1"></div>
+    <div><label>脂肪 g</label><input id="mF" type="number" inputmode="decimal" step="0.1"></div>
+   </div>
+   <details class="more"><summary>钠 / 膳食纤维（可选）</summary>
+    <div class="grid2"><div><label>钠 mg</label><input id="mNa" type="number" inputmode="numeric"></div><div><label>膳食纤维 g</label><input id="mFib" type="number" inputmode="decimal" step="0.1"></div></div>
+   </details>
+   <input id="mG" type="hidden"><div id="foodTpl" hidden></div>
+   <div class="row" style="margin-top:8px"><button id="mAdd">添加</button><button class="ghost" id="mCancel" hidden>取消</button><button class="ghost sm" id="mSaveFav">存为常用</button><button class="ghost sm danger" id="mDel" hidden>删除</button></div>
+  </div>
+ </div>
+ <div id="faCustom" hidden>
+  <div id="cfRows"></div>
+  <details class="card" id="cfNew"><summary><b>新建 / 管理</b> <span class="mut" id="cfCnt"></span></summary>
+   <div class="seg" style="margin-top:8px"><button class="chip" data-cfmode="food" id="cfmFood">单个食物</button><button class="chip" data-cfmode="combo" id="cfmCombo">组合 / 食谱</button></div>
   <div id="cfFood">
    <div class="grid2" style="margin-top:8px">
     <div style="grid-column:1/-1"><label>名称</label><input id="cuName" placeholder="如：公司食堂套餐"></div>
@@ -102,7 +110,22 @@
   </div>
   <div class="row" style="margin-top:8px"><button id="cuAdd">保存</button><span class="mut" style="font-size:12px">保存后快速输入名称即可记录（优先匹配）</span></div>
   <ul class="list" id="cuList"></ul>
- </details>
+  </details>
+ </div>
+</section>
+
+<!-- 饮食：食物详情（份量 / 单位 / 实时营养 / 餐次） -->
+<section id="dietFood">
+ <div class="card df-day" id="dfDay"></div>
+ <div class="card" id="dfInfo"></div>
+ <div id="dfManual"></div>
+ <div class="card df-sheet" id="dfSheet">
+  <div class="grid2"><div><label>数量</label><input id="dfQty" type="number" inputmode="decimal" step="any"></div><div><label>单位</label><select id="dfUnit"></select></div></div>
+  <div class="row df-pre" id="dfPre"></div>
+  <div style="margin-top:8px"><label>添加到</label><div class="tabs4" id="dfMeal"></div></div>
+  <div class="row" style="margin-top:10px"><button class="btn-big" id="dfAdd" style="flex:1"></button></div>
+  <div class="row" style="margin-top:6px" id="dfEditRow" hidden><button class="ghost sm danger" id="dfDel">删除此条</button></div>
+ </div>
 </section>
 
 <!-- 营养分析 -->

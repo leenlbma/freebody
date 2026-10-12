@@ -36,6 +36,8 @@
     moon: '<path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>',
     chart: '<path d="M4 4v16h16M8 15l3.5-4 3 2.5L19 8"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
+    cal: '<rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+    search: '<circle cx="11" cy="11" r="6"/><path d="m15.5 15.5 4 4"/>',
     minus: '<path d="M5 12h14"/>',
     play: '<path d="M8 5.5v13l10.5-6.5z"/>',
     timer: '<circle cx="12" cy="13.5" r="7"/><path d="M12 10v3.5l2.5 1.5M10 3.5h4M18.5 6.5l1.5-1.5"/>',
