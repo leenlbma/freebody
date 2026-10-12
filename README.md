@@ -8,9 +8,9 @@
 
 ## 截图
 
-<img src="docs/screenshots/home.png" alt="FreeBody 今天页（空模板）" width="240"> <img src="docs/screenshots/diet.png" alt="饮食日记（空模板）" width="240"> <img src="docs/screenshots/diet-food.png" alt="食物详情（内置库示例，深色）" width="240">
+<img src="docs/screenshots/home.png" alt="FreeBody 今天页（空模板）" width="240"> <img src="docs/screenshots/diet.png" alt="饮食日记（空模板）" width="240"> <img src="docs/screenshots/diet-food.png" alt="食物详情（内置库示例，深色）" width="240"> <img src="docs/screenshots/muscle-map.png" alt="训练页肌群恢复热图（示例训练数据）" width="240">
 
-<sub>空模板截图，不含任何个人数据。其他截图可放入 `docs/screenshots/`（请勿包含真实个人数据）。</sub>
+<sub>空模板截图，不含任何个人数据；肌群热图使用临时注入的示例训练数据，截图后即丢弃。其他截图可放入 `docs/screenshots/`（请勿包含真实个人数据）。</sub>
 
 ## 设计原则（v2.0）
 
