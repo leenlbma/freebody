@@ -321,6 +321,17 @@ textarea{padding:10px 12px}
 .danger-zone{margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)}
 .danger-zone>button{width:100%}
 .grid2>div>button{width:100%}
+/* v2.3.2 多字段并排：标签单行、输入框严格同高 */
+.grid2>div>label:not(.chk){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px;min-height:18px;margin-bottom:4px}
+input,select{line-height:20px}
+input::-webkit-datetime-edit{padding:0;line-height:20px}
+input::-webkit-date-and-time-value{min-height:20px}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select){height:var(--bh)}
+.dnav input{height:var(--bhs)}.pe-row input,.pe-row select,.pe-row2 input,.pe-row2 select{height:36px}.ck-t input:not([type=range]){height:var(--bhs)}.mini-sel{height:auto}
+/* 快捷入口：等宽网格 */
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+@media(min-width:600px){.chips{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+.chips>.chip{width:100%;min-height:var(--bhs);border-radius:10px;font-size:13px;padding:0 12px}
 .grid2>div:has(>input),.grid2>div:has(>select){display:flex;flex-direction:column;justify-content:flex-end}
 .card .btn-big{margin-top:12px}
 /* 间距刻度 8/12/16/24/32 */
@@ -344,7 +355,8 @@ main{padding:12px 12px 24px}
  section.on>details,section.on>.disc,section.on>.alert,section.on>.tools,section.on>.actions,#ovAlerts,#otAlert,#injAlert,#sessBox,#recBanner,#dfDay,#dataBox,#data>.card,#mealCards,#dietSum,#ovMain,#ovNut,#ovChecks,#ovTrend{grid-column:1/-1}
  #dataBox>.card{display:flex;flex-direction:column}
  section.on>.card.mut{grid-column:1/-1;background:none;box-shadow:none;padding:0 4px}
- #settings.on{grid-auto-flow:row dense}#settings>.card:nth-last-child(2){grid-column:1/-1}
+ /* 我的：平板为 常用 + 数据备份 一行，个人配置整行；桌面为 常用 整行，个人配置 + 数据备份 两等分 */
+ #settings.on{grid-auto-flow:row dense}#settings>div.card:nth-child(2){grid-column:1/-1}#settings>.card:nth-last-child(2){grid-column:span 4}
  #dietAdd.on{display:block;max-width:720px;margin:0 auto}#dietAdd.on>*{margin-bottom:12px}
  #nutri.on{display:block}
  /* 今天：主卡（准备度 + 今日训练）合并为一张；营养环横排；打卡三等分；近 7 天趋势 */
@@ -401,11 +413,11 @@ main{padding:12px 12px 24px}
  main{max-width:1248px;padding:24px 24px 32px}
  .subnav{margin-bottom:24px}
  section.on{--cols:12;--span:6}
- #injury.on,#settings.on,#hormone.on,#supp.on{--span:4}
+ #injury.on,#hormone.on,#supp.on{--span:4}
  #dietAdd.on{max-width:760px}
  .card,#overview .card{padding:24px}
  details.card:not([open]){padding-top:16px;padding-bottom:16px}
- #settings>.card:nth-last-child(2){grid-column:span 4}
+ #settings>div.card:first-child{grid-column:1/-1}#settings>div.card:nth-child(2),#settings>.card:nth-last-child(2){grid-column:span 6}
  section.on>.card.mut{padding:0 4px}
  .ck-t{padding:16px 24px}
  .ov-main>.card{padding:24px}

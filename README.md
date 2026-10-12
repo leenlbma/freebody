@@ -8,9 +8,15 @@
 
 ## 截图
 
+手机（390 宽）：
+
 <img src="docs/screenshots/home.png" alt="FreeBody 今天页（空模板）" width="240"> <img src="docs/screenshots/diet.png" alt="饮食日记（空模板）" width="240"> <img src="docs/screenshots/diet-food.png" alt="食物详情（内置库示例，深色）" width="240"> <img src="docs/screenshots/muscle-map.png" alt="训练页肌群恢复热图（示例训练数据）" width="240">
 
-<sub>空模板截图，不含任何个人数据；肌群热图使用临时注入的示例训练数据，截图后即丢弃。其他截图可放入 `docs/screenshots/`（请勿包含真实个人数据）。</sub>
+桌面（1280 宽，深色）与平板（768 宽）：
+
+<img src="docs/screenshots/desktop-1280.png" alt="桌面布局：左侧导航、主卡 + 营养环 + 打卡 + 近 7 天趋势（示例数据，深色）" width="640"> <img src="docs/screenshots/tablet-768.png" alt="平板竖屏布局（示例数据）" width="300">
+
+<sub>截图由当前版本生成（v2.3.2）。今天页、饮食日记、食物详情为空模板；肌群热图、桌面与平板截图使用临时注入的通用示例数据，截图后即丢弃，不含任何个人数据。其他截图可放入 `docs/screenshots/`（请勿包含真实个人数据）。</sub>
 
 ## 设计原则（v2.0）
 
