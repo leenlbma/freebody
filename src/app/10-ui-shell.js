@@ -8,7 +8,7 @@ function applyTheme() {
 $('#themeBtn').onclick = function () {
   var o = ['auto', 'light', 'dark'];
   S.theme = o[(o.indexOf(S.theme) + 1) % 3];
-  save();
+  if (!save(true)) return;
   applyTheme();
   toast('主题：' + { auto: '跟随系统', light: '浅色', dark: '深色' }[S.theme]);
   drawCharts();

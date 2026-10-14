@@ -313,7 +313,7 @@ function startSession(plan) {
     restEnd: null,
     restTotal: 0
   };
-  save();
+  if (!save(true)) return;
   render();
   window.scrollTo(0, 0);
 }
@@ -390,7 +390,7 @@ function sessAction(act, t) {
     tp[1].forEach(function (x) {
       if (!S.exRules[x[0]]) S.exRules[x[0]] = { rule: x[4], lo: x[4] === 'double' ? x[2] : null, hi: x[3] };
     });
-    save();
+    if (!save(true)) return;
     toast('已添加计划「' + tp[0] + '」');
     render();
     return;
@@ -457,8 +457,8 @@ function sessAction(act, t) {
       return x.id !== pl.id;
     });
     S.plans.push(pl);
+    if (!save(true)) return;
     editPlan = null;
-    save();
     toast('计划已保存');
     render();
     return;
@@ -468,8 +468,8 @@ function sessAction(act, t) {
     S.plans = S.plans.filter(function (x) {
       return x.id !== editPlan.id;
     });
+    if (!save(true)) return;
     editPlan = null;
-    save();
     render();
     return;
   }
@@ -484,14 +484,14 @@ function sessAction(act, t) {
     var s = it.sets[j],
       stp = act === 'w' ? (defInc(it.ex, s.w) >= 2.5 ? 2.5 : 1) : 1;
     s[act] = Math.max(0, r1(s[act] + +v * stp));
-    save();
+    if (!save(true)) return;
     rSession();
     return;
   }
   if (act === 'rir') {
     if (j == null) return;
     it.sets[j].rir = +v;
-    save();
+    if (!save(true)) return;
     rSession();
     return;
   }
@@ -546,7 +546,7 @@ function sessAction(act, t) {
     a.restTotal = it.rest;
     a.restEnd = Date.now() + it.rest * 1000;
     adjOpen = false;
-    save();
+    if (!save(true)) return;
     tickRest();
     render();
     return;
@@ -560,7 +560,7 @@ function sessAction(act, t) {
     s3.done = false;
     s3.eid = null;
     s3.miss = false;
-    save();
+    if (!save(true)) return;
     render();
     return;
   }
@@ -574,21 +574,21 @@ function sessAction(act, t) {
         if (w4) w4.wrist = it.wrist;
       }
     });
-    save();
+    if (!save(true)) return;
     toast(it.wrist ? '已标记' + flagLabel() + '，下次将保持重量' : '已取消标记');
     rSession();
     return;
   }
   if (act === 'pick') {
     a.cur = +v;
-    save();
+    if (!save(true)) return;
     render();
     return;
   }
   if (act === 'addset') {
     var ls = it.sets[it.sets.length - 1];
     it.sets.push({ tw: ls.tw, tr: ls.tr, w: ls.w, r: ls.tr, rir: 2, done: false });
-    save();
+    if (!save(true)) return;
     render();
     return;
   }
@@ -611,7 +611,7 @@ function sessAction(act, t) {
         );
       });
     if (nx2 >= 0) a.cur = nx2;
-    save();
+    if (!save(true)) return;
     render();
     return;
   }
@@ -623,20 +623,20 @@ function sessAction(act, t) {
     }
     a.items.push(newItem(ex, 3));
     a.cur = a.items.length - 1;
-    save();
+    if (!save(true)) return;
     render();
     return;
   }
   if (act === 'rest-skip') {
     a.restEnd = null;
-    save();
+    if (!save(true)) return;
     rSession();
     return;
   }
   if (act === 'rest-add') {
     a.restEnd = (a.restEnd || Date.now()) + 30000;
     a.restTotal += 30;
-    save();
+    if (!save(true)) return;
     rSession();
     return;
   }
@@ -652,7 +652,7 @@ function sessAction(act, t) {
     if (!doneSets) {
       if (confirm('还没有完成任何一组，放弃本次训练？')) {
         S.active = null;
-        save();
+        if (!save(true)) return;
         render();
       }
       return;
@@ -680,7 +680,7 @@ function sessAction(act, t) {
       return ids.indexOf(x.id) < 0;
     });
     S.active = null;
-    save();
+    if (!save(true)) return;
     render();
     return;
   }
@@ -781,7 +781,7 @@ function finishSession() {
   S.sessions.push(sm);
   S.active = null;
   showSummary = sm.id;
-  save();
+  if (!save(true)) return;
   toast('训练完成');
   render();
   window.scrollTo(0, 0);
@@ -803,7 +803,7 @@ function tickRest() {
         rb = document.getElementById('restB');
       if (left <= 0) {
         a.restEnd = null;
-        save();
+        if (!save(true)) return;
         if (navigator.vibrate)
           try {
             navigator.vibrate([200, 100, 200]);
@@ -949,6 +949,15 @@ function rSession() {
       '结束</button></div><div class="pbar"><i style="width:' +
       (total ? (dn / total) * 100 : 0) +
       '%"></i></div></div>';
+    if (!a.items.length) {
+      box.innerHTML =
+        h +
+        '<div class="card"><h2>添加第一个动作</h2><p class="mut">输入动作名称，随后按组记录重量与次数。</p>' +
+        '<div class="qrow"><label class="sr" for="ssEx">动作名称</label><input id="ssEx" list="exList" placeholder="如 杠铃卧推">' +
+        '<button data-ss="addex">添加</button></div><div class="actions">' +
+        '<button class="ghost" data-ss="discard">放弃本次训练</button></div></div>';
+      return;
+    }
     if (a.restEnd && a.restEnd > Date.now())
       h +=
         '<div class="rest">' +

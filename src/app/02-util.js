@@ -15,7 +15,7 @@ function esc(s) {
 }
 function num(v) {
   var n = parseFloat(v);
-  return isNaN(n) ? null : n;
+  return isFinite(n) ? n : null;
 }
 function r1(n) {
   return Math.round(n * 10) / 10;

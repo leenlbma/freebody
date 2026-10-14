@@ -53,6 +53,8 @@ Names, categories, units and labels are in Chinese because they appear in the in
 | `参考 USDA FoodData Central 同类条目（v2.1 自整理近似值）` | 81 | Older entries that only say a similar USDA entry was used, **without naming it**, so they are hard to check one by one. Adding the specific USDA description in the format above is welcome (see the good first issues) |
 - **Estimates only:** every value is an estimate for reference. Packaging labels take precedence, and nothing here is nutritional or medical advice.
 
+Since v2.12, food details display these source categories. Named references link to a USDA search by description. Specific FDC IDs are not stored and the values have not been independently verified item by item. None of these categories is presented as an exact measurement.
+
 ### How quick entry matches foods
 
 1. **Splitting:** input is split into items on spaces, commas, the Chinese enumeration comma, semicolons and plus signs. Number words such as 一 / 两 / 半 before a unit become digits.

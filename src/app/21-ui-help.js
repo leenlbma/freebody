@@ -55,7 +55,7 @@ document.addEventListener('click', function (e) {
     S.motion = v;
     applyMotion();
   }
-  save();
+  if (!save(true)) return;
   rPrefs();
   toast((k === 'theme' ? '主题：' : '动效：') + b.textContent);
 });

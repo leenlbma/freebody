@@ -23,9 +23,48 @@ const meal = (o) => ({
   ...o
 });
 const plan = (a, pk) => {
+  a.IMP.pack = pk;
   a.IMP.rows = a.impPlan(pk);
   return a.IMP.rows.map((r) => r.status);
 };
+
+test('写满时不显示导入成功，回滚内存并保留预览；腾出空间后可重试', () => {
+  const a = load({ quota: 6000 });
+  a.S.notes.push({ id: 'existing', date: '2026-10-12', text: '原记录' });
+  assert.equal(a.save(), true);
+  const before = a.storage.getItem(a.KEY);
+  a.storage.setItem('filler', 'x'.repeat(4000));
+  plan(a, pack([1, 2].map((i) => ({ type: 'note', id: 'n' + i, date: '2026-10-12', text: 'x'.repeat(800) }))));
+  a.impApply();
+  assert.equal(a.STORE.err, 'quota');
+  assert.equal(a.IMP.phase, 'preview');
+  assert.match(a.IMP.err, /尚未保存/);
+  assert.equal(a.IMP.res, null);
+  assert.equal(a.storage.getItem(a.KEY), before);
+  assert.equal(a.S.notes.length, 1);
+  assert.ok(!a.calls.toast.some((m) => /^已导入/.test(m)));
+  a.storage.removeItem('filler');
+  a.impApply();
+  assert.equal(a.IMP.phase, 'done');
+  assert.equal(a.IMP.err, null);
+  assert.equal(JSON.parse(a.storage.getItem(a.KEY)).notes.length, 3);
+});
+
+test('导入更新失败后重试仍替换原记录，不因回滚引用变化产生重复条目', () => {
+  const a = load({ quota: 6000 });
+  plan(a, pack([meal()]));
+  a.impApply();
+  const before = a.storage.getItem(a.KEY);
+  a.storage.setItem('filler', 'x'.repeat(4000));
+  plan(a, pack([meal({ kcal: 250 }), { type: 'note', id: 'n', date: '2026-10-12', text: 'x'.repeat(1800) }]));
+  a.impApply();
+  assert.equal(a.IMP.phase, 'preview');
+  assert.equal(a.storage.getItem(a.KEY), before);
+  a.storage.removeItem('filler');
+  a.impApply();
+  assert.equal(a.S.meals.length, 1);
+  assert.equal(a.S.meals[0].kcal, 250);
+});
 
 test('示例导入包全部有效，可导入，重复导入全部「已存在」', () => {
   const a = load();

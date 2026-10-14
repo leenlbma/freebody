@@ -95,6 +95,8 @@ function normTime(s) {
   return m ? pad(+m[1]) + ':' + m[2] : null;
 }
 function importCSV(txt) {
+  if (!storeCanWrite(false)) return null;
+  var snapshot = JSON.stringify(S);
   var rows = parseCSV(txt);
   if (rows.length < 2) throw new Error('至少需要表头和一行数据');
   var hd = rows[0].map(function (h) {
@@ -218,7 +220,10 @@ function importCSV(txt) {
     }
     ok++;
   });
-  save();
+  if (!save()) {
+    S = JSON.parse(snapshot);
+    return null;
+  }
   return type[1] + '：导入 ' + ok + ' 行' + (bad ? '，跳过 ' + bad + ' 行无效' : '');
 }
 /* ===== v2.5 导入包：AI 教练生成数据 → 本机预览 → 确认后合并（只在本机处理，不经过服务器）。格式见 docs/data-format.md ===== */
@@ -291,7 +296,16 @@ function impKcal(n) {
 }
 /** 单条：校验 + 规范化为 FreeBody 记录 + 与本机数据比对，返回预览行 */
 function impRow(e, seen, src) {
-  var row = { type: e && e.type, id: e && e.id, date: e && e.date, status: 'bad', title: '', detail: '', tags: [] };
+  var row = {
+    entry: e,
+    type: e && e.type,
+    id: e && e.id,
+    date: e && e.date,
+    status: 'bad',
+    title: '',
+    detail: '',
+    tags: []
+  };
   try {
     if (!e || typeof e !== 'object' || Array.isArray(e)) throw impErr('条目应为对象');
     if (!IMP_TYPES[e.type]) throw impErr('不支持的类型 ' + (e.type == null ? '(缺少 type)' : String(e.type)));
@@ -677,6 +691,7 @@ function impCount() {
 }
 /** 写入：逐条按预览时的判断合并；写前保存快照，可撤销 */
 function impApply() {
+  if (!storeCanWrite(false)) return;
   var rows = IMP.rows.filter(function (r) {
     return r.status === 'new' || r.status === 'update' || r.status === 'merge';
   });
@@ -726,7 +741,20 @@ function impApply() {
       else S.notes.push(rec);
     }
   });
-  save();
+  if (!save()) {
+    S = JSON.parse(IMP.undo);
+    IMP.rows = impPlan(
+      IMP.pack ||
+        IMP.rows.map(function (r) {
+          return r.entry;
+        })
+    );
+    IMP.err = '导入尚未保存，请先处理上方的存储提示，再重试。';
+    IMP.phase = 'preview';
+    rImp();
+    return;
+  }
+  IMP.err = null;
   var c = impCount();
   IMP.res = {
     n: rows.length,

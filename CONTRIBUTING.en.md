@@ -19,7 +19,7 @@ Thanks for helping out. FreeBody sticks to three principles: **no runtime depend
    npx playwright install chromium webkit   # once, before the end-to-end tests
    npm run test:e2e       # every page loads without errors, axe 0 violations, import, demo mode, corrupt data
    ```
-   `npm run verify` runs build, check, lint, typecheck and the unit tests in one go. CI also checks that the committed `index.html` matches a fresh build and that the logic modules keep at least 85% line coverage.
+   `npm run verify` runs build, check, lint, typecheck and the unit tests in one go. CI also checks that the committed `index.html` matches a fresh build and that the logic modules keep at least 90% line coverage.
 4. Open `index.html` at phone width (390 px, for example) and check it in both the light and dark themes.
 5. If you have a real device, run the relevant parts of [docs/device-test.en.md](docs/device-test.en.md) and note the device and results in the pull request.
 6. Open a pull request with a short entry under "未发布" (Unreleased) in `CHANGELOG.md`. Include both the source changes and the rebuilt `index.html`.

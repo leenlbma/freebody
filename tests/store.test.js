@@ -3,7 +3,7 @@
 // 存储安全：用量阈值只提示一次、写满兜底、备份提醒、旧键迁移
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { load } = require('./harness');
+const { load, memStorage } = require('./harness');
 
 test('quotaLevel：70 / 90 各提示一次，回落后重新计入', () => {
   const a = load();
@@ -51,6 +51,42 @@ test('isQuotaErr：兼容各浏览器的名称与错误码', () => {
   assert.ok(a.isQuotaErr({ code: 22 }));
   assert.ok(!a.isQuotaErr(new Error('x')));
   assert.ok(!a.isQuotaErr(null));
+});
+
+test('界面保存失败回滚操作并保留导出草稿，重试只生成一条记录', () => {
+  const a = load({ quota: 3000 });
+  const record = { id: 'n', date: '2026-10-12', text: '待保存' };
+  a.storage.setItem('filler', 'x'.repeat(2500));
+  a.S.notes.push(record);
+  assert.equal(a.save(true), false);
+  assert.equal(a.S.notes.length, 0);
+  assert.equal(JSON.parse(a.STORE.draft).notes[0].text, '待保存');
+  a.storage.removeItem('filler');
+  a.S.notes.push(record);
+  assert.equal(a.save(true), true);
+  assert.equal(JSON.parse(a.storage.getItem(a.KEY)).notes.length, 1);
+  assert.equal(a.STORE.draft, null);
+});
+
+test('计划、进行中的训练和个人配置也需要备份保护', () => {
+  for (const edit of [
+    (s) => {
+      s.profile.name = '测试';
+    },
+    (s) => {
+      s.goals.kcal = 2000;
+    },
+    (s) => {
+      s.plans.push({ name: '测试', items: [] });
+    },
+    (s) => {
+      s.active = { items: [] };
+    }
+  ]) {
+    const a = load();
+    edit(a.S);
+    assert.equal(a.hasUserData(a.S), true);
+  }
 });
 
 test('backupDue：距上次备份 30 天；从未备份按首次使用；可推迟；无数据不提醒', () => {
@@ -117,4 +153,136 @@ test('空存储不算损坏', () => {
   const a = load();
   assert.equal(a.STORE.bad, null);
   assert.equal(a.save(), true);
+});
+
+test('备份校验：缺省字段补齐，输入不被修改；演示数据和训练会话仍兼容', () => {
+  const a = load();
+  const input = { v: 1, meals: [], goals: {} };
+  const next = a.stateNormalize(input, true);
+  assert.ok(Array.isArray(next.workouts));
+  assert.equal(next.goals.sleepH, 7);
+  assert.equal(input.goals.sleepH, undefined);
+  assert.ok(a.stateNormalize(a.demoData('2026-10-12'), true).meals.length > 0);
+  const full = a.defaults();
+  full.plans = [{ name: '测试', items: [{ ex: '深蹲', sets: 3 }] }];
+  full.sessions = [{ date: '2026-10-12', sets: 2, items: [{ ex: '深蹲', sets: '5×60 / 5×60', miss: false }] }];
+  full.active = { date: '2026-10-12', items: [{ ex: '深蹲', sets: [{ weight: 60, reps: 5 }] }] };
+  full.customFoods = [{ name: '测试餐', aliases: ['别名'], units: { 份: 100 }, servings: [{ g: 100 }] }];
+  full.suppLog = { '2026-10-12': { test: { at: '12:00' } } };
+  full.rehabLog = { '2026-10-12': { test: 1 } };
+  full.exRules = { '深蹲': { rule: 'linear' } };
+  assert.equal(a.stateNormalize(full, true).active.items[0].sets[0].weight, 60);
+  const restored = load({ storage: { freeBody_v1: JSON.stringify(full) } });
+  assert.equal(restored.STORE.bad, null);
+  assert.equal(restored.S.sessions[0].items[0].sets, '5×60 / 5×60');
+});
+
+test('备份校验：拒绝错误数组、嵌套类型、数值和版本；本机损坏原文保留', () => {
+  const a = load();
+  const bad = [
+    null,
+    [],
+    { workouts: null },
+    { workouts: [null] },
+    { plans: [{ name: '坏计划' }] },
+    { profile: { height: '170' } },
+    { goals: { weight: {} } },
+    { goals: [] },
+    { profile: 3 },
+    { meals: [{ name: 1 }] },
+    { meals: [{ kcal: '520' }] },
+    { meals: [{ date: '2026-02-30' }] },
+    { notes: [{ tags: [1] }] },
+    { plans: [{ items: {} }] },
+    { workouts: [{ sets: '3' }] },
+    { customFoods: [{ units: [] }] },
+    { customFoods: [{ units: { 份: '100' } }] },
+    { goals: { kcal: '2000' } },
+    { goals: { mealSplit: [] } },
+    { goals: { mealSplit: { 早餐: '25' } } },
+    { suppLog: { date: [] } },
+    { suppLog: { date: { id: '12:00' } } },
+    { suppLog: { date: { id: { at: 12 } } } },
+    { rehabLog: { date: { id: '1' } } },
+    { exRules: { 深蹲: null } },
+    { active: { items: [{ ex: '深蹲', sets: 3 }] } },
+    { recoveryStart: 1 },
+    { v: 2 }
+  ];
+  assert.throws(() => a.stateNormalize({ meals: [{ kcal: Infinity }] }, true), /有限数字/);
+  for (const value of bad) {
+    assert.throws(() => a.stateNormalize(value, true), JSON.stringify(value));
+    if (value && !Array.isArray(value)) {
+      const raw = JSON.stringify(value);
+      const b = load({ storage: { freeBody_v1: raw } });
+      // 本机的 goals / profile 历史上允许回退；其他错误必须保护原文。
+      if (('goals' in value && Array.isArray(value.goals)) || value.profile === 3) continue;
+      assert.equal(b.STORE.bad, raw);
+      assert.equal(b.save(), false);
+      assert.equal(b.storage.getItem(b.KEY), raw);
+    }
+  }
+});
+
+test('多页面：即使没有收到 storage 事件，过期页面也不能覆盖新记录或清空数据', () => {
+  const storage = memStorage();
+  const first = load({ sharedStorage: storage });
+  first.save();
+  const second = load({ sharedStorage: storage });
+  first.S.notes.push({ id: 'A', date: '2026-10-12', text: '窗口 A' });
+  first.save();
+  const latest = storage.getItem(first.KEY);
+  second.S.notes.push({ id: 'B', date: '2026-10-12', text: '窗口 B' });
+  assert.equal(second.save(), false);
+  assert.equal(second.storeCanWrite(true), false);
+  assert.equal(second.STORE.err, 'conflict');
+  assert.equal(storage.getItem(first.KEY), latest);
+  assert.equal(second.S.notes[0].id, 'B', '保留本页修改供导出');
+  assert.ok(second.calls.alert.includes('conflict'));
+  storage.removeItem(first.KEY);
+  assert.equal(first.save(), false, '其他页面清空后也不能重新写回旧数据');
+});
+
+test('Web Locks：只允许持锁页面写入，页面关闭释放锁后可以继续', async () => {
+  let held = false;
+  const locks = {
+    request: async (name, opt, fn) => {
+      assert.equal(name, 'freebody-write');
+      assert.equal(opt.ifAvailable, true);
+      if (held) return fn(null);
+      held = true;
+      try {
+        return await fn({ name });
+      } finally {
+        held = false;
+      }
+    }
+  };
+  const storage = memStorage();
+  const first = load({ sharedStorage: storage, locks });
+  first.storeLock();
+  assert.equal(first.STORE.writer, true);
+  assert.ok(first.save());
+  const second = load({ sharedStorage: storage, locks });
+  second.storeLock();
+  assert.equal(second.STORE.writer, false);
+  assert.equal(second.save(), false);
+  assert.ok(second.calls.alert.includes('readonly'));
+  first.STORE.release();
+  await new Promise(setImmediate);
+  second.storeLock();
+  assert.equal(second.STORE.writer, true);
+  assert.ok(second.save());
+  second.STORE.release();
+});
+
+test('Web Locks 不可用时保留保存前的冲突检查', async () => {
+  const a = load({ locks: { request: () => Promise.reject(new Error('unsupported')) } });
+  a.storeLock();
+  await new Promise(setImmediate);
+  assert.equal(a.STORE.writer, true);
+  assert.ok(a.save());
+  a.storage.setItem(a.KEY, '{}');
+  assert.equal(a.save(), false);
+  assert.equal(a.storage.getItem(a.KEY), '{}');
 });

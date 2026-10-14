@@ -1,5 +1,22 @@
 // SPDX-License-Identifier: MIT
 /* 90-boot.js — 全局事件、启动、可访问性、日期输入、快捷键、PWA、调试钩子 */
+storeLock();
+window.addEventListener('storage', function (e) {
+  if (e.key === KEY || e.key == null) storeCheck();
+});
+window.addEventListener('focus', function () {
+  storeCheck();
+});
+window.addEventListener('pagehide', function () {
+  if (STORE.release) {
+    STORE.release();
+    STORE.release = null;
+    STORE.writer = false;
+  }
+});
+window.addEventListener('pageshow', function () {
+  storeLock();
+});
 /* 通用点击：删除/模板 */
 document.addEventListener('click', function (e) {
   var t = e.target.closest('button,input[type=checkbox]');
@@ -22,7 +39,7 @@ document.addEventListener('click', function (e) {
     return;
   } else if (t.id === 'helloX') {
     S.hideHello = true;
-    save();
+    if (!save()) return;
     render();
     return;
   } else if (t.id === 'ovDietRepeat') {
@@ -168,7 +185,7 @@ document.addEventListener('click', function (e) {
     $('#lbVal').focus();
     return;
   } else return;
-  save();
+  if (!save()) return;
   render();
 });
 /* 长按删除常用食物 */
@@ -181,7 +198,7 @@ document.addEventListener('click', function (e) {
       var i = +b.getAttribute('data-fav');
       if (confirm('删除常用「' + S.favFoods[i].food + '」？')) {
         S.favFoods.splice(i, 1);
-        save();
+        if (!save()) return;
         render();
       }
     }, 650);
@@ -225,6 +242,7 @@ else
       storeAlert(lv);
     } else if (backupDue(META, today(), hasUserData(S))) storeAlert('backup');
     storePersist(false);
+    vaultCapture(null, JSON.stringify(S));
   })();
 /* ---------- 多端：主题色 / 键盘 / 可访问性 / 尺寸变化 / PWA ---------- */
 /** 浏览器 UI 颜色跟随当前主题（手动切换时覆盖媒体查询） */

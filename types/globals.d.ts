@@ -1,7 +1,7 @@
 // 构建时注入或由其他内联脚本提供的全局对象，供 tsc --checkJs 使用（不参与构建）
 declare const FB_VERSION: string;
 interface Window {
-  FIT_DATA: { foods: { foods: Food[]; [k: string]: any }; examples: any[] };
+  FIT_DATA: { foods: { foods: Food[]; [k: string]: any }; examples: any[]; coachPrompt?: string };
   FitIcons: { svg(name: string, cls?: string): string; hydrate(root?: ParentNode): void; names: string[] };
   FitCharts: any;
   __fbPwaMeta?: boolean;

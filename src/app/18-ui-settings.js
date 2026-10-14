@@ -71,7 +71,7 @@ $('#pfSave').onclick = function () {
   S.profile.name = $('#pfName').value.trim();
   S.profile.height = num($('#pfH').value);
   S.profile.injuryFlagLabel = $('#pfFlag').value.trim() || '伤处不适';
-  save();
+  if (!save(true)) return;
   applyTitle();
   toast('已保存');
 };
@@ -81,8 +81,26 @@ function applyTitle() {
 }
 /** 应用示例配置：合并个人配置与清单（追加，不删除已有数据，不写入任何记录） */
 function applyExample(e) {
+  try {
+    stateNormalize(
+      {
+        profile: e.profile === undefined ? {} : e.profile,
+        injuries: e.injuries === undefined ? [] : e.injuries,
+        rehab: e.rehab === undefined ? [] : e.rehab,
+        restricted: e.restricted === undefined ? [] : e.restricted,
+        run800Hist: e.run800Hist
+      },
+      true
+    );
+  } catch (error) {
+    toast('配置无效：' + error.message);
+    return;
+  }
   if (!confirm('加载「' + e.title + '」？将合并其配置与清单（伤病、受限动作、康复动作等），不会删除已有记录。')) return;
-  if (e.profile) for (var k in e.profile) S.profile[k] = e.profile[k];
+  if (e.profile)
+    Object.keys(defaults().profile).forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(e.profile, key)) S.profile[key] = e.profile[key];
+    });
   if (e.run800Hist != null && S.run800Hist == null) S.run800Hist = e.run800Hist;
   /** @type {Array<[string, string[]]>} */ ([
     ['injuries', ['name', 'desc', 'status']],
@@ -103,7 +121,7 @@ function applyExample(e) {
       S[spec[0]].push(o);
     });
   });
-  save();
+  if (!save(true)) return;
   applyTitle();
   toast('示例配置已加载');
   render();
@@ -124,9 +142,10 @@ $('#cfFile').onchange = function () {
       var ok = arr.filter(function (x) {
         return (
           x &&
-          x.name &&
+          typeof x.name === 'string' &&
+          x.name.trim() &&
           [x.kcal, x.p, x.c, x.f].every(function (v) {
-            return typeof v === 'number' && v >= 0;
+            return typeof v === 'number' && isFinite(v) && v >= 0;
           })
         );
       });
@@ -142,16 +161,32 @@ $('#cfFile').onchange = function () {
           p: x.p,
           c: x.c,
           f: x.f,
-          aliases: Array.isArray(x.aliases) ? x.aliases : undefined,
-          units: x.units && typeof x.units === 'object' ? x.units : undefined,
-          servings: Array.isArray(x.servings) ? x.servings : undefined,
+          aliases: Array.isArray(x.aliases)
+            ? x.aliases.filter(function (v) {
+                return typeof v === 'string';
+              })
+            : undefined,
+          units:
+            x.units &&
+            typeof x.units === 'object' &&
+            !Array.isArray(x.units) &&
+            Object.keys(x.units).every(function (k) {
+              return typeof x.units[k] === 'number' && isFinite(x.units[k]) && x.units[k] > 0;
+            })
+              ? x.units
+              : undefined,
+          servings: Array.isArray(x.servings)
+            ? x.servings.filter(function (v) {
+                return v && typeof v.unit === 'string' && typeof v.g === 'number' && isFinite(v.g) && v.g > 0;
+              })
+            : undefined,
           na: typeof x.na === 'number' ? x.na : undefined,
           fib: typeof x.fib === 'number' ? x.fib : undefined,
           source: x.source || '自定义导入',
           custom: true
         });
       });
-      save();
+      if (!save(true)) return;
       toast(
         '导入 ' + ok.length + ' 项' + (arr.length - ok.length ? '，跳过 ' + (arr.length - ok.length) + ' 项无效' : '')
       );
@@ -166,7 +201,7 @@ $('#cfFile').onchange = function () {
 $('#cfClear').onclick = function () {
   if (confirm('清空自定义食物？')) {
     S.customFoods = [];
-    save();
+    if (!save(true)) return;
     render();
   }
 };
@@ -178,7 +213,7 @@ $('#g2Save').onclick = function () {
   if (b) S.goals.trainDays = b;
   if (c) S.goals.stairMin = c;
   S.goals.weight = num($('#gWt').value);
-  save();
+  if (!save(true)) return;
   toast('已保存');
 };
 $('#impBtn').onclick = function () {
@@ -229,14 +264,13 @@ $('#imp').onchange = function () {
       toast('这是加密备份：请在「加密备份」中填写密码后再导入');
       return;
     }
-    bkDecrypt(d, pw).then(
-      function (t) {
+    bkDecrypt(d, pw)
+      .then(function (t) {
         bkRestore(JSON.parse(t));
-      },
-      function (e) {
+      })
+      .catch(function (e) {
         toast('导入失败：' + e.message);
-      }
-    );
+      });
   };
   rd.readAsText(f);
   this.value = '';
@@ -249,11 +283,12 @@ function bkRestore(d) {
   }
   try {
     if (!d || typeof d !== 'object' || !Array.isArray(d.meals) || !d.goals) throw new Error('格式不符');
+    var next = stateNormalize(d, true);
     if (!confirm('导入将覆盖当前全部数据，确定？')) return;
+    if (!storeCanWrite(true)) return;
+    delete next.aiConfig;
+    if (!storeReplace(next)) return;
     if (d.aiConfig) aiImport(d.aiConfig);
-    delete d.aiConfig;
-    localStorage.setItem(KEY, JSON.stringify(d));
-    S = load();
     rStoreBanner();
     applyTheme();
     applyTitle();
@@ -268,20 +303,22 @@ $('#wipe').onclick = function () {
     exitDemo();
     return;
   }
+  if (!storeCanWrite(true)) return;
   if (confirm('确定清空全部数据（含本机保存的 API Key）？建议先导出备份。') && confirm('再次确认：不可恢复')) {
-    localStorage.removeItem(KEY);
-    localStorage.removeItem(AIKEY);
-    localStorage.removeItem(METAKEY);
-    META = {};
-    STORE.used = 0;
-    STORE.banner = null;
-    rStoreBanner();
-    AIC = aiLoad();
-    S = load();
-    save();
-    rStoreBanner();
-    toast('已清空');
-    render();
+    if (!storeCanWrite(true)) return;
+    storeReset().then(function (ok) {
+      if (!ok) return;
+      localStorage.removeItem(AIKEY);
+      localStorage.removeItem(METAKEY);
+      AIC = aiLoad();
+      META = {};
+      applyTheme();
+      applyMotion();
+      applyTitle();
+      rStoreBanner();
+      toast('记录与恢复点已清空');
+      render();
+    });
   }
 };
 
@@ -289,8 +326,9 @@ $('#wipe').onclick = function () {
 /** 导出完整备份（JSON）；记录 lastBackup，关闭备份提醒 */
 /** 导出备份；「加密备份」中填了密码时导出加密文件 */
 function doExport() {
-  var out = {};
-  for (var k in S) out[k] = S[k];
+  var source = STORE.draft ? JSON.parse(STORE.draft) : S,
+    out = {};
+  for (var k in source) out[k] = source[k];
   out.aiConfig = aiExport();
   var json = JSON.stringify(out, null, 2),
     pw = $('#bkPw') ? $('#bkPw').value : '';
@@ -325,6 +363,9 @@ function bkDone(enc) {
 }
 $('#exp').onclick = doExport;
 var ST_MSG = {
+  invalid: ['bad', '当前修改未保存，数据格式有误', '请核对输入或导入内容。上一次保存的记录仍保留在本机。'],
+  readonly: ['warn', '其他窗口正在使用，本页暂为只读', '请关闭其他 FreeBody 窗口，再重新载入此页。'],
+  conflict: ['bad', '记录已在其他窗口改变，本页修改没有保存', '请先导出本页内容留底，再重新载入最新记录。'],
   demo: [
     'info',
     '演示模式：数据不会保存',
@@ -338,27 +379,51 @@ var ST_MSG = {
   quota: [
     'bad',
     '存储空间已满，最近的修改没有保存',
-    '请立即导出备份。数据仍在当前页面中，导出后再清理旧记录或换用其他浏览器。'
+    '未保存的内容可立即导出；表单输入仍保留。腾出空间后可重试本次操作，重试不会重复添加。'
   ],
   90: ['bad', '本机存储已用约 90%', '空间快满了，写满后新的记录将无法保存。请先导出备份。'],
   70: ['warn', '本机存储已用约 70%', '建议导出一次备份，并留意存储用量。'],
   backup: ['warn', '超过 30 天没有备份', '数据只存在本机，清除浏览器数据或换设备时会丢失。建议现在导出一份备份。']
 };
 /** 横幅优先级：数据损坏 > 存储写满 > 其他提醒 */
-var ST_RANK = { corrupt: 3, quota: 2 };
+var ST_RANK = { corrupt: 4, conflict: 3, readonly: 3, quota: 2 };
 function storeAlert(kind) {
   var k = String(kind);
   if ((ST_RANK[STORE.banner] || 0) > (ST_RANK[k] || 0)) return;
   STORE.banner = k;
   rStoreBanner();
-  if (k === 'corrupt' || k === 'quota' || k === '90') toast(ST_MSG[k][1]); // 每次保存失败都提示
+  if (k === 'corrupt' || k === 'quota' || k === '90' || k === 'readonly' || k === 'conflict') toast(ST_MSG[k][1]);
 }
 function backupTitle() {
   var ref = META.lastBackup || META.firstUse,
     n = ref ? diffDays(ref, today()) : BACKUP_DAYS;
   return META.lastBackup ? '已经 ' + n + ' 天没有备份' : '已记录 ' + n + ' 天，还没有备份过';
 }
+function storeUIState() {
+  var blocked = !STORE.writer || STORE.err === 'conflict' || STORE.resetting;
+  document.querySelectorAll('main > section').forEach(function (s) {
+    if (blocked) s.setAttribute('data-readonly', 'true');
+    else s.removeAttribute('data-readonly');
+  });
+  document.querySelectorAll('main button,main input,main select,main textarea,#themeBtn').forEach(function (node) {
+    var el = /** @type {HTMLInputElement} */ (node);
+    if (
+      el.readOnly ||
+      el.matches('[data-go],[data-sub],[data-st],[data-rngk],[data-mapmode],[data-coach=copy],[data-history-export]')
+    )
+      return;
+    if (blocked && !el.disabled) {
+      el.disabled = true;
+      el.setAttribute('data-store-disabled', '');
+    } else if (!blocked && el.hasAttribute('data-store-disabled')) {
+      el.disabled = false;
+      el.removeAttribute('data-store-disabled');
+    }
+  });
+}
+HOOKS.render.push(storeUIState);
 function rStoreBanner() {
+  storeUIState();
   var b = $('#stBanner');
   if (!b) return;
   var k = STORE.banner,
@@ -392,8 +457,11 @@ function rStoreBanner() {
           IC('download') +
           '导出原文</button><button class="ghost sm" data-st="restore">导入备份</button>' +
           '<button class="ghost sm" data-st="reset">清空重来</button>'
-        : '<button class="sm" data-st="export">' + IC('download') + '立即导出</button>') +
-    (k === 'quota' || k === 'demo' || k === 'corrupt'
+        : '<button class="sm" data-st="export">' +
+          IC('download') +
+          '立即导出</button>' +
+          (k === 'conflict' || k === 'readonly' ? '<button class="ghost sm" data-st="reload">重新载入</button>' : '')) +
+    (k === 'quota' || k === 'demo' || k === 'corrupt' || k === 'conflict' || k === 'readonly'
       ? ''
       : '<button class="ghost sm" data-st="later">' + (k === 'backup' ? '7 天后提醒' : '知道了') + '</button>') +
     '</div></div>';
@@ -416,17 +484,21 @@ document.addEventListener('click', function (e) {
     return;
   }
   if (a === 'reset') {
+    if (!storeCanWrite(true)) return;
     if (!confirm('清空后无法恢复。确定已经导出原始数据，要清空并重新开始？')) return;
-    localStorage.removeItem(KEY);
-    S = load();
-    save();
-    rStoreBanner();
-    toast('已清空，可以重新开始记录');
-    render();
+    if (!storeCanWrite(true)) return;
+    storeReset().then(function (ok) {
+      if (!ok) return;
+      rStoreBanner();
+      toast('已清空，可以重新开始记录');
+      render();
+    });
     return;
   }
   if (a === 'export') doExport();
-  else if (a === 'later') {
+  else if (a === 'reload') {
+    if (confirm('重新载入会丢弃本页未保存的修改。请先导出留底，确定继续？')) location.reload();
+  } else if (a === 'later') {
     if (STORE.banner === 'backup') {
       META.snooze = addDays(today(), 7);
       metaSave();

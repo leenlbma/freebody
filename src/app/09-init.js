@@ -7,3 +7,4 @@ S = DEMO ? demoData(today()) : load();
 (S.customFoods || []).forEach(function (f) {
   f.custom = true;
 }); // 自定义食物均优先匹配
+STORE.accepted = JSON.stringify(S);

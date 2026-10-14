@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.11.0-2148b8" alt="version 2.11.0">
+<img src="https://img.shields.io/badge/version-2.12.0-2148b8" alt="version 2.12.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -47,9 +47,11 @@ You can log everything by hand. You can also use FreeBody as the **dashboard for
 
 > FreeBody is for personal logging and spotting trends. **It is not medical advice.** Talk to a doctor or qualified professional about lab results, injuries or supplements.
 
+The first-use card and 我的 › 搭配 AI (Me › Use with AI) can copy the same coach prompt and open the import preview. If clipboard access fails, select the prompt and copy it manually.
+
 ## Today and readiness
 
-A single screen answers "what's the plan today?". The readiness score (0–100, with a one-line summary) combines sleep, subjective recovery, resting heart rate and muscle fatigue. The day's suggestion picks push, pull, legs or full body from muscle recovery, and you start it with one tap. Remaining nutrition, supplement check-ins, sleep confirmation and body weight sit on the same screen, and checking in takes a single tap.
+A single screen answers "what's the plan today?". The readiness score (0–100, with a one-line summary) combines sleep, subjective recovery, resting heart rate and HRV. The day's suggestion picks push, pull, legs or full body from muscle recovery, and you start it with one tap. Remaining nutrition, supplement check-ins, sleep confirmation and body weight sit on the same screen, and checking in takes a single tap. The recovery page explains the contributing measurements and their normalised weights, marking sparse evidence as limited.
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-today-dark.png"><img src="docs/screenshots/f-today-light.png" alt="Today and readiness" width="620"></picture></p>
 
@@ -85,6 +87,14 @@ Photo recognition is optional and arrived in v2.4.
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-diet-dark.png"><img src="docs/screenshots/f-diet-light.png" alt="Food diary and photo recognition review" width="620"></picture></p>
 
+## Local recovery points
+
+Successful record or configuration saves retain the previous state and a daily recovery point, up to 8 snapshots and 20 MB total. Under 我的 › 数据备份 › 本机恢复点 (Me › Backup › Local recovery points), turn automatic retention off, inspect history, export a verified copy, confirm a restore or clear history. Snapshots omit model settings and API keys. Demo mode cannot read or change real history.
+
+Snapshots share the same device and browser as primary records, so clearing site data removes both. Keep exporting external backups. Clearing all data also removes recovery history and legacy storage keys.
+
+Food details distinguish named USDA references, recipe estimates, analogous approximations and user values. Named references link to USDA search for checking; they do not claim individually verified exact values.
+
 ## Charts
 
 Four cards (body, nutrition, training, recovery) open into detailed views:
@@ -109,7 +119,7 @@ Every chart is dependency-free inline SVG. Tap any point to read its value, and 
 
 **Device self-check.** 我的 › 帮助与自检 › 设备自检 (Me › Help › Device self-check) tests offline support, storage, link import, safe areas and more in this browser. The report contains no records and can be pasted into an issue. For manual device testing, see [docs/device-test.en.md](docs/device-test.en.md).
 
-**Add it to your home screen.** FreeBody is a progressive web app (PWA). Open it once over https, from the link above or your own server, and you can install it like a native app and use it offline. Your data stays in the browser's localStorage either way.
+**Add it to your home screen.** FreeBody is a progressive web app (PWA). Open it once over https, from the link above or your own server, and you can install it like a native app and use it offline. Primary records stay in localStorage and local recovery points in same-origin IndexedDB either way.
 
 - **iPhone / iPad (Safari):** open the site, tap Share, choose Add to Home Screen, then Add. It then launches in its own window without the address bar.
   - **Note: once added to the home screen, its data is stored separately from Safari.** The home-screen app starts empty and cannot see what you recorded in Safari. If you have already logged data in Safari, first export it there under 我的 › 数据备份 (Me › Backup) with 导出 JSON (Export JSON), then use 导入 JSON (Import JSON) in the same place in the home-screen app. After that, keep recording in one place.
@@ -165,7 +175,7 @@ The repository includes `.github/workflows/pages.yml`. Every push to `main` buil
 
 ## Privacy
 
-- **Data stays on your device.** Every record lives in your browser's localStorage under the key `freeBody_v1`, and nothing is uploaded. Data from the old `fitTracker_v1` key is migrated automatically, and old backups import as they are.
+- **Data stays on your device.** Primary records live in localStorage under `freeBody_v1`; automatic recovery points live in same-origin IndexedDB (`freebody-history`). Nothing is uploaded. Data from the old `fitTracker_v1` key is migrated automatically, and old backups import as they are.
 - **Your API key stays on your device.** The photo-recognition key is stored locally and separately, under `freeBody_ai_v1`. Backups leave it out **by default**; you can opt in, but we don't recommend it. You can also untick "在本机记住 API Key" (remember the key on this device): the key then lives only in the open page's memory, and you enter it again after a reload.
 - **Imports are processed locally.** Both paste import and link import (`#import=`) are parsed in the browser. Browsers never send anything after `#` to a server, and nothing is written until you confirm.
 - **Photo recognition goes online only after you enter a model key.** Without a key, FreeBody makes no network requests: taking or choosing a photo stays on the device, and the recognition screen points you to manual logging. With a key, a request is sent only when you tap recognise or test the connection. The compressed photo (or the test request) then goes straight from your browser to the provider you chose, never through a FreeBody server, under that provider's privacy policy. FreeBody does not keep the photo.
@@ -256,7 +266,7 @@ freebody/
 │   ├── icons.js               # inline SVG line icons
 │   ├── charts.js              # dependency-free SVG charts
 │   ├── app/                   # application modules, concatenated in file-name order into one IIFE at build time
-│   │   ├── 00-core.js … 06-crypto.js   # state, storage, utilities, core calculations, import merge, demo data, encrypted backups (no DOM; unit-tested)
+│   │   ├── 00-core.js … 08-state.js   # state, storage, utilities, core calculations, import merge, demo data, encrypted backups, recovery points and state validation (no DOM; unit-tested)
 │   │   ├── 09-init.js                  # reads stored data (keeps the raw text and pauses saving if it is corrupt)
 │   │   └── 10-ui-*.js … 90-boot.js     # page UI and startup
 │   └── sw.template.js         # service worker template

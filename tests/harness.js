@@ -59,6 +59,16 @@ const EXPORTS = [
   'defaults',
   'load',
   'save',
+  'storeReplace',
+  'storeReset',
+  'HOOKS',
+  'VAULT',
+  'EVIDENCE',
+  'recommend',
+  'stateNormalize',
+  'storeCanWrite',
+  'storeCheck',
+  'storeLock',
   'uid',
   'dayTot',
   'dayMeals',
@@ -133,7 +143,7 @@ const EXPORTS = [
  */
 function load(opt) {
   opt = opt || {};
-  const ls = memStorage(opt.storage, opt.quota);
+  const ls = opt.sharedStorage || memStorage(opt.storage, opt.quota);
   const calls = { toast: [], alert: [], render: 0 };
   const now = opt.now || '2026-10-12';
   const [Y, M, D] = now.split('-').map(Number);
@@ -159,10 +169,23 @@ function load(opt) {
   const sandbox = {
     window: {},
     localStorage: ls,
-    navigator: { userAgent: 'node' },
+    navigator: { userAgent: 'node', locks: opt.locks },
     location: { hash: opt.hash || '', pathname: '/', search: '' },
     history: { replaceState() {} },
-    document: { querySelector: el, querySelectorAll: () => [], documentElement: el(), addEventListener() {} },
+    document: {
+      querySelector: (s) =>
+        s === '#toast'
+          ? {
+              set textContent(m) {
+                calls.toast.push(m);
+              },
+              classList: el().classList
+            }
+          : el(),
+      querySelectorAll: () => [],
+      documentElement: el(),
+      addEventListener() {}
+    },
     console,
     Date: FDate,
     Math,
@@ -170,6 +193,7 @@ function load(opt) {
     TextDecoder,
     TextEncoder,
     crypto: globalThis.crypto,
+    indexedDB: opt.indexedDB,
     btoa,
     Uint8Array,
     Response,
@@ -192,7 +216,7 @@ function load(opt) {
   sandbox.window = sandbox;
   // UI 层函数在测试中不存在，用桩记录调用
   const stubs =
-    'function toast(m){__calls.toast.push(m);}function storeAlert(k){__calls.alert.push(k);}function rImp(){}function render(){__calls.render++;}function show(){}var cur="overview";var DT_WD=["周日","周一","周二","周三","周四","周五","周六"];\n';
+    'function storeAlert(k){__calls.alert.push(k);}function rStoreBanner(){}function rImp(){}function render(){__calls.render++;}function show(){}var cur="overview";var DT_WD=["周日","周一","周二","周三","周四","周五","周六"];\n';
   const tail =
     '\nwindow.__out={' +
     EXPORTS.map((k) => `get ${k}(){return typeof ${k}==='undefined'?undefined:${k};}`).join(',') +

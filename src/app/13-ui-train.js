@@ -287,7 +287,7 @@ $('#wEx').addEventListener('input', function () {
 })();
 $('#rSave').onclick = function () {
   S.recoveryStart = $('#rStart').value;
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -324,7 +324,7 @@ $('#wAdd').onclick = function () {
     note: $('#wNote').value.trim(),
     wrist: $('#wWrist').checked
   });
-  save();
+  if (!save(true)) return;
   $('#wRir').value = '';
   $('#wWrist').checked = false;
   var wk = recWeek(sel);
@@ -361,7 +361,7 @@ $('#swAdd').onclick = function () {
     swolf: num($('#swSw').value),
     note: $('#swN').value.trim()
   });
-  save();
+  if (!save(true)) return;
   ['#swD', '#swT', '#swSw', '#swN'].forEach(function (s) {
     $(s).value = '';
   });
@@ -380,7 +380,7 @@ $('#pbAdd').onclick = function () {
     return b == null || x.sec < b ? x.sec : b;
   }, null);
   S.pb100br.push({ id: uid(), date: d, sec: t, type: $('#pbTy').value, note: $('#pbN').value.trim() });
-  save();
+  if (!save(true)) return;
   $('#pbT').value = '';
   $('#pbN').value = '';
   toast(prev == null || t < prev ? '新的个人最好成绩！' : '已记录');
@@ -394,7 +394,7 @@ $('#rnHistSave').onclick = function () {
     return;
   }
   S.run800Hist = t;
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -406,7 +406,7 @@ $('#rnAdd').onclick = function () {
     return;
   }
   S.run800.push({ id: uid(), date: d, sec: t, type: $('#rnTy').value, note: $('#rnN').value.trim() });
-  save();
+  if (!save(true)) return;
   $('#rnT').value = '';
   $('#rnN').value = '';
   toast(
@@ -423,7 +423,7 @@ $('#cAdd').onclick = function () {
     return;
   }
   S.cardio.push({ id: uid(), date: sel, min: m, floors: num($('#cFl').value), hr: num($('#cHr').value) });
-  save();
+  if (!save(true)) return;
   ['#cMin', '#cFl', '#cHr'].forEach(function (s) {
     $(s).value = '';
   });

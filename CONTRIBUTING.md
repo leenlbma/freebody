@@ -19,7 +19,7 @@
    npx playwright install chromium webkit   # 首次运行端到端测试前
    npm run test:e2e       # 端到端：所有页面无报错、axe 0 违规、导入、演示模式、损坏数据
    ```
-   `npm run verify` 依次运行 build、check、lint、typecheck 与单元测试。CI 会额外检查提交的 `index.html` 与源码构建结果一致，并要求纯逻辑模块的行覆盖率不低于 85%。
+   `npm run verify` 依次运行 build、check、lint、typecheck 与单元测试。CI 会额外检查提交的 `index.html` 与源码构建结果一致，并要求纯逻辑模块的行覆盖率不低于 90%。
 4. 用手机尺寸（如 390px 宽）在浏览器中打开 `index.html`，浅色与深色主题下各检查一遍。
 5. 有真机的话，按 [docs/device-test.md](docs/device-test.md) 跑一遍相关项目，并在 PR 中写明设备与结果。
 6. 提交 PR，并在 `CHANGELOG.md` 的「未发布」下简述改动。PR 中需同时包含源码与重新构建后的 `index.html`。

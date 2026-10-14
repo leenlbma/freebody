@@ -16,7 +16,7 @@ function rOverview() {
     !S.hideHello && !S.meals.length && !S.workouts.length && !S.body.length && !S.sleep.length
       ? '<div class="hello-bar">' +
         IC('hello') +
-        '<span>欢迎使用 FreeBody。数据只存在本机，可在「我的」中导出备份。<button class="linkb" id="helloDemo">先看看演示数据</button></span><button class="ghost hello-x" id="helloX" aria-label="关闭欢迎提示">' +
+        '<div><b>从一条记录开始</b><p>复制提示词给常用 AI，再把它的记录粘贴回来。也可以直接手动记录，数据都留在本机。</p><div class="actions"><button class="sm" data-coach="copy">复制 AI 教练提示词</button><button class="ghost sm" data-coach="import">粘贴 AI 记录</button><button class="ghost sm" data-sub="diet">手动记一餐</button><button class="linkb" id="helloDemo">先看演示</button></div></div><button class="ghost hello-x" id="helloX" aria-label="关闭欢迎提示">' +
         IC('x') +
         '</button></div>'
       : '';
@@ -32,6 +32,7 @@ function rOverview() {
     lv = 'bad';
     sent = '恢复不足信号 ' + ot.length + ' 项，建议减量';
   }
+  if (rd && rd.weight < 0.5 && ot.length < 2) sent = '现有依据有限，结合体感安排训练';
   var sub = [];
   if (wk && wk <= 6) sub.push('恢复期第' + wk + '周');
   if (ot.length) sub.push(ot[0]);
@@ -288,7 +289,7 @@ document.addEventListener('change', function (e) {
     });
     o.pain = v;
     S.wristLog.push(o);
-    save();
+    if (!save(true)) return;
     toast('疼痛 ' + v + '/10 已记录');
     render();
   } else if (t.id === 'ovWt') {
@@ -299,7 +300,7 @@ document.addEventListener('change', function (e) {
     });
     if (o2) o2.weight = w;
     else S.body.push({ id: uid(), date: sel, weight: w });
-    save();
+    if (!save(true)) return;
     toast('体重已记录');
     render();
   }

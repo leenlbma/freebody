@@ -19,3 +19,7 @@ private/
 test-results/
 playwright-report/
 coverage/
+
+# 本地版本压缩包与解压副本
+/freebody-v*.zip
+/freebody-v*/

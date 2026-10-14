@@ -405,6 +405,7 @@ function dfFromFood(f) {
     id: f.id,
     src: f.custom ? 'custom' : 'lib',
     source: f.source || '',
+    ref: f.ref || '',
     qty: k ? 1 : 100,
     unit: k || 'g',
     meal: dMeal(),
@@ -426,6 +427,7 @@ function dfFromRec(m, asNew) {
       id: m.foodId,
       src: m.src || 'lib',
       source: (lf && lf.source) || '',
+      ref: (lf && lf.ref) || '',
       qty: m.amount != null ? m.amount : m.g,
       unit: m.unit || 'g'
     };
@@ -595,6 +597,17 @@ function dfLive() {
         p.f +
         (DF.source ? '。来源：' + esc(DF.source) : '')) +
     '</div></details>';
+  var evidence = EVIDENCE.food(DF);
+  $('#dfInfo').innerHTML +=
+    '<details class="more" id="foodEvidence"><summary>来源与估算 · ' +
+    esc(evidence.label) +
+    '</summary><p>' +
+    esc(evidence.note) +
+    '</p><p class="mut">' +
+    esc(evidence.reference) +
+    '</p>' +
+    (evidence.url ? '<a href="' + esc(evidence.url) + '" target="_blank" rel="noopener">查找 USDA 条目</a>' : '') +
+    '</details>';
   dfDay();
 }
 $('#dfQty').addEventListener('input', function () {
@@ -667,7 +680,7 @@ $('#dfAdd').onclick = function () {
     toast('已加入' + m.meal + '：' + mealLabel(m));
   }
   curMeal = m.meal;
-  save();
+  if (!save(true)) return;
   DF = null;
   show('diet', true);
 };
@@ -676,7 +689,7 @@ $('#dfDel').onclick = function () {
   S.meals = S.meals.filter(function (x) {
     return x.id !== DF.editId;
   });
-  save();
+  if (!save(true)) return;
   DF = null;
   toast('已删除');
   show('diet', true);
@@ -729,7 +742,7 @@ $('#mDel').onclick = function () {
   S.meals = S.meals.filter(function (x) {
     return x.id !== editMeal;
   });
-  save();
+  if (!save(true)) return;
   mReset();
   DF = null;
   toast('已删除');
@@ -770,7 +783,7 @@ document.addEventListener('click', function (e) {
     DF = d;
     var m = dfRecord();
     S.meals.push(m);
-    save();
+    if (!save(true)) return;
     DF = null;
     toast('已加入' + m.meal + '：' + mealLabel(m));
     render();
@@ -871,7 +884,7 @@ $('#gSave').onclick = function () {
     })
   )
     S.goals.mealSplit = sp;
-  save();
+  if (!save(true)) return;
   toast('目标已保存');
   render();
 };
@@ -949,7 +962,7 @@ $('#mAdd').onclick = function () {
   } else S.meals.push(mkMeal(o));
   pickFood = null;
   curMeal = o.meal;
-  save();
+  if (!save(true)) return;
   mReset();
   DF = null;
   toast(em ? '已修改' : '已加入' + o.meal);
@@ -975,7 +988,7 @@ $('#mSaveFav').onclick = function () {
     return x.food !== food;
   });
   S.favFoods.push({ food: food, kcal: k, p: p, c: c, f: f });
-  save();
+  if (!save(true)) return;
   toast('已存为常用（长按可删除）');
   render();
 };
@@ -1231,7 +1244,7 @@ function tcRead() {
   c.pkg = num($('#tcPkg').value) || 1.6;
   c.km = !!($('#tcKm') && $('#tcKm').checked);
   S.goals.calc = c;
-  save();
+  if (!save(true)) return;
 }
 $('#tgtBox').addEventListener('change', function (e) {
   if (/^tc/.test(e.target.id)) {
@@ -1249,7 +1262,7 @@ $('#tgtBox').addEventListener('click', function (e) {
   S.goals.p = r.p;
   S.goals.c = r.c;
   S.goals.f = r.f;
-  save();
+  if (!save(true)) return;
   toast('已应用到饮食目标');
   render();
 });
@@ -1312,7 +1325,7 @@ function saveCustom(f) {
     return normName(y.name) !== normName(f.name);
   });
   S.customFoods.push(f);
-  save();
+  return save(true);
 }
 $('#cuAdd').onclick = function () {
   /** @type {Food} */
@@ -1348,9 +1361,6 @@ $('#cuAdd').onclick = function () {
       custom: true
     };
     if (na != null) f.na = r1(na * r);
-    ['#cuName', '#cuG', '#cuK', '#cuP', '#cuC', '#cuF', '#cuNa'].forEach(function (s) {
-      $(s).value = '';
-    });
   } else {
     var nm = $('#coName').value.trim(),
       tx = $('#coText').value.trim(),
@@ -1390,11 +1400,17 @@ $('#cuAdd').onclick = function () {
     };
     if (T.na != null) f.na = r1(T.na * rr);
     if (T.fib != null) f.fib = r1(T.fib * rr);
+  }
+  if (!saveCustom(f)) return;
+  if (cfMode === 'food') {
+    ['#cuName', '#cuG', '#cuK', '#cuP', '#cuC', '#cuF', '#cuNa'].forEach(function (s) {
+      $(s).value = '';
+    });
+  } else {
     $('#coName').value = '';
     $('#coText').value = '';
     $('#coPrev').textContent = '';
   }
-  saveCustom(f);
   toast('已保存「' + f.name + '」，快速输入名称即可记录');
   render();
 };
@@ -1422,7 +1438,7 @@ document.addEventListener('click', function (e) {
     if (!m) return;
     var o = cloneMeal(m);
     S.meals.push(o);
-    save();
+    if (!save(true)) return;
     toast('已记入' + o.meal + '：' + mealLabel(o));
     render();
     return;
@@ -1443,7 +1459,7 @@ document.addEventListener('click', function (e) {
     S.customFoods = S.customFoods.filter(function (x) {
       return x.id !== a;
     });
-    save();
+    if (!save(true)) return;
     render();
   }
 });

@@ -25,8 +25,8 @@ jobs:
       - run: npm run typecheck
       - name: 开发依赖许可证
         run: npm run licenses
-      - name: 单元测试与覆盖率（纯逻辑模块行覆盖 ≥ 85%）
-        run: node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=85 tests/*.test.js
+      - name: 单元测试与覆盖率（纯逻辑模块行覆盖 ≥ 90%）
+        run: node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=90 tests/*.test.js
 
   e2e:
     runs-on: ubuntu-latest
@@ -44,8 +44,8 @@ jobs:
         env:
           CI: '1'
           FB_COVERAGE: '1'
-      - name: 端到端覆盖率（src/app 合计 ≥ 60%）
-        run: node scripts/e2e-coverage.js --min 60
+      - name: 端到端覆盖率（src/app 合计 ≥ 65%）
+        run: node scripts/e2e-coverage.js --min 65
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

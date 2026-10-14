@@ -502,12 +502,23 @@
    <div class="fg2"><div style="grid-column:1/-1"><label for="bkPw">备份密码</label><input id="bkPw" type="password" autocomplete="new-password" spellcheck="false" placeholder="留空则导出普通 JSON"></div></div>
    <p class="mut">填写后，「导出 JSON」会用这个密码加密（AES-GCM，在本机完成）；导入加密备份时也在这里填写同一密码。密码不会保存，忘记后无法恢复。</p>
   </details>
+  <details class="more" id="historyCard"><summary>本机恢复点</summary>
+   <p class="mut">自动保留最近 8 个恢复点，最多约 20 MB，不含 API Key。恢复前会检查内容完整性。它们与主记录分开存放，但清除本站数据时仍会一起丢失，请继续定期导出备份。</p>
+   <label class="history-toggle"><input type="checkbox" id="historyOn">自动保留恢复点</label>
+   <div class="actions"><button class="ghost sm" id="historyRefresh">刷新列表</button><button class="ghost sm" id="historyClear">清空恢复点</button></div>
+   <div id="historyList" aria-live="polite"></div>
+  </details>
   <div class="danger-zone"><button class="danger" id="wipe">清空全部数据</button></div>
  </div>
  <div class="card" id="prefCard"><h2>显示与辅助</h2>
   <div class="pref"><span class="pref-k" id="lbTheme">主题</span><div class="tabs4 t3" id="prTheme" role="group" aria-labelledby="lbTheme"></div></div>
   <div class="pref"><span class="pref-k" id="lbMotion">动效</span><div class="tabs4 t2" id="prMotion" role="group" aria-labelledby="lbMotion"></div></div>
   <p class="mut">「跟随系统」读取系统的深色模式与「减弱动态效果」设置。每张图表下方都可以展开「数据表」，用读屏软件也能读到具体数值。</p>
+ </div>
+ <div class="card" id="coachCard"><h2>搭配 AI 教练</h2>
+  <p class="mut">复制提示词给你常用的 AI。聊完训练或饮食，把 AI 给出的导入包粘贴回来，预览后确认。无需在 FreeBody 配置聊天账号。</p>
+  <div class="actions"><button data-coach="copy"><i data-ic="copy"></i>复制教练提示词</button><button class="ghost" data-coach="import"><i data-ic="paste"></i>粘贴 AI 记录</button></div>
+  <details class="more" id="coachText"><summary>查看或手动复制提示词</summary><label for="coachPrompt">给 AI 的提示词</label><textarea id="coachPrompt" rows="6" readonly spellcheck="false"></textarea></details>
  </div>
  <div class="card" id="helpCard"><h2>帮助与自检</h2>
   <div class="chips"><button class="chip" data-sub="selftest"><i data-ic="check"></i>设备自检</button><button class="chip" id="demoBtn"><i data-ic="play"></i>试用演示数据</button><a class="chip" href="https://github.com/leenlbma/freebody/blob/main/docs/device-test.md" target="_blank" rel="noopener"><i data-ic="note"></i>真机测试清单</a><a class="chip" href="https://github.com/leenlbma/freebody/issues/new/choose" target="_blank" rel="noopener"><i data-ic="link"></i>反馈问题</a></div>

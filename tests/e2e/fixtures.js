@@ -35,17 +35,24 @@ const test = base.test.extend({
     await use(page);
     if (!on) return;
     const list = await page.coverage.stopJSCoverage();
-    const app = list.find((e) => e.source && e.source.includes('var FB_VERSION ='));
-    if (!app) return;
+    const apps = list.filter((e) => e.source && e.source.includes('var FB_VERSION ='));
+    if (!apps.length) return;
     fs.mkdirSync(DIR, { recursive: true });
-    const id = crypto.createHash('sha1').update(app.source).digest('hex').slice(0, 10);
-    const src = path.join(DIR, `app-${id}.js`);
-    if (!fs.existsSync(src)) fs.writeFileSync(src, app.source);
     const name = crypto.createHash('sha1').update(testInfo.titlePath.join('/')).digest('hex').slice(0, 12);
-    fs.writeFileSync(
-      path.join(DIR, `${name}.json`),
-      JSON.stringify({ src: id, title: testInfo.title, ranges: executed(app) })
-    );
+    const groups = new Map();
+    for (const app of apps) {
+      const id = crypto.createHash('sha1').update(app.source).digest('hex').slice(0, 10);
+      const src = path.join(DIR, `app-${id}.js`);
+      if (!fs.existsSync(src)) fs.writeFileSync(src, app.source);
+      if (!groups.has(id)) groups.set(id, []);
+      groups.get(id).push(...executed(app));
+    }
+    for (const [id, ranges] of groups) {
+      fs.writeFileSync(
+        path.join(DIR, `${name}-${id}.json`),
+        JSON.stringify({ src: id, title: testInfo.title, ranges })
+      );
+    }
   }
 });
 

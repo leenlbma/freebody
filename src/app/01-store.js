@@ -61,6 +61,10 @@ function uid() {
 var S;
 /** 地址带 #demo 时进入演示模式（见 05-demo.js）：数据只在内存中，不读写本机存储，退出或关闭页面后消失 */
 var DEMO = /^#demo(&|$)/.test(location.hash || '');
+/** 完整备份与本机数据共用结构校验；缺省字段补齐，已有错误记录不静默丢弃。 */
+function stateNormalize(input, strict) {
+  return StateCodec.normalize(input, strict, defaults());
+}
 function load() {
   var d = defaults(),
     raw = null;
@@ -76,20 +80,10 @@ function load() {
         }
       }
     }
+    STORE.raw = raw;
     var r = JSON.parse(raw || 'null');
     if (r && typeof r === 'object' && !Array.isArray(r)) {
-      for (var k in d) {
-        if (r[k] === undefined) r[k] = d[k];
-      }
-      if (!r.goals || typeof r.goals !== 'object') r.goals = d.goals;
-      if (!r.profile || typeof r.profile !== 'object') r.profile = d.profile;
-      for (var g in d.goals) {
-        if (r.goals[g] === undefined) r.goals[g] = d.goals[g];
-      }
-      for (var pk in d.profile) {
-        if (r.profile[pk] === undefined) r.profile[pk] = d.profile[pk];
-      }
-      return r;
+      return stateNormalize(r, false);
     }
     if (raw != null && raw !== 'null') STORE.bad = raw; // 能解析但不是对象，同样视为损坏
   } catch (e) {
@@ -105,7 +99,134 @@ var LS_QUOTA = 2621440,
   QUOTA_STEPS = [70, 90],
   BACKUP_DAYS = 30;
 /** bad：本机数据无法解析时保存原文，期间 save() 不写入，避免用默认值覆盖用户数据 */
-var STORE = { err: null, used: 0, pct: 0, persist: null, banner: null, bad: null };
+var STORE = {
+  err: null,
+  used: 0,
+  pct: 0,
+  persist: null,
+  banner: null,
+  bad: null,
+  raw: null,
+  accepted: null,
+  draft: null,
+  writer: true,
+  locking: false,
+  release: null
+};
+/** 恢复点只保存训练与饮食状态，不含独立的模型配置与 Key。 */
+function vaultCapture(before, json) {
+  runHooks('saved', {
+    before: before,
+    json: json,
+    day: today(),
+    hasData: hasUserData(S),
+    enabled: !DEMO && !STORE.skipVault && META.historyEnabled !== false
+  });
+}
+function storeReplace(next) {
+  if (!storeCanWrite(true)) return false;
+  var previous = S,
+    bad = STORE.bad,
+    banner = STORE.banner;
+  S = next;
+  STORE.bad = null;
+  if (banner === 'corrupt') STORE.banner = null;
+  if (!save()) {
+    S = previous;
+    STORE.bad = bad;
+    if (bad) STORE.banner = banner;
+    return false;
+  }
+  return true;
+}
+/** 清空恢复历史后再清空主记录；清理失败不显示成功。 */
+function storeReset() {
+  if (DEMO) return Promise.resolve(false);
+  if (!storeCanWrite(true)) return Promise.resolve(false);
+  STORE.skipVault = true;
+  STORE.resetting = true;
+  rStoreBanner();
+  return Promise.all(
+    HOOKS.reset.map(function (fn) {
+      return Promise.resolve().then(fn);
+    })
+  ).then(
+    function () {
+      STORE.resetting = false;
+      var ok = storeReplace(defaults());
+      if (ok)
+        LEGACY_KEYS.forEach(function (key) {
+          localStorage.removeItem(key);
+        });
+      STORE.skipVault = false;
+      rStoreBanner();
+      return ok;
+    },
+    function (e) {
+      STORE.skipVault = false;
+      STORE.resetting = false;
+      rStoreBanner();
+      toast('清空失败：' + e.message);
+      return false;
+    }
+  );
+}
+/** Web Locks 让同源页面只有一个写入者；旧浏览器仍在每次写入前检查原文是否改变。 */
+function storeLock() {
+  if (DEMO || !navigator.locks || STORE.locking || STORE.release) return;
+  STORE.writer = false;
+  STORE.locking = true;
+  navigator.locks
+    .request('freebody-write', { ifAvailable: true }, function (lock) {
+      STORE.locking = false;
+      if (!lock) {
+        storeAlert('readonly');
+        return;
+      }
+      STORE.writer = true;
+      if (STORE.banner === 'readonly') STORE.banner = null;
+      storeCheck();
+      rStoreBanner();
+      return new Promise(function (resolve) {
+        STORE.release = resolve;
+      });
+    })
+    .catch(function () {
+      STORE.locking = false;
+      STORE.writer = true;
+      if (STORE.banner === 'readonly') STORE.banner = null;
+      storeCheck();
+      rStoreBanner();
+    });
+}
+function storeCheck() {
+  if (DEMO) return true;
+  try {
+    if (localStorage.getItem(KEY) === STORE.raw) return STORE.err !== 'conflict';
+    STORE.err = 'conflict';
+    storeAlert('conflict');
+  } catch (e) {
+    toast('无法读取本机存储：' + e.message);
+  }
+  return false;
+}
+function storeCanWrite(allowBad) {
+  if (DEMO) return true;
+  if (STORE.resetting) {
+    toast('正在清理恢复点，请稍候');
+    return false;
+  }
+  if (!STORE.writer) {
+    storeAlert('readonly');
+    return false;
+  }
+  if (!storeCheck()) return false;
+  if (!allowBad && STORE.bad != null) {
+    storeAlert('corrupt');
+    return false;
+  }
+  return true;
+}
 function metaLoad() {
   var m = null;
   try {
@@ -178,33 +299,74 @@ function firstDataDate(s) {
 }
 function hasUserData(s) {
   return (
-    ['meals', 'workouts', 'cardio', 'sleep', 'body', 'recov', 'labs', 'notes', 'sessions', 'wristLog'].some(
-      function (k) {
-        return s[k] && s[k].length;
-      }
-    ) || Object.keys(s.suppLog || {}).length > 0
+    [
+      'meals',
+      'workouts',
+      'cardio',
+      'sleep',
+      'body',
+      'recov',
+      'labs',
+      'notes',
+      'sessions',
+      'wristLog',
+      'plans',
+      'customFoods',
+      'swims',
+      'run800',
+      'pb100br',
+      'perfLog',
+      'injuries',
+      'rehab',
+      'restricted'
+    ].some(function (k) {
+      return s[k] && s[k].length;
+    }) ||
+    Object.keys(s.suppLog || {}).length > 0 ||
+    !!s.active ||
+    JSON.stringify(s.profile) !== JSON.stringify(defaults().profile) ||
+    JSON.stringify(s.goals) !== JSON.stringify(defaults().goals)
   );
 }
-/** 保存：写满时保留内存中的数据并给出导出出口；成功后更新用量并按阈值预警 */
-function save() {
-  if (DEMO) return true;
-  if (STORE.bad != null) {
-    storeAlert('corrupt');
+/** 保存：界面传 rollback=true，失败回滚到上次成功状态，另存待导出的草稿；重试不会重复添加。 */
+function save(rollback) {
+  function failed() {
+    if (rollback && STORE.accepted) {
+      try {
+        STORE.draft = JSON.stringify(S);
+      } catch (e) {}
+      S = JSON.parse(STORE.accepted);
+    }
     return false;
   }
-  var json = JSON.stringify(S);
+  if (DEMO) return true;
+  if (!storeCanWrite(false)) return failed();
+  var json;
+  try {
+    stateNormalize(S, true);
+    json = JSON.stringify(S);
+  } catch (e) {
+    STORE.err = 'invalid';
+    storeAlert('invalid');
+    toast('未保存：' + e.message);
+    return failed();
+  }
+  var previous = STORE.raw;
   try {
     localStorage.setItem(KEY, json);
+    STORE.raw = json;
   } catch (e) {
     if (isQuotaErr(e)) {
       STORE.err = 'quota';
       storeAlert('quota');
     } else toast('保存失败：' + e.message);
-    return false;
+    return failed();
   }
+  STORE.accepted = json;
+  STORE.draft = null;
   if (STORE.err) {
     STORE.err = null;
-    if (STORE.banner === 'quota') {
+    if (STORE.banner === 'quota' || STORE.banner === 'invalid') {
       STORE.banner = null;
       if (typeof rStoreBanner === 'function') rStoreBanner();
     }
@@ -221,5 +383,6 @@ function save() {
   }
   if (dirty) metaSave();
   if (lv) storeAlert(lv);
+  vaultCapture(previous, json);
   return true;
 }

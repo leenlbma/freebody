@@ -119,6 +119,7 @@ function rImp() {
       IC('check') +
       (n ? '确认导入 ' + n + ' 条' : '没有可导入的条目') +
       '</button><button class="ghost" id="ipNo">取消</button></div>';
+    if (IMP.err) h += '<div class="alert bad imp-err" role="alert">' + esc(IMP.err) + '</div>';
   } else {
     var r = IMP.res || { n: 0, dates: [] },
       last = r.dates[r.dates.length - 1];
@@ -175,9 +176,13 @@ document.addEventListener('click', function (e) {
     else rImp();
   } else if (id === 'ipUndo') {
     if (IMP.undo && confirm('撤销这次导入？导入后的其他修改也会一并撤回。')) {
+      var before = S;
       S = JSON.parse(IMP.undo);
+      if (!save()) {
+        S = before;
+        return;
+      }
       IMP.undo = null;
-      save();
       toast('已撤销');
       impReset();
       show('settings');
@@ -246,7 +251,7 @@ $('#ntSave').onclick = function () {
   }
   S.notes.push({ id: uid(), date: sel, title: '', text: t.slice(0, 2000), tags: [] });
   $('#ntText').value = '';
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -258,6 +263,6 @@ document.addEventListener('click', function (e) {
   S.notes = S.notes.filter(function (x) {
     return x.id !== a;
   });
-  save();
+  if (!save(true)) return;
   render();
 });

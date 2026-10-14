@@ -85,7 +85,12 @@ const app =
   '})();\n';
 
 // 4) 内联：样式、数据、图标、图表库、应用脚本依次注入模板（JSON 中的 "</" 转义，避免提前闭合 <script>）
-const data = 'window.FIT_DATA = ' + JSON.stringify({ foods, examples }).replace(/<\//g, '<\\/') + ';';
+const promptMatch = /<!-- freebody-prompt:zh -->\n```text\n([\s\S]*?)\n```/.exec(
+  read('skills/freebody-coach/PROMPT.md')
+);
+if (!promptMatch) throw new Error('缺少中文教练提示词');
+const coachPrompt = promptMatch[1];
+const data = 'window.FIT_DATA = ' + JSON.stringify({ foods, examples, coachPrompt }).replace(/<\//g, '<\\/') + ';';
 const html = read('src/index.template.html')
   .replace('/*__STYLES__*/', () => read('src/styles.css'))
   .replace('/*__DATA__*/', () => data)

@@ -323,7 +323,7 @@ function readiness(d) {
     r = recovOf(d),
     g = S.goals;
   if (s) {
-    add(0.2, (s.dur - 4) / (g.sleepH - 4), '睡眠时长');
+    add(0.2, (s.dur - 4) / Math.max(1, g.sleepH - 4), '睡眠时长');
     if (s.q) add(0.1, (s.q - 1) / 4, '睡眠质量');
   }
   var rhrOf = function (x) {
@@ -367,6 +367,7 @@ function readiness(d) {
     return a + p.w;
   }, 0);
   return {
+    weight: tw,
     score: Math.round(
       (parts.reduce(function (a, p) {
         return a + p.w * p.v;

@@ -1,7 +1,7 @@
 {
   "name": "freebody",
-  "version": "2.11.0",
-  "description": "FreeBody：AI 健身教练的仪表盘。离线单文件的训练、饮食、睡眠与身体指标记录与可视化，数据只存本机（localStorage），支持 AI 生成的导入包。",
+  "version": "2.12.0",
+  "description": "FreeBody：AI 健身教练的仪表盘。离线单文件的训练、饮食、睡眠与身体指标记录与可视化；记录与恢复点只存本机，支持 AI 生成的导入包。",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -16,7 +16,7 @@
     "serve": "node scripts/serve.js 8766",
     "verify": "npm run build && npm run check && npm run lint && npm run typecheck && npm run licenses && npm test",
     "licenses": "node scripts/licenses.js",
-    "test:e2e:coverage": "FB_COVERAGE=1 playwright test --project=chromium && node scripts/e2e-coverage.js --min 60"
+    "test:e2e:coverage": "FB_COVERAGE=1 playwright test --project=chromium && node scripts/e2e-coverage.js --min 65"
   },
   "engines": {
     "node": ">=18"

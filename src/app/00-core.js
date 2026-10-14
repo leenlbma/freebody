@@ -81,10 +81,10 @@ var EX_PRESETS = [
 ];
 /* ---------- 钩子 ---------- */
 /** 渲染、切换页面、切换主题之后要做的事（如可访问性补全、日期控件包装），由各模块注册，避免改写函数本身 */
-var HOOKS = { render: [], show: [], theme: [] };
-/** @param {'render' | 'show' | 'theme'} k */
-function runHooks(k) {
+var HOOKS = { render: [], show: [], theme: [], saved: [], reset: [] };
+/** @param {'render' | 'show' | 'theme' | 'saved'} k */
+function runHooks(k, payload) {
   HOOKS[k].forEach(function (f) {
-    f();
+    f(payload);
   });
 }

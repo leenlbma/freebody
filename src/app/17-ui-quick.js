@@ -40,7 +40,7 @@ function quickAdd(inp, box) {
     i.meal = meal;
     S.meals.push(mkMeal(i));
   });
-  save();
+  if (!save(true)) return;
   $(inp).value = '';
   $(box).textContent = '';
   toast('已记入' + meal + ' ' + r.items.length + ' 项' + (r.miss.length ? '，未识别 ' + r.miss.length + ' 项' : ''));
@@ -68,7 +68,7 @@ function suppAll() {
   S.supps.forEach(function (s) {
     if (!L[s.id]) L[s.id] = { at: at };
   });
-  save();
+  if (!save(true)) return;
   toast('补剂已全部打卡');
   render();
 }
@@ -87,7 +87,7 @@ function repeatDiet() {
     o.date = sel;
     S.meals.push(o);
   });
-  save();
+  if (!save(true)) return;
   toast('已复制昨天 ' + src.length + ' 条');
   render();
 }
@@ -129,7 +129,7 @@ function repeatTrain() {
       wrist: false
     });
   });
-  save();
+  if (!save(true)) return;
   toast('已复制 ' + d.slice(5) + ' 的 ' + src.length + ' 项（RPE 待填）');
   render();
 }
@@ -155,7 +155,7 @@ function reuseSleep() {
     return x.date !== sel;
   });
   S.sleep.push({ id: uid(), date: sel, bed: l.bed, wake: l.wake, dur: l.dur, q: l.q, note: '沿用上次' });
-  save();
+  if (!save(true)) return;
   toast('已沿用 ' + l.bed + '→' + l.wake);
   render();
 }

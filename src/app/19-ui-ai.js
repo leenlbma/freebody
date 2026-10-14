@@ -808,7 +808,7 @@ function aiRecord() {
     o.meal = meal;
     S.meals.push(mkMeal(o));
   });
-  save();
+  if (!save(true)) return;
   toast('已记入' + meal + ' ' + list.length + ' 项');
   AI = {
     mode: AI.mode,

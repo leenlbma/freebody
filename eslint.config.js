@@ -47,10 +47,51 @@ const shared = {
 };
 
 module.exports = [
-  { ignores: ['index.html', 'sw.js', 'node_modules/**', 'tests/e2e/report/**', 'test-results/**'] },
+  { ignores: ['index.html', 'sw.js', 'node_modules/**', 'tests/e2e/report/**', 'test-results/**', 'freebody-v*/**'] },
   js.configs.recommended,
   {
     files: ['src/app/*.js'],
+    plugins: {
+      freebody: {
+        rules: {
+          'checked-save': {
+            meta: {
+              type: 'problem',
+              schema: [],
+              messages: { unchecked: '必须处理 save() 的失败结果，避免显示未实际保存的成功状态。' }
+            },
+            create(context) {
+              return {
+                'ExpressionStatement > CallExpression[callee.name="save"]'(node) {
+                  context.report({ node, messageId: 'unchecked' });
+                }
+              };
+            }
+          },
+          'storage-boundary': {
+            meta: {
+              type: 'problem',
+              schema: [],
+              messages: { direct: '主记录写入必须经过 01-store.js 的校验与冲突保护。' }
+            },
+            create(context) {
+              return {
+                CallExpression(node) {
+                  if (context.filename.endsWith('01-store.js')) return;
+                  if (
+                    node.callee.type === 'MemberExpression' &&
+                    node.callee.object.name === 'localStorage' &&
+                    ['setItem', 'removeItem'].includes(node.callee.property.name) &&
+                    (node.arguments[0]?.name === 'KEY' || node.arguments[0]?.value === 'freeBody_v1')
+                  )
+                    context.report({ node, messageId: 'direct' });
+                }
+              };
+            }
+          }
+        }
+      }
+    },
     languageOptions: {
       ecmaVersion: 5,
       sourceType: 'script',
@@ -64,7 +105,7 @@ module.exports = [
         FB_VERSION: 'readonly'
       }
     },
-    rules: shared
+    rules: { ...shared, 'freebody/checked-save': 'error', 'freebody/storage-boundary': 'error' }
   },
   {
     files: ['src/charts.js', 'src/icons.js', 'src/sw.template.js'],

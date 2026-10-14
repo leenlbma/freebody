@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.11.0-2148b8" alt="version 2.11.0">
+<img src="https://img.shields.io/badge/version-2.12.0-2148b8" alt="version 2.12.0">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -27,6 +27,8 @@
 ```
 <!-- /freebody-prompt -->
 
+应用内的「今天」首次使用卡片和「我的 › 搭配 AI」也能复制同一份提示词，并直接打开 AI 记录预览。剪贴板不可用时可选择文字手动复制。
+
 不能联网的 AI，可以直接复制 [SKILL.md](https://github.com/leenlbma/freebody/blob/main/skills/freebody-coach/SKILL.md) 全文给它。
 
 <sub>同一段提示词也在 [skills/freebody-coach/PROMPT.md](skills/freebody-coach/PROMPT.md)。AI 给出的数据先在本机预览，确认后才写入。不构成医疗建议。</sub>
@@ -47,7 +49,7 @@ FreeBody 是一个打开就能用的网页应用：一个 `index.html`，无账�
 
 ## 今天页和准备度
 
-一屏回答「今天怎么安排」。准备度综合睡眠、主观恢复、静息心率与肌群疲劳给出 0–100 分和一句话建议；今日推荐按肌群恢复状态选择推 / 拉 / 腿 / 全身，一键开始。营养剩余、补剂打卡、睡眠确认与体重都在同一屏，打卡只需一次点按。
+一屏回答「今天怎么安排」。准备度综合睡眠、主观恢复、静息心率与 HRV 给出 0–100 分和一句话建议；今日推荐按肌群恢复状态选择推 / 拉 / 腿 / 全身，一键开始。营养剩余、补剂打卡、睡眠确认与体重都在同一屏，打卡只需一次点按。恢复页可展开实际参与评分的项目、归一后的权重与依据；只有少量项目时明确标注「依据有限」。
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-today-dark.png"><img src="docs/screenshots/f-today-light.png" alt="今天页与准备度" width="620"></picture></p>
 
@@ -65,11 +67,17 @@ FreeBody 是一个打开就能用的网页应用：一个 `index.html`，无账�
 
 ## 饮食与拍照识别
 
-日记页一眼看剩余热量与三大宏量，每餐一个「+」。内置 322 项常见中餐与食材，支持最近常吃、自定义食物、组合与一行文字快速记录。
+日记页一眼看剩余热量与三大宏量，每餐一个「+」。食物详情分别标注 USDA 条目名称参考、配方估算、同类近似值或用户数值；名称参考可打开 USDA 搜索核对，不代表逐项验证过的精确值。内置 322 项常见中餐与食材，支持最近常吃、自定义食物、组合与一行文字快速记录。
 
 v2.4 起可选拍照识别：拍一张，或吃前、吃后各拍一张，模型按固定格式返回每样食物的名称、克重、剩余比例与估算营养。实际摄入 = 克重 ×（1 − 剩余比例）；营养数值优先匹配本地食物库，匹配不到才使用模型估算并标注「估算」。确认页可逐项改名称、克重、餐次或删除，确认后才记录。
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/f-diet-dark.png"><img src="docs/screenshots/f-diet-light.png" alt="饮食日记与拍照识别确认" width="620"></picture></p>
+
+## 本机恢复点
+
+记录或配置保存成功后自动保留「上一次保存前」和每日恢复点，最多 8 份、总量不超过 20 MB。可在「我的 › 数据备份 › 本机恢复点」关闭自动保留、查看、校验导出、确认恢复或清空历史。恢复点不含模型配置和 API Key；演示模式不会读取或改动真实历史。
+
+恢复点与主记录同在这台设备，清除网站数据仍会一起丢失；请继续定期导出外部备份。「清空所有数据」会同时清理主记录、恢复点和旧版存储键。
 
 ## 数据可视化
 
@@ -91,7 +99,7 @@ v2.4 起可选拍照识别：拍一张，或吃前、吃后各拍一张，模型
 
 **添加到主屏幕**
 
-FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pages 链接或你自己的服务器）打开一次后，即可离线使用，并可像 App 一样安装。数据仍只保存在本机浏览器的 localStorage 中，安装与否不影响数据。
+FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pages 链接或你自己的服务器）打开一次后，即可离线使用，并可像 App 一样安装。主记录保存在本机浏览器的 localStorage，恢复点保存在同源 IndexedDB，安装与否不影响数据。
 
 - **iPhone / iPad（Safari）**：打开网址 → 点底部「分享」按钮 → 选择「添加到主屏幕」→「添加」。之后从主屏幕图标以独立窗口启动、无地址栏。
   - **注意：添加到主屏幕后，数据与 Safari 分开存储。**主屏幕应用打开时是空的，看不到你在 Safari 里记过的数据。如果已经在 Safari 里记录过，请先在 Safari 中打开「我的 › 数据备份」→「导出 JSON」，再到主屏幕应用的同一位置「导入 JSON」。之后固定在一处记录即可。
@@ -146,7 +154,7 @@ npm test         # 或 node --test tests/     → 单元测试
 
 ## 隐私说明
 
-- **数据只存本地**：所有记录只保存在本机浏览器的 localStorage（键名 `freeBody_v1`），不上传任何服务器。旧版 `fitTracker_v1` 数据会自动迁移，旧备份可直接导入。
+- **数据只存本地**：主记录保存在本机浏览器的 localStorage（键名 `freeBody_v1`）；自动恢复点保存在同源 IndexedDB（`freebody-history`），不上传任何服务器。旧版 `fitTracker_v1` 数据会自动迁移，旧备份可直接导入。
 - **Key 只存本地**：拍照识别的 API Key 单独保存在本机（`freeBody_ai_v1`），导出备份时**默认不包含 Key**（可在设置中勾选包含，不推荐）。也可以取消「在本机记住 API Key」，Key 只留在当前页面内存中，刷新或关闭后需重新填写。
 - **导入只在本机处理**：粘贴导入与链接导入（`#import=`）都在浏览器中解析，`#` 之后的内容不会发送给任何服务器，确认前不写入。
 - **拍照识别只有在你填写模型 Key 之后才会联网**。没有填写 Key 时，FreeBody 不发起任何网络请求：拍照、选图都只在本机处理，识别入口会引导你手动记录。填写 Key 后，只有你主动点「识别」或「测试连接」时，压缩后的照片（或测试请求）才会直接从浏览器发送到你所选的服务商，不经过 FreeBody 的任何服务器，并受该服务商的隐私政策约束。FreeBody 不保存照片。
@@ -230,7 +238,7 @@ freebody/
 │   ├── icons.js               # 内联 SVG 线条图标
 │   ├── charts.js              # 零依赖 SVG 图表库
 │   ├── app/                   # 应用逻辑模块，构建时按文件名顺序合并进一个 IIFE
-│   │   ├── 00-core.js … 06-crypto.js   # 状态、存储、工具函数、核心计算、导入合并、演示数据、加密备份（不依赖 DOM，可单测）
+│   │   ├── 00-core.js … 08-state.js   # 状态、存储、工具函数、核心计算、导入合并、演示数据、加密备份、恢复点、状态校验（不依赖 DOM，可单测）
 │   │   ├── 09-init.js                  # 读取本机数据（损坏时保留原文、暂停保存）
 │   │   └── 10-ui-*.js … 90-boot.js     # 各页面界面与启动
 │   └── sw.template.js         # Service Worker 模板

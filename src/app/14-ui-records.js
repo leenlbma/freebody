@@ -73,7 +73,7 @@ $('#sAdd').onclick = function () {
     editSup = null;
     $('#sAdd').textContent = '添加';
   } else S.supps.push({ id: uid(), name: n, dose: $('#sDose').value.trim(), time: $('#sTime').value.trim() });
-  save();
+  if (!save(true)) return;
   ['#sName', '#sDose', '#sTime'].forEach(function (s) {
     $(s).value = '';
   });
@@ -187,7 +187,7 @@ $('#slSave').onclick = function () {
     return x.date !== sel;
   });
   S.sleep.push({ id: uid(), date: sel, bed: b, wake: w, dur: d, q: slQ, note: $('#slNote').value.trim() });
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -282,7 +282,7 @@ $('#bSave').onclick = function () {
   o.id = uid();
   o.date = sel;
   S.body.push(o);
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -474,7 +474,7 @@ $('#rvSave').onclick = function () {
     return x.date !== sel;
   });
   S.recov.push(o);
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -496,7 +496,7 @@ $('#lbAdd').onclick = function () {
     hi: num($('#lbHi').value),
     note: $('#lbNote').value.trim()
   });
-  save();
+  if (!save(true)) return;
   lbMetric = n;
   $('#lbVal').value = '';
   $('#lbNote').value = '';
@@ -768,7 +768,7 @@ $('#wpSave').onclick = function () {
     return x.date !== sel;
   });
   S.wristLog.push({ date: sel, pain: wpTmp.pain, trig: wpTmp.trig.slice(), note: $('#wpNote').value.trim() });
-  save();
+  if (!save(true)) return;
   toast('已保存');
   render();
 };
@@ -779,7 +779,7 @@ $('#rhAdd').onclick = function () {
     return;
   }
   S.rehab.push({ id: uid(), name: n, dose: $('#rhDose').value.trim() });
-  save();
+  if (!save(true)) return;
   $('#rhName').value = '';
   $('#rhDose').value = '';
   render();
@@ -791,7 +791,7 @@ $('#rsAdd').onclick = function () {
     return;
   }
   S.restricted.push({ id: uid(), name: n, alt: $('#rsAlt').value.trim() });
-  save();
+  if (!save(true)) return;
   $('#rsName').value = '';
   $('#rsAlt').value = '';
   render();
@@ -803,7 +803,7 @@ $('#injAdd').onclick = function () {
     return;
   }
   S.injuries.push({ id: uid(), name: n, desc: $('#injDesc').value.trim(), status: '康复中' });
-  save();
+  if (!save(true)) return;
   $('#injName').value = '';
   $('#injDesc').value = '';
   render();

@@ -594,7 +594,7 @@ $('#ptAdd').onclick = function () {
   }
   S.perfLog.push({ id: uid(), date: d, ev: ev, value: v, note: $('#ptN').value.trim() });
   ptEv = ev;
-  save();
+  if (!save(true)) return;
   $('#ptV').value = '';
   $('#ptN').value = '';
   toast('已记录');
@@ -611,7 +611,7 @@ $('#peAdd').onclick = function () {
   var e = { id: uid(), name: n, unit: $('#peUnit').value.trim(), better: $('#peBetter').value, hist: hv };
   S.perfEvents.push(e);
   ptEv = e.id;
-  save();
+  if (!save(true)) return;
   ['#peName', '#peUnit', '#peHist'].forEach(function (s) {
     $(s).value = '';
   });
@@ -772,6 +772,31 @@ function chRecovery() {
         .join('、') +
       '</div></div></div>'
     : '<div class="mut" style="margin-bottom:6px">准备度需要当天至少 2 项数据（睡眠、晨起心率、HRV、主观指标）。</div>';
+  var evidence = EVIDENCE.readiness(rd);
+  $('#readyNow').innerHTML +=
+    '<details class="more" id="readyEvidence"><summary>分数依据 · ' +
+    esc(evidence.label) +
+    '</summary><p>' +
+    esc(evidence.note) +
+    '</p>' +
+    (evidence.rows.length
+      ? '<table class="ntab"><caption>本次准备度计算</caption><thead><tr><th scope="col">项目</th><th scope="col">本次权重</th><th scope="col">单项分数</th></tr></thead><tbody>' +
+        evidence.rows
+          .map(function (row) {
+            return (
+              '<tr><th scope="row">' +
+              esc(row.name) +
+              '</th><td>' +
+              row.weight +
+              '%</td><td>' +
+              row.value +
+              ' / 100</td></tr>'
+            );
+          })
+          .join('') +
+        '</tbody></table>'
+      : '') +
+    '</details>';
   CH.line($('#chReady'), {
     h: 150,
     series: [
