@@ -88,34 +88,6 @@ function show(id, direct) {
   runHooks('show');
 }
 
-/* ---------- 日期 ---------- */
-$('#dSel').value = sel;
-$('#dSel').onchange = function () {
-  if (this.value) {
-    sel = this.value;
-    render();
-  }
-};
-$('#dPrev').onclick = function () {
-  sel = addDays(sel, -1);
-  $('#dSel').value = sel;
-  render();
-};
-$('#dNext').onclick = function () {
-  sel = addDays(sel, 1);
-  $('#dSel').value = sel;
-  render();
-};
-$('#dToday').onclick = function () {
-  sel = today();
-  $('#dSel').value = sel;
-  render();
-};
-function todayBtn() {
-  var b = $('#dToday');
-  if (b) b.classList.toggle('is-today', sel === today());
-}
-
 /* ---------- 图表 ---------- */
 function ring(val, goal, color, label, unit) {
   var pc = goal ? Math.min(val / goal, 1) : 0,
@@ -173,6 +145,7 @@ function otHtml(d) {
 
 /* ---------- 渲染 ---------- */
 function render() {
+  syncRecordDates();
   document.querySelectorAll('[data-rng]').forEach(function (el) {
     var k = el.getAttribute('data-rng'),
       v = rng(k);

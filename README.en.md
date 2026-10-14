@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.12.2-2148b8" alt="version 2.12.2">
+<img src="https://img.shields.io/badge/version-2.12.3-2148b8" alt="version 2.12.3">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -148,6 +148,7 @@ You can also download `index.html` and open it directly. Over `file://` there is
 - **Tablet, portrait (600–1024 px):** 8-column grid with a 16 px gutter and paired cards of equal height. Phones in landscape switch to a left-hand icon rail.
 - **Desktop (> 1024 px) and tablet, landscape:** sidebar navigation, a 12-column grid, content up to 1200 px wide, 24 px margins and gutters. The Today page shows the main card, the nutrition ring, check-ins and a 7-day trend.
 - **Buttons:** three styles (primary, secondary, destructive) in two heights (44 px and 36 px). Form buttons span the full width, and grouped buttons share it equally.
+- **Dates:** the compact header control opens Today, Yesterday and a date picker. Other days show a date notice and a return-to-today action. Performance and lab forms can override the date for one record beside the save button; successful saves resume following the page date. The recovery start date remains independent.
 - **Accessibility:** respects system text size and safe areas (notch, home indicator) and shows visible keyboard focus.
 - **Shortcuts** (outside text fields):
 

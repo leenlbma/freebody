@@ -189,8 +189,7 @@ document.addEventListener('click', function (e) {
     }
   } else if (id === 'ipView') {
     var r = IMP.res;
-    sel = r && r.dates.length ? r.dates[r.dates.length - 1] : today();
-    $('#dSel').value = sel;
+    setSelectedDate(r && r.dates.length ? r.dates[r.dates.length - 1] : today(), false);
     impReset();
     show('overview');
   } else if (id === 'ipDone') {

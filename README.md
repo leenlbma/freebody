@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.12.2-2148b8" alt="version 2.12.2">
+<img src="https://img.shields.io/badge/version-2.12.3-2148b8" alt="version 2.12.3">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -128,6 +128,7 @@ npm ci && npm run lint && npm run typecheck && npm run test:e2e   # 贡献代码
 - 平板竖屏（600–1024px）：8 列网格、间距 16，卡片两栏等高；横屏手机改为左侧图标导航。
 - 桌面（> 1024px）与平板横屏：左侧导航栏，12 列网格、内容最大宽 1200、边距与列间距 24；今天页为「主卡 + 营养环 + 打卡 + 近 7 天趋势」。
 - 按钮统一为主 / 次 / 危险三种样式、44 / 36px 两档高度；表单底部按钮全宽、成组按钮等宽。
+- 日期入口收在顶栏「今天 ▾」中，可选今天、昨天或其他日期；非当天显示日期提示和「回到今天」。成绩、化验的保存按钮旁可单独选择本条日期，保存成功后恢复跟随页面日期；恢复起始日保持独立。
 - 支持系统大字体、安全区（刘海 / 底部横条）、键盘焦点样式。
 - 快捷键（输入框外）：`1`–`4` 切换 今天 / 训练 / 数据 / 我的，`←` `→` 前一天 / 后一天，`T` 回到今天，`/` 搜索食物，`Esc` 返回上一级；`Enter` / 空格 可激活聚焦的卡片。
 

@@ -17,6 +17,7 @@
     theme: '<circle cx="12" cy="12" r="8"/><path d="M12 4v16a8 8 0 0 0 0-16z"/>',
     left: '<path d="M14.5 6 8.5 12l6 6"/>',
     right: '<path d="M9.5 6l6 6-6 6"/>',
+    down: '<path d="m6 9 6 6 6-6"/>',
     pill: '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.2 8.1l5.6 7.8"/>',
     note: '<path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M14 3.5V8h5M9 12.5h7M9 16h5"/>',
     database:

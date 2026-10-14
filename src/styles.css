@@ -46,9 +46,6 @@ section{display:none}section.on{display:block}
 .bar i{display:block;height:100%;background:var(--acc)}
 .chk{display:flex;align-items:center;gap:10px;flex:1}
 .chk input{width:24px;height:24px;min-height:0}
-.dnav{display:flex;gap:4px;align-items:center}
-.dnav input{width:140px;min-height:34px;padding:4px 6px}
-.dnav button{min-height:34px;padding:4px 10px}
 .seg{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
 .seg button{background:var(--in);color:var(--fg);border:1px solid var(--bd);min-height:30px;padding:3px 9px;font-size:12px}
 .seg button.on{background:var(--acc);color:var(--on-acc)}
@@ -96,7 +93,7 @@ h2 .ic{margin-right:6px;color:var(--mut)}
 button .ic{width:16px;height:16px;vertical-align:-3px}
 button.sm .ic,.chip .ic{width:14px;height:14px}
 button:has(.ic):not(.del):not([aria-label]){display:inline-flex;align-items:center;gap:5px;justify-content:center}
-.dnav button,#themeBtn{display:inline-flex;align-items:center;justify-content:center}
+#themeBtn{display:inline-flex;align-items:center;justify-content:center}
 button.del .ic{width:16px;height:16px;color:var(--mut)}button.del:hover .ic{color:var(--bad)}
 .alert .ic{margin-right:4px}.tag .ic{width:12px;height:12px;vertical-align:-2px}
 .disc .ic{color:var(--warn);margin-right:4px}
@@ -309,7 +306,6 @@ button:disabled{opacity:.45;cursor:default}
 @media(hover:hover){button:not(.ghost):not(.danger):not(.del):not(.chip):not(.plus):hover{filter:brightness(1.07)}button.ghost:hover{background:color-mix(in srgb,var(--fg) 7%,var(--in))}button.danger:hover{background:color-mix(in srgb,var(--bad) 8%,transparent)}}
 input,select{min-height:var(--bh);padding:10px 12px}
 textarea{padding:10px 12px}
-.dnav{gap:8px}.dnav button{width:var(--bhs);min-height:var(--bhs);padding:0}.dnav input{min-height:var(--bhs);padding:4px 10px}
 #themeBtn{width:var(--bhs);padding:0}
 /* 表单底部操作：全宽；多个按钮等宽排列；说明文字另起一行 */
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
@@ -329,7 +325,7 @@ input,select{line-height:20px}
 input::-webkit-datetime-edit{padding:0;line-height:20px}
 input::-webkit-date-and-time-value{min-height:20px}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select){height:var(--bh)}
-.dnav input{height:var(--bhs)}.pe-row input,.pe-row select,.pe-row2 input,.pe-row2 select{height:36px}.ck-t input:not([type=range]){height:var(--bhs)}.mini-sel{height:auto}
+.pe-row input,.pe-row select,.pe-row2 input,.pe-row2 select{height:36px}.ck-t input:not([type=range]){height:var(--bhs)}.mini-sel{height:auto}
 /* v2.3.3 iOS WebKit：日期 / 时间 / 下拉统一外观与高度；空日期显示占位文字 */
 input[type=date],input[type=time],input[type=datetime-local],input[type=month]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
 input::-webkit-date-and-time-value{text-align:left;margin:0}
@@ -555,8 +551,7 @@ button.sm,.chip,.tabs4 button,.seg button,.ck-h,.wk-prog,.ai-r3 .tag,.st-tag[dat
 button.sm::after,.chip::after,.tabs4 button::after,.seg button::after,.ck-h::after,.wk-prog::after,.ai-r3 .tag::after,.linkb::after{content:'';position:absolute;left:50%;top:50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}
 .chart .seg::after,.chart .seg button::after{content:none}
 button.plus{width:44px;height:44px}
-.dnav button,#themeBtn,#dToday{min-height:var(--bh)!important;height:var(--bh)}.dnav button,#themeBtn{width:var(--bh)!important}
-.dnav input,#dSel{height:var(--bh)!important;min-height:var(--bh)!important}
+#themeBtn,#dToday{min-height:var(--bh)!important;height:var(--bh)}#themeBtn{width:var(--bh)!important}
 .ck-t input:not([type=range]){height:var(--bh)!important}
 details.card>summary{min-height:44px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0}
 details.card>summary>b{flex:none}
@@ -573,9 +568,8 @@ label.chk{min-height:44px}
 @media(max-width:599px){#dTools{grid-template-columns:repeat(3,minmax(0,1fr))}}
 input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 70%,transparent);border-color:var(--acc)}
 button.plus{background:var(--in);color:var(--acc)}button.plus:hover{background:color-mix(in srgb,var(--acc) 12%,var(--in))}
-#dToday.is-today{visibility:hidden}
-.dnav button,#themeBtn{background:transparent!important;color:var(--fg)}
-@media(hover:hover){.dnav button:hover,#themeBtn:hover{background:var(--in)!important}}
+#themeBtn{background:transparent!important;color:var(--fg)}
+@media(hover:hover){#themeBtn:hover{background:var(--in)!important}}
 header .hrow+.hrow{margin-top:4px!important}
 input[list]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e96' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px 16px;padding-right:32px}
 input[list]::-webkit-calendar-picker-indicator{opacity:0}
@@ -591,15 +585,6 @@ input[list]{padding-right:34px;text-overflow:ellipsis}
 .dtf>input::-webkit-calendar-picker-indicator{display:none}
 .dtf:has(>input:focus){border-color:var(--acc)}
 .dtf:has(>input:focus-visible),.dtf:has(>input:focus){box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 70%,transparent)}
-/* 顶部日期栏：一个 44px 高的步进条「‹ 日期 ›」，左缘与 logo、内容对齐；「今天」在右侧，已是今天时保留占位 */
-header .hrow+.hrow{justify-content:space-between;align-items:center;gap:8px}
-.dnav{display:inline-flex!important;align-items:center;gap:0!important;flex:none;height:var(--bh);padding:0;background:var(--in);border-radius:12px}
-.dnav>button{flex:none;width:var(--bh)!important;height:var(--bh)!important;min-height:var(--bh)!important;padding:0!important;margin:0;border-radius:12px;background:transparent!important;color:var(--fg)}
-.dnav>button svg{width:20px;height:20px}
-@media(hover:hover){.dnav>button:hover{background:color-mix(in srgb,var(--fg) 7%,transparent)!important}}
-.dnav>.dtf-bar{flex:none;width:auto;min-width:136px;padding:0 6px;background:transparent;border-color:transparent;border-radius:10px;justify-content:center;font-weight:600}
-.dtf-bar .dtf-v{flex:none;text-align:center}
-#dToday{flex:none;height:var(--bh)!important;min-height:var(--bh)!important;padding:0 14px}
 @media(max-width:599px){header{padding-left:16px;padding-right:16px}main{padding-left:16px;padding-right:16px}}/* ===== v2.5 导入包预览 / 心得 ===== */
 #impPack.on,#notes.on{display:block;max-width:720px}
 #impPack .card,#notes .card{margin-bottom:12px}
@@ -641,12 +626,8 @@ html{background:var(--bg);min-height:100%}
 body{min-height:100vh;min-height:-webkit-fill-available;min-height:100dvh}
 @media(max-width:599px){
  header{padding-top:calc(12px + env(safe-area-inset-top))}
- /* 页头：logo / 主题按钮的可见边缘、日期栏两端与内容卡片对齐 */
+ /* 页头 logo / 主题按钮的可见边缘与内容卡片对齐 */
  header>.hrow:first-child #themeBtn{margin-right:-12px}
- header .hrow+.hrow{gap:8px}
- header .dnav{flex:1 1 auto!important;min-width:0}
- header .dnav>.dtf-bar{flex:1 1 auto;min-width:0}
- #dToday.is-today{display:none}
  #toast{bottom:calc(90px + env(safe-area-inset-bottom))}
 }
 /* 主屏幕模式：iOS 26 部分版本 env(safe-area-inset-bottom) 会报 0，底部导航与吸底按钮保留最小间距，避开 home indicator */
@@ -729,3 +710,37 @@ html[data-motion=reduce] .spin{animation-duration:2.4s!important;animation-itera
 a.chip{display:inline-flex;align-items:center;justify-content:center;gap:4px;text-decoration:none;color:var(--fg);font-weight:600;box-sizing:border-box}
 #helpCard .chip{gap:6px}#helpCard .chip .ic{margin:0;vertical-align:0}
 .hello-bar .linkb{margin-left:6px;font-size:13px;vertical-align:baseline}
+/* 紧凑日期：页面入口与独立记录共用面板，非当天才显示日期提示。 */
+header{display:block}
+header>.hrow:first-child{display:flex;width:100%}
+header>.hrow:first-child>.row{margin-left:auto;flex-wrap:nowrap;min-width:0}
+header #appTitle{flex:none}
+.date-trigger{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px!important;max-width:100%;padding:8px 10px;font-size:13px;white-space:nowrap}
+.date-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.date-trigger>.ic{flex:none;width:16px;height:16px}
+.date-trigger>.ic:last-child{width:14px}
+#dTrigger{background:transparent;border:0;color:var(--fg);min-width:0;font-size:14px;max-width:180px}
+.date-context{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:1200px;margin:6px auto 0;padding:0 10px;border-radius:10px;background:color-mix(in srgb,var(--warn) 10%,var(--card));font-size:13px}
+#dToday{flex:none;padding:0 8px;border:0;background:transparent}
+.date-field{display:inline-flex;align-items:center;max-width:100%;min-width:0}
+.date-custom{color:var(--warn)!important;border-color:color-mix(in srgb,var(--warn) 40%,var(--bd))!important}
+.date-trigger[hidden],.date-context[hidden],.date-dialog [hidden],.date-field>input[hidden]{display:none!important}
+.date-dialog{position:fixed;inset:0;width:calc(100% - 32px);max-width:420px;max-height:calc(100dvh - env(safe-area-inset-top,0px) - 24px);margin:auto;padding:20px;border:1px solid var(--bd);border-radius:20px;background:var(--card);color:var(--fg);box-shadow:var(--sh);overflow-y:auto;overscroll-behavior:contain}
+.date-dialog::backdrop{background:rgba(0,0,0,.4)}
+.date-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.date-dialog-head h2{margin:0}
+#dateClose{display:flex;align-items:center;justify-content:center;width:44px;min-height:44px;padding:0;border:0}
+#dateScope{margin:6px 0 18px}
+.date-quick{display:flex;gap:10px;margin-bottom:18px}
+.date-quick>button{flex:1;min-height:44px}
+.date-step{display:flex;align-items:center;gap:8px;margin-top:6px}
+.date-step>button{display:flex;align-items:center;justify-content:center;flex:none;width:44px;min-height:44px;padding:0}
+.date-step>.dtf{flex:1;min-width:0}
+.date-step .dtf-v{text-align:center}
+.date-follow{width:100%;min-height:44px;margin-top:12px}
+#dateApply{width:100%;min-height:44px;margin-top:18px}
+body.date-open{overflow:hidden}
+@media(max-width:599px){
+ #dTrigger{max-width:150px}
+ .date-dialog{inset:auto 0 0;width:100%;max-width:none;margin:0;border-radius:20px 20px 0 0;padding:18px 20px max(20px,env(safe-area-inset-bottom,0px))}
+}

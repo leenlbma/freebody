@@ -32,7 +32,8 @@ The files in `src/app/` are concatenated in file-name order into one function sc
 | | `07-vault` | IndexedDB recovery history, digest validation, limits and serial write queue (private IIFE) | No |
 | | `08-state` | Full-state validation with explicit defaults and no dependency on global `S` (private IIFE) | No |
 | Initialisation | `09-init` | Reads stored data (or builds demo data in demo mode) into the global state `S` | No |
-| UI | `10-ui-shell` | Navigation `show()`, page render dispatch `render()`, theme | Yes |
+| UI | `10-ui-dates` | Page date, per-record overrides, compact controls and shared native dialog | Yes |
+| | `10-ui-shell` | Navigation `show()`, page render dispatch `render()`, theme | Yes |
 | | `11`–`21` | Pages: today, diet, training, records, charts, guided session, quick entry, settings, photo recognition, import preview, help and self-check | Yes |
 | | `22`–`23` | Recovery-point management, coach prompt and clipboard fallback | Yes |
 | Startup | `90-boot` | Accessibility fixes, keyboard, layout, PWA and update prompt; registers hooks | Yes |
@@ -49,7 +50,8 @@ localStorage freeBody_v1 ──load()──▶ S (all data, in memory)
                                render() ──▶ current page DOM ──HOOKS.render──▶ accessibility, date inputs, grid fill
 ```
 
-- **Single state:** every record lives in `S`. The UI re-renders the current page from `S` and keeps no state in the DOM.
+- **Record state:** saved records live in `S`. The UI re-renders the current page from `S`; unsaved form fields and date overrides stay in the current page.
+- **Date scope:** `sel` is the page date, changed through `setSelectedDate()`. Fields with `data-date-follow` default to `sel`; choosing a date adds `data-date-override` for that record only. Successful saves call `resetRecordDate()` to resume following the page. The recovery start date is independent of `sel`. Cancelling the date dialog changes neither dates nor form contents.
 - **Saving:** `save()` validates and serialises `S`. UI calls use `save(true)`: failure rolls back to the last accepted state, preserving form inputs and `STORE.draft` for export, so retries cannot append duplicates. Import modules keep their own before-operation snapshots. Nothing is written when stored data is corrupt or in demo mode.
 - **Write protection:** where Web Locks is available, one FreeBody window holds the editing lock and other windows are read-only. Close the editing window and reload to continue elsewhere. Saves, backup restores and resets also compare the current stored text with the text read by this window; changed data is never overwritten, and this window's content remains available for export. Older browsers use this conflict check without an exclusive lock, so fully simultaneous writes cannot be guaranteed safe; use one window for recording.
 - **Restore and import:** full backups pass through `stateNormalize()` for validation and legacy defaults before replacing storage or memory. Validation or write failures preserve the previous records. Failed AI and CSV imports roll back their changes; AI imports rebuild the preview and retain the input for retry.
@@ -63,7 +65,7 @@ Code that has to run after a render, a page switch or a theme change registers w
 
 | Hook | Callbacks (in order) |
 |---|---|
-| `render` | `storeUIState`, `a11y`, `dtWrap`, `todayBtn`, `layFill` |
+| `render` | `storeUIState`, `a11y`, `dtWrap`, `dateShell`, `layFill` |
 | `show` | Screen-reader announcement "已打开 …" (opened …) |
 | `theme` | `syncThemeColor` |
 | `saved` | Explicit payload captures recovery points after the primary save |

@@ -1444,9 +1444,7 @@ document.addEventListener('click', function (e) {
     return;
   }
   if ((a = b.getAttribute('data-calday'))) {
-    sel = a;
-    $('#dSel').value = sel;
-    render();
+    setSelectedDate(a);
     return;
   }
   if ((a = b.getAttribute('data-calm'))) {

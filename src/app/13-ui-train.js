@@ -62,8 +62,6 @@ function rTrain() {
         .join('') +
       '</ul>'
     : '';
-  if (!$('#pbD').value) $('#pbD').value = sel;
-  if (!$('#rnD').value) $('#rnD').value = sel;
   $('#rnHist').value = S.run800Hist ? fmtT(S.run800Hist) : '';
   var rn = S.run800.slice().sort(function (a, b) {
       return a.date < b.date ? -1 : 1;
@@ -381,6 +379,7 @@ $('#pbAdd').onclick = function () {
   }, null);
   S.pb100br.push({ id: uid(), date: d, sec: t, type: $('#pbTy').value, note: $('#pbN').value.trim() });
   if (!save(true)) return;
+  resetRecordDate('pbD');
   $('#pbT').value = '';
   $('#pbN').value = '';
   toast(prev == null || t < prev ? '新的个人最好成绩！' : '已记录');
@@ -407,6 +406,7 @@ $('#rnAdd').onclick = function () {
   }
   S.run800.push({ id: uid(), date: d, sec: t, type: $('#rnTy').value, note: $('#rnN').value.trim() });
   if (!save(true)) return;
+  resetRecordDate('rnD');
   $('#rnT').value = '';
   $('#rnN').value = '';
   toast(

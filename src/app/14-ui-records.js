@@ -330,7 +330,6 @@ function rHormone() {
     })
     .join('');
   chRecovery();
-  if (!$('#lbDate').value) $('#lbDate').value = sel;
   $('#labNames').innerHTML = LAB_PRESETS.map(function (p) {
     return '<option value="' + esc(p[0]) + '">';
   }).join('');
@@ -498,6 +497,7 @@ $('#lbAdd').onclick = function () {
   });
   if (!save(true)) return;
   lbMetric = n;
+  resetRecordDate('lbDate');
   $('#lbVal').value = '';
   $('#lbNote').value = '';
   toast('已添加');

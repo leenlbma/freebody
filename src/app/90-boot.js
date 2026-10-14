@@ -403,6 +403,10 @@ function dtFmt(el) {
 }
 function dtSync(el) {
   var w = el.parentNode;
+  if (w && w.classList && w.classList.contains('date-field')) {
+    syncDateField(el);
+    return;
+  }
   if (!w || !w.classList || !w.classList.contains('dtf')) return;
   var t = dtFmt(el),
     v = w.querySelector('.dtf-v');
@@ -410,10 +414,29 @@ function dtSync(el) {
   w.classList.toggle('dt-empty', !t);
 }
 var DT_DESC = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+function dtWatch(el) {
+  if (DT_DESC && DT_DESC.set)
+    try {
+      Object.defineProperty(el, 'value', {
+        configurable: true,
+        get: function () {
+          return DT_DESC.get.call(this);
+        },
+        set: function (x) {
+          DT_DESC.set.call(this, x);
+          dtSync(this);
+        }
+      });
+    } catch (e) {}
+}
 function dtWrap() {
   document
     .querySelectorAll('input[type=date],input[type=time],input[type=datetime-local],input[type=month]')
     .forEach(function (el) {
+      if (el.type === 'date' && el.id !== 'dSel') {
+        wrapDateField(el);
+        return;
+      }
       var w = el.parentNode;
       if (!w.classList || !w.classList.contains('dtf')) {
         w = document.createElement('span');
@@ -431,19 +454,7 @@ function dtWrap() {
           w.appendChild(ic);
         }
         w.appendChild(el);
-        if (DT_DESC && DT_DESC.set)
-          try {
-            Object.defineProperty(el, 'value', {
-              configurable: true,
-              get: function () {
-                return DT_DESC.get.call(this);
-              },
-              set: function (x) {
-                DT_DESC.set.call(this, x);
-                dtSync(this);
-              }
-            });
-          } catch (e) {}
+        dtWatch(el);
         if (!el.getAttribute('aria-label')) {
           var lb = w.parentNode && w.parentNode.querySelector('label');
           if (lb) el.setAttribute('aria-label', lb.textContent.trim());
@@ -499,10 +510,10 @@ document.addEventListener(
   },
   true
 );
-HOOKS.render.push(a11y, dtWrap, todayBtn, layFill);
+HOOKS.render.push(a11y, dtWrap, dateShell, layFill);
 a11y();
 dtWrap();
-todayBtn();
+dateShell();
 layFill();
 window.addEventListener('resize', layFill);
 impFromHash();
@@ -528,14 +539,14 @@ document.addEventListener('keydown', function (e) {
   if (/^[1-4]$/.test(k)) {
     show(GROUPS[+k - 1][0]);
     e.preventDefault();
-  } else if (k === 'ArrowLeft') {
-    $('#dPrev').click();
+  } else if (k === 'ArrowLeft' && datePageVisible() && t.tagName !== 'BUTTON') {
+    setSelectedDate(addDays(sel, -1));
     e.preventDefault();
-  } else if (k === 'ArrowRight') {
-    $('#dNext').click();
+  } else if (k === 'ArrowRight' && datePageVisible() && t.tagName !== 'BUTTON') {
+    setSelectedDate(addDays(sel, 1));
     e.preventDefault();
-  } else if (k === 't' || k === 'T') {
-    $('#dToday').click();
+  } else if ((k === 't' || k === 'T') && datePageVisible()) {
+    setSelectedDate(today());
   } else if (k === '/') {
     e.preventDefault();
     if (cur !== 'dietAdd') openAdd(dMeal(), 'search');

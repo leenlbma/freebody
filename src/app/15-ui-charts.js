@@ -506,7 +506,6 @@ function rPerfTests() {
       );
     })
     .join('');
-  if (!$('#ptD').value) $('#ptD').value = sel;
   var log = S.perfLog
       .filter(function (x) {
         return x.ev === ptEv;
@@ -595,6 +594,7 @@ $('#ptAdd').onclick = function () {
   S.perfLog.push({ id: uid(), date: d, ev: ev, value: v, note: $('#ptN').value.trim() });
   ptEv = ev;
   if (!save(true)) return;
+  resetRecordDate('ptD');
   $('#ptV').value = '';
   $('#ptN').value = '';
   toast('已记录');
