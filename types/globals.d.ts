@@ -4,7 +4,6 @@ interface Window {
   FIT_DATA: { foods: { foods: Food[]; [k: string]: any }; examples: any[]; coachPrompt?: string };
   FitIcons: { svg(name: string, cls?: string): string; hydrate(root?: ParentNode): void; names: string[] };
   FitCharts: any;
-  __fbPwaMeta?: boolean;
   __freeBody?: any;
 }
 declare const FitIcons: Window['FitIcons'];

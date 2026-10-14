@@ -660,6 +660,18 @@ body{min-height:100vh;min-height:-webkit-fill-available;min-height:100dvh}
 @media(max-width:1024px) and (orientation:portrait){
  html.ios.browser-viewport nav{top:calc(var(--nav-viewport-bottom) - var(--nav-height));bottom:auto}
 }
+/* iOS 主屏幕竖屏：导航参与三行布局，避开 fixed 元素的视口底边偏移。
+   内容在 main 内滚动；冷启动时只补回 dvh 缺少的顶部安全区，最多到 vh。
+   顶部 inset 为 0 时保留 dvh，兼容状态栏不透明的旧安装配置。
+   CSS 无法绘制系统保留区，旧图标仍可能需要备份后重新安装。 */
+@media(max-width:1024px) and (orientation:portrait){
+ html.ios.standalone{overflow:hidden}
+ html.ios.standalone body{height:100vh;height:min(100vh,calc(100dvh + env(safe-area-inset-top,0px)));min-height:0;padding-bottom:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+ html.ios.standalone body>header{grid-row:1;position:relative;top:auto}
+ html.ios.standalone main{grid-row:2;min-height:0;width:100%;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:24px}
+ html.ios.standalone nav{grid-row:3;position:relative;top:auto;bottom:auto;padding-bottom:max(env(safe-area-inset-bottom),12px)}
+ html.ios.standalone .imp-bar{bottom:0}
+}
 /* 禁用状态与主按钮区分更明显：灰底 + 次要文字，而不是只降低透明度 */
 button:disabled,button:disabled:hover{background:var(--in)!important;color:var(--mut)!important;border-color:var(--bd)!important;opacity:1;box-shadow:none}
 /* ===== v2.6 存储状态与提示条 ===== */

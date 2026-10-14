@@ -564,12 +564,10 @@ document.addEventListener('keydown', function (e) {
 (function () {
   var web = /^https?:$/.test(location.protocol);
   if (!web) return;
-  if (window.__fbPwaMeta !== false) {
-    var l = document.createElement('link');
-    l.rel = 'manifest';
-    l.href = 'manifest.webmanifest';
-    document.head.appendChild(l);
-  }
+  var l = document.createElement('link');
+  l.rel = 'manifest';
+  l.href = 'manifest.webmanifest';
+  document.head.appendChild(l);
   if (!('serviceWorker' in navigator)) return;
   var btn = $('#swUpd'),
     reloading = false;

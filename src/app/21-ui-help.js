@@ -124,17 +124,28 @@ function selfChecks(done) {
     ins = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].map(function (x) {
       return Math.round(parseFloat(x) || 0);
     });
+  pr.style.padding = '0';
+  pr.style.height = '100vh';
+  var largeHeight = Math.round(pr.getBoundingClientRect().height);
+  pr.style.height = '100dvh';
+  var dynamicHeight = Math.round(pr.getBoundingClientRect().height);
   pr.remove();
+  add('视口单位 vh / dvh', 'info', largeHeight + ' / ' + dynamicHeight + ' px');
   add(
     '安全区（上 右 下 左）',
     'info',
     ins.join(' / ') + ' px',
-    sa && de.classList.contains('ios') && !ins[0] && !ins[2] ? '独立窗口下安全区为 0，刘海屏上可能异常' : ''
+    sa && de.classList.contains('ios') && !ins[0] ? '顶部安全区为 0：可能由系统状态栏占用；不能据此判断没有黑边' : ''
   );
   var nav = $('#nav'),
     nb = nav ? Math.round(nav.getBoundingClientRect().bottom) : 0,
     vv = window.visualViewport,
-    vh = de.classList.contains('browser-viewport') && vv ? Math.round(vv.offsetTop + vv.height) : innerHeight;
+    shell = sa && de.classList.contains('ios') && getComputedStyle(document.body).display === 'grid',
+    vh = shell
+      ? Math.round(document.body.getBoundingClientRect().bottom)
+      : de.classList.contains('browser-viewport') && vv
+        ? Math.round(vv.offsetTop + vv.height)
+        : innerHeight;
   if (vv)
     add(
       '可见视口',
@@ -147,12 +158,19 @@ function selfChecks(done) {
         ' · 缩放 ' +
         vv.scale
     );
-  if (nav && getComputedStyle(nav).position === 'fixed' && innerWidth < 600)
+  if (nav && innerWidth < 600 && (shell || getComputedStyle(nav).position === 'fixed'))
     add(
       '底部导航布局',
-      Math.abs(nb - vh) <= 1 ? 'ok' : 'bad',
-      '导航底边 ' + nb + ' px，视口底边 ' + vh + ' px',
+      Math.abs(nb - vh) <= 1 ? (sa ? 'info' : 'ok') : 'bad',
+      '导航底边 ' + nb + ' px，' + (shell ? '应用底边 ' : '视口底边 ') + vh + ' px',
       '此项只检查页面内坐标，不能确认系统绘制的黑边。若仍有留白，请附截图、iOS 版本与本报告'
+    );
+  if (sa && de.classList.contains('ios'))
+    add(
+      '主屏幕安装配置',
+      'info',
+      '旧图标可能保留旧配置',
+      '先更新并完全关闭应用后重开。若仍有黑边，先导出 JSON 并确认文件可用，再重新添加图标；需要时导入备份'
     );
   add(
     'dvh 视口单位',

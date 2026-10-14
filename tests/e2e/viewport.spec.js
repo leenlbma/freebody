@@ -90,7 +90,6 @@ test('iOS Safari：横屏、桌面侧栏、缩放和返回页面后恢复定位'
 
 for (const [name, options] of [
   ['非 iOS 浏览器', { ios: false }],
-  ['主屏幕应用', { standalone: true }],
   ['无 VisualViewport', { available: false }]
 ]) {
   test(`${name}保留原有底栏定位`, async ({ page }) => {

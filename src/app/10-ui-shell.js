@@ -16,6 +16,11 @@ $('#themeBtn').onclick = function () {
 };
 
 /* ---------- 导航 ---------- */
+function scrollPageTop() {
+  // 主屏幕竖屏由 main 滚动；其余布局由文档滚动。
+  $('#main').scrollTop = 0;
+  window.scrollTo(0, 0);
+}
 $('#nav').innerHTML =
   '<div class="nav-brand" aria-hidden="true">' +
   $('#appTitle')
@@ -77,7 +82,7 @@ function show(id, direct) {
   document.querySelectorAll('nav button').forEach(function (b) {
     b.classList.toggle('on', b.getAttribute('data-go') === grp[0]);
   });
-  window.scrollTo(0, 0);
+  scrollPageTop();
   render();
   if (toMus && $('#musWrap')) $('#musWrap').scrollIntoView({ block: 'start' });
   runHooks('show');

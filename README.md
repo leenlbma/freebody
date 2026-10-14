@@ -5,7 +5,7 @@
 <p align="center">AI 健身教练的仪表盘：你和 AI 聊训练与饮食，FreeBody 负责存储和可视化。数据只在你自己的设备上。</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.12.1-2148b8" alt="version 2.12.1">
+<img src="https://img.shields.io/badge/version-2.12.2-2148b8" alt="version 2.12.2">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -103,7 +103,7 @@ FreeBody 是 PWA（渐进式网页应用）：通过 https 地址（如上方 Pa
 
 - **iPhone / iPad（Safari）**：打开网址 → 点底部「分享」按钮 → 选择「添加到主屏幕」→「添加」。之后从主屏幕图标以独立窗口启动、无地址栏。
   - **注意：添加到主屏幕后，数据与 Safari 分开存储。**主屏幕应用打开时是空的，看不到你在 Safari 里记过的数据。如果已经在 Safari 里记录过，请先在 Safari 中打开「我的 › 数据备份」→「导出 JSON」，再到主屏幕应用的同一位置「导入 JSON」。之后固定在一处记录即可。
-  - 如果主屏幕应用底部出现空白条、导航没有贴住屏幕底边，请删除主屏幕图标后重新添加（v2.6.0 修复了 iOS 26 上的布局问题，旧图标可能仍沿用旧配置）。
+  - 如果主屏幕应用底部出现空白条，先更新到 v2.12.2 并完全关闭后重开。此版恢复标准安装声明，并调整主屏幕竖屏布局。旧图标可能保留旧的状态栏配置；若仍有留白，**先在旧图标里导出 JSON 并确认备份文件可用**，再从 Safari 重新添加，必要时导入备份。iOS 27 的最终显示效果仍需真机确认，详见 [设备测试说明](docs/device-test.md)。
 - **Android（Chrome / Edge）**：打开网址 → 右上角菜单 →「安装应用」或「添加到主屏幕」。部分浏览器会在底部自动弹出安装提示。
 - **电脑（Chrome / Edge）**：打开网址 → 地址栏右侧的「安装」图标（或菜单 →「投放、保存和分享 → 将页面作为应用安装」）。安装后在独立窗口运行，可固定到任务栏 / 程序坞。
 

@@ -315,7 +315,7 @@ function startSession(plan) {
   };
   if (!save(true)) return;
   render();
-  window.scrollTo(0, 0);
+  scrollPageTop();
 }
 function newItem(ex, nSets, lo, rest) {
   var nt = nextTarget(ex, nSets),
@@ -784,7 +784,7 @@ function finishSession() {
   if (!save(true)) return;
   toast('训练完成');
   render();
-  window.scrollTo(0, 0);
+  scrollPageTop();
 }
 function tickRest() {
   if (restTimer) return;

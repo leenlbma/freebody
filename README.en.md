@@ -5,7 +5,7 @@
 <p align="center">A dashboard for your AI fitness coach. You talk training and food through with your AI; FreeBody stores it and shows you what it means. Your data never leaves your device.</p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-2.12.1-2148b8" alt="version 2.12.1">
+<img src="https://img.shields.io/badge/version-2.12.2-2148b8" alt="version 2.12.2">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-63666c" alt="MIT"></a>
 <img src="https://img.shields.io/badge/PWA-offline-a9492a" alt="PWA">
 </p>
@@ -123,7 +123,7 @@ Every chart is dependency-free inline SVG. Tap any point to read its value, and 
 
 - **iPhone / iPad (Safari):** open the site, tap Share, choose Add to Home Screen, then Add. It then launches in its own window without the address bar.
   - **Note: once added to the home screen, its data is stored separately from Safari.** The home-screen app starts empty and cannot see what you recorded in Safari. If you have already logged data in Safari, first export it there under 我的 › 数据备份 (Me › Backup) with 导出 JSON (Export JSON), then use 导入 JSON (Import JSON) in the same place in the home-screen app. After that, keep recording in one place.
-  - If the home-screen app shows an empty strip at the bottom and the navigation bar does not sit on the bottom edge, delete the icon and add it again. v2.6.0 fixes this layout issue on iOS 26, but an old icon may keep the old configuration.
+  - If the home-screen app has a bottom gap, update to v2.12.2, fully close it, then reopen. This version restores standard installation metadata and changes the portrait layout. Old icons may retain their installed status-bar configuration. If the gap remains, **export JSON from the old app and verify the backup file first**, then re-add from Safari and import the backup if needed. The final iOS 27 rendering still needs a real device; see the [device checklist](docs/device-test.en.md).
 - **Android (Chrome / Edge):** open the site, then choose Install app or Add to Home screen from the menu. Some browsers also offer it in a banner.
 - **Desktop (Chrome / Edge):** use the install icon at the right of the address bar, or the menu entry for installing the page as an app. It then runs in its own window and can be pinned to the taskbar or Dock.
 

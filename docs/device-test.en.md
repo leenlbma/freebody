@@ -27,7 +27,9 @@ All automated tests run in emulated browsers on Linux (Chromium and WebKit). **T
 | 1.9 | Safari toolbar | Scroll to collapse and expand the toolbar; navigation follows the visible page bottom without an extra gap |
 | 1.10 | Keyboard and resume | Dismiss the keyboard after entering a weight, then background and resume the page; navigation returns to the bottom and all four tabs work |
 
-> If the iOS home-screen app shows an empty strip at the bottom, delete the icon, add it again from Safari and check once more. Note the difference in your report.
+> For an iOS home-screen bottom gap, first update to v2.12.2, fully close and reopen the app. If it persists, export JSON from the old app and verify the backup before removing or re-adding its icon. Reinstall from the updated Safari page, import the backup if needed, and report before/after results. Do not clear website data as a first step.
+
+The old CSS-feature check removed installation metadata on newer iOS builds. v2.12.2 restores it and uses a normal-flow portrait shell with a scrolling main area. [WebKit 316008](https://bugs.webkit.org/show_bug.cgi?id=316008) reports install-time status-bar configuration affecting viewport units; [WebKit 301994](https://bugs.webkit.org/show_bug.cgi?id=301994) tracks a system rendering regression also reported on iOS 27. Neither a matching DOM bottom coordinate nor desktop emulation proves the physical-screen gap is gone.
 
 ## 2. Recording and saving (use an empty environment, not real data)
 

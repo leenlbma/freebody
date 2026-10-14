@@ -23,7 +23,7 @@ npm run build
 npm run test:e2e
 ```
 
-`playwright.config.js` starts a static server with `scripts/serve.js` on 127.0.0.1:8766. Ordinary UI tests block service workers to avoid first-install reloads. `pwa.spec.js` enables a real service worker on an isolated server and verifies offline reloads and confirmed updates preserving records. Home-screen installation and safe areas still need real devices. `viewport.spec.js` injects VisualViewport dimensions, offsets and events to verify iOS Safari navigation positioning, rotation, zoom and fallback paths. It does not reproduce Safari toolbar animations or system compositor defects.
+`playwright.config.js` starts a static server with `scripts/serve.js` on 127.0.0.1:8766. Ordinary UI tests block service workers to avoid first-install reloads. `pwa.spec.js` enables a real service worker on an isolated server and verifies offline reloads and confirmed updates preserving records. Home-screen installation and safe areas still need real devices. `viewport.spec.js` injects VisualViewport dimensions, offsets and events to verify iOS Safari navigation positioning, rotation, zoom and fallback paths. It does not reproduce Safari toolbar animations or system compositor defects. `standalone-layout.spec.js` separately injects CSS viewport sizes and safe areas for home-screen portrait layout, scroll reachability, rotation, saving, reloads and the import action bar. These checks cannot verify iOS installation caches or physical-screen rendering.
 
 **Test data.** Tests that need data use demo mode only (`#demo`: fictional data, in memory) or a few fictional records written inside the test. Each test runs in a fresh browser context that is thrown away afterwards.
 
@@ -42,9 +42,9 @@ npm run test:e2e
 
 Arrays from the sandbox belong to another realm, so spread them (`[...arr]`) before `deepEqual`.
 
-Local validation on 2026-10-14: all 71 unit tests across 9 core test files passed, with 91.91% core line coverage. For v2.12.1, the Chromium project ran through the locally installed Chrome channel: all 45 cases passed, with about 71.4% app-script character coverage. New custom-food and recipe regression tests verify that failed saves retain inputs, retries persist exactly one record, and the saved record survives a reload. Coverage aggregation includes executions before and after page reloads.
+Local validation on 2026-10-14: all 71 unit tests across 9 core test files passed, with 91.91% core line coverage. For v2.12.2, the Chromium project ran through the locally installed Chrome channel: all 48 cases passed, with about 70.5% app-script character coverage. New custom-food and recipe regression tests verify that failed saves retain inputs, retries persist exactly one record, and the saved record survives a reload. Coverage aggregation includes executions before and after page reloads.
 
-WebKit and real iOS devices were not tested in this run. The full two-engine matrix contains 90 cases, including 2 existing axe scans explicitly skipped on WebKit.
+The local run uses Chrome; WebKit runs in CI, and iOS still needs a real-device check. The full two-engine matrix contains 96 cases, including 2 existing axe scans explicitly skipped on WebKit.
 
 ## Known limits
 
