@@ -85,7 +85,7 @@ test('演示模式不读取、导出或清空真实恢复点', async ({ page }) 
   await page.locator('#bW').fill('70');
   await page.locator('#bSave').click();
   await history(page);
-  await page.locator('#demoBtn').click();
+  await Promise.all([page.waitForEvent('load'), page.locator('#demoBtn').click()]);
   await expect(page).toHaveURL(/#demo$/);
   await openSection(page, 'settings');
   await page.locator('#historyCard').evaluate((el) => {
@@ -94,7 +94,7 @@ test('演示模式不读取、导出或清空真实恢复点', async ({ page }) 
   await expect(page.locator('#historyList')).toContainText('演示模式');
   await expect(page.locator('#historyClear')).toBeDisabled();
   await expect(page.locator('[data-history-export]')).toHaveCount(0);
-  await page.locator('#stBanner [data-st=exitdemo]').click();
+  await Promise.all([page.waitForEvent('load'), page.locator('#stBanner [data-st=exitdemo]').click()]);
   await expect(page).not.toHaveURL(/#demo$/);
   await history(page);
 });

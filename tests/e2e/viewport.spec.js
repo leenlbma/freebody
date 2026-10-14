@@ -4,6 +4,8 @@ const { test, expect } = require('./fixtures');
 const { openSection, watchErrors } = require('./helpers');
 
 async function viewportFixture(page, { ios = true, standalone = false, available = true } = {}) {
+  // iPhone 13 项目默认可见高度是 664px（屏幕高度 844px）；统一容器后再注入视口变化。
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(
     ({ ios, standalone, available }) => {
       Object.defineProperty(navigator, 'userAgent', {
