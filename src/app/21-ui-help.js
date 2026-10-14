@@ -133,13 +133,26 @@ function selfChecks(done) {
   );
   var nav = $('#nav'),
     nb = nav ? Math.round(nav.getBoundingClientRect().bottom) : 0,
-    vh = innerHeight;
+    vv = window.visualViewport,
+    vh = de.classList.contains('browser-viewport') && vv ? Math.round(vv.offsetTop + vv.height) : innerHeight;
+  if (vv)
+    add(
+      '可见视口',
+      'info',
+      Math.round(vv.width) +
+        '×' +
+        Math.round(vv.height) +
+        ' · 顶部偏移 ' +
+        Math.round(vv.offsetTop) +
+        ' · 缩放 ' +
+        vv.scale
+    );
   if (nav && getComputedStyle(nav).position === 'fixed' && innerWidth < 600)
     add(
-      '底部导航贴底',
+      '底部导航布局',
       Math.abs(nb - vh) <= 1 ? 'ok' : 'bad',
-      Math.abs(nb - vh) <= 1 ? '是' : '导航底边 ' + nb + ' px，视口 ' + vh + ' px',
-      '若不贴底，请删除主屏幕图标后重新添加，并在 issue 中附上本报告'
+      '导航底边 ' + nb + ' px，视口底边 ' + vh + ' px',
+      '此项只检查页面内坐标，不能确认系统绘制的黑边。若仍有留白，请附截图、iOS 版本与本报告'
     );
   add(
     'dvh 视口单位',

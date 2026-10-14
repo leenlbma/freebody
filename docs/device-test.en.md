@@ -24,6 +24,8 @@ All automated tests run in emulated browsers on Linux (Chromium and WebKit). **T
 | 1.6 | Import preview | The confirm bar sits above the navigation and does not hide the last item |
 | 1.7 | Dark mode | The page follows the system; all text stays readable |
 | 1.8 | Largest text size | Button labels are not cut off or overlapping |
+| 1.9 | Safari toolbar | Scroll to collapse and expand the toolbar; navigation follows the visible page bottom without an extra gap |
+| 1.10 | Keyboard and resume | Dismiss the keyboard after entering a weight, then background and resume the page; navigation returns to the bottom and all four tabs work |
 
 > If the iOS home-screen app shows an empty strip at the bottom, delete the icon, add it again from Safari and check once more. Note the difference in your report.
 

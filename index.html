@@ -683,6 +683,11 @@ body{min-height:100vh;min-height:-webkit-fill-available;min-height:100dvh}
  body{padding-bottom:calc(96px + max(env(safe-area-inset-bottom),12px))}
  .imp-bar{bottom:calc(max(env(safe-area-inset-bottom),12px) + 72px)}
 }
+/* iOS Safari 竖屏：按 visualViewport 从顶部定位，避开工具栏收起后的旧 bottom 锚点。
+   Home 指示条的间距仍由 nav 的 safe-area padding 提供，不重复加到坐标上。 */
+@media(max-width:1024px) and (orientation:portrait){
+ html.ios.browser-viewport nav{top:calc(var(--nav-viewport-bottom) - var(--nav-height));bottom:auto}
+}
 /* 禁用状态与主按钮区分更明显：灰底 + 次要文字，而不是只降低透明度 */
 button:disabled,button:disabled:hover{background:var(--in)!important;color:var(--mut)!important;border-color:var(--bd)!important;opacity:1;box-shadow:none}
 /* ===== v2.6 存储状态与提示条 ===== */
@@ -2403,12 +2408,12 @@ window.FIT_DATA = {"foods":{"version":4,"per":"100g","note":"常见食物每100g
  * FreeBody — 应用脚本（由 scripts/build.js 从 src/app/*.js 合并）
  * 单页离线健身记录：饮食 / 训练 / 补剂 / 睡眠 / 身体指标 / 激素与恢复 / 伤病与限制
  * 数据仅存于浏览器 localStorage（键：freeBody_v1，自动从旧键 fitTracker_v1 迁移），可导出/导入 JSON。
- * 模块：00-core.js、01-store.js、02-util.js、03-calc.js、03-evidence.js、04-import.js、05-demo.js、06-crypto.js、07-vault.js、08-state.js、09-init.js、10-ui-shell.js、11-ui-today.js、12-ui-diet.js、13-ui-train.js、14-ui-records.js、15-ui-charts.js、16-ui-session.js、17-ui-quick.js、18-ui-settings.js、19-ui-ai.js、20-ui-import.js、21-ui-help.js、22-ui-history.js、23-ui-coach.js、90-boot.js
+ * 模块：00-core.js、01-store.js、02-util.js、03-calc.js、03-evidence.js、04-import.js、05-demo.js、06-crypto.js、07-vault.js、08-state.js、09-init.js、10-ui-shell.js、11-ui-today.js、12-ui-diet.js、13-ui-train.js、14-ui-records.js、15-ui-charts.js、16-ui-session.js、17-ui-quick.js、18-ui-settings.js、19-ui-ai.js、20-ui-import.js、21-ui-help.js、22-ui-history.js、22-viewport.js、23-ui-coach.js、90-boot.js
  * 本项目不提供医疗建议。SPDX-License-Identifier: MIT · https://github.com/leenlbma/freebody
  */
 (function(){
 'use strict';
-var FB_VERSION = "2.12.0";
+var FB_VERSION = "2.12.1";
 /* 00-core.js — 常量、导航配置、预设 */
 /** localStorage 键名；LEGACY_KEYS 用于从旧版本自动迁移 */
 var KEY = 'freeBody_v1',
@@ -12907,13 +12912,26 @@ function selfChecks(done) {
   );
   var nav = $('#nav'),
     nb = nav ? Math.round(nav.getBoundingClientRect().bottom) : 0,
-    vh = innerHeight;
+    vv = window.visualViewport,
+    vh = de.classList.contains('browser-viewport') && vv ? Math.round(vv.offsetTop + vv.height) : innerHeight;
+  if (vv)
+    add(
+      '可见视口',
+      'info',
+      Math.round(vv.width) +
+        '×' +
+        Math.round(vv.height) +
+        ' · 顶部偏移 ' +
+        Math.round(vv.offsetTop) +
+        ' · 缩放 ' +
+        vv.scale
+    );
   if (nav && getComputedStyle(nav).position === 'fixed' && innerWidth < 600)
     add(
-      '底部导航贴底',
+      '底部导航布局',
       Math.abs(nb - vh) <= 1 ? 'ok' : 'bad',
-      Math.abs(nb - vh) <= 1 ? '是' : '导航底边 ' + nb + ' px，视口 ' + vh + ' px',
-      '若不贴底，请删除主屏幕图标后重新添加，并在 issue 中附上本报告'
+      '导航底边 ' + nb + ' px，视口底边 ' + vh + ' px',
+      '此项只检查页面内坐标，不能确认系统绘制的黑边。若仍有留白，请附截图、iOS 版本与本报告'
     );
   add(
     'dvh 视口单位',
@@ -13181,6 +13199,35 @@ document.addEventListener('click', function (e) {
       toast(error.message);
     });
 });
+/* 22-viewport.js — iOS 浏览器工具栏变化时，底栏跟随可见视口 */
+(function () {
+  var root = document.documentElement,
+    viewport = window.visualViewport,
+    nav = $('#nav');
+  if (!root.classList.contains('ios') || root.classList.contains('standalone') || !viewport || !nav) return;
+  var frame = 0;
+  function sync() {
+    frame = 0;
+    // 缩放时交还浏览器处理，避免放大后的导航追着视口移动、挡住内容。
+    var enabled = Math.abs(viewport.scale - 1) < 0.01 && viewport.height > 0;
+    root.classList.toggle('browser-viewport', enabled);
+    if (!enabled) return;
+    // 不依赖 fixed 的 bottom 锚点：Safari 收起工具栏后可能仍沿用旧的底边。
+    root.style.setProperty('--nav-viewport-bottom', viewport.offsetTop + viewport.height + 'px');
+    root.style.setProperty('--nav-height', nav.offsetHeight + 'px');
+  }
+  function schedule() {
+    if (!frame) frame = requestAnimationFrame(sync);
+  }
+  viewport.addEventListener('resize', schedule);
+  viewport.addEventListener('scroll', schedule);
+  window.addEventListener('resize', schedule);
+  window.addEventListener('pageshow', schedule);
+  document.addEventListener('visibilitychange', schedule);
+  // 安全区、字体与导航内容变化后重新测量，避免写死底栏高度。
+  if (window.ResizeObserver) new ResizeObserver(schedule).observe(nav);
+  sync();
+})();
 /* 23-ui-coach.js — 教练提示词：应用内复制、拒绝剪贴板时保留手动路径 */
 var COACH_PROMPT = (window.FIT_DATA && window.FIT_DATA.coachPrompt) || '';
 $('#coachPrompt').value = COACH_PROMPT;

@@ -1,6 +1,6 @@
 {
   "name": "freebody",
-  "version": "2.12.0",
+  "version": "2.12.1",
   "description": "FreeBody：AI 健身教练的仪表盘。离线单文件的训练、饮食、睡眠与身体指标记录与可视化；记录与恢复点只存本机，支持 AI 生成的导入包。",
   "license": "MIT",
   "private": true,

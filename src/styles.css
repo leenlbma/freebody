@@ -655,6 +655,11 @@ body{min-height:100vh;min-height:-webkit-fill-available;min-height:100dvh}
  body{padding-bottom:calc(96px + max(env(safe-area-inset-bottom),12px))}
  .imp-bar{bottom:calc(max(env(safe-area-inset-bottom),12px) + 72px)}
 }
+/* iOS Safari 竖屏：按 visualViewport 从顶部定位，避开工具栏收起后的旧 bottom 锚点。
+   Home 指示条的间距仍由 nav 的 safe-area padding 提供，不重复加到坐标上。 */
+@media(max-width:1024px) and (orientation:portrait){
+ html.ios.browser-viewport nav{top:calc(var(--nav-viewport-bottom) - var(--nav-height));bottom:auto}
+}
 /* 禁用状态与主按钮区分更明显：灰底 + 次要文字，而不是只降低透明度 */
 button:disabled,button:disabled:hover{background:var(--in)!important;color:var(--mut)!important;border-color:var(--bd)!important;opacity:1;box-shadow:none}
 /* ===== v2.6 存储状态与提示条 ===== */
